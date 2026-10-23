@@ -46,7 +46,15 @@
     "gmail_connected_email": "",
     "gmail_connected": false,
     "demo_mode_active": true,
-    "updated_at": "2026-10-23T20:27:49.206Z"
+    "updated_at": "2026-10-23T20:35:36.107Z",
+    "apollo_configured": false,
+    "gemini_configured": true,
+    "apollo_api_key": "",
+    "llm_api_key": "",
+    "search_api_key": "",
+    "gmail_client_secret": "",
+    "gmail_refresh_token": "",
+    "n8n_webhook_secret": ""
   },
   "companies": [
     {
@@ -820,6 +828,23 @@
   ],
   "workflowExecutions": [
     {
+      "id": "exec-1792787591084",
+      "started_at": "2026-10-23T20:33:11.090Z",
+      "current_stage": "human_approval",
+      "status": "AWAITING_APPROVAL",
+      "summary": "Workflow paused at Stage 4 (Human Approval Gate). 11 leads pending human review. Only approved leads will proceed to email generation.",
+      "stats": {
+        "companies_found": 7,
+        "leads_identified": 12,
+        "leads_enriched": 5,
+        "pending_approvals": 11,
+        "approved_leads": 1,
+        "rejected_leads": 0,
+        "drafts_created": 0,
+        "workflow_errors": 0
+      }
+    },
+    {
       "id": "exec-1792787275887",
       "started_at": "2026-10-23T20:27:55.894Z",
       "current_stage": "human_approval",
@@ -872,6 +897,142 @@
     }
   ],
   "workflowLogs": [
+    {
+      "id": "log-1792787591469-nd5t",
+      "execution_id": "exec-1792787591084",
+      "stage": "human_approval",
+      "level": "info",
+      "message": "Pipeline halted at Human Approval Gate. 11 leads require review before sequence generation. Pending leads will NOT generate email drafts.",
+      "timestamp": "2026-10-23T20:33:11.469Z"
+    },
+    {
+      "id": "log-1792787591436-p6ua",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "success",
+      "message": "Completed enrichment for 5 leads with verified evidence citations.",
+      "timestamp": "2026-10-23T20:33:11.436Z"
+    },
+    {
+      "id": "log-1792787591397-bjkh",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Quinn Newhall (Clean Eatz). Confidence Score: 70/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:33:11.397Z"
+    },
+    {
+      "id": "log-1792787591367-aulb",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Jonathan Aguirre (WaBa Grill). Confidence Score: 70/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:33:11.367Z"
+    },
+    {
+      "id": "log-1792787591341-fjf5",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Chris Schultz (Velvet Taco). Confidence Score: 85/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:33:11.341Z"
+    },
+    {
+      "id": "log-1792787591321-srt7",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Lance Juhas (Piada Italian Street Food). Confidence Score: 90/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:33:11.321Z"
+    },
+    {
+      "id": "log-1792787591301-d25t",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: John Ishmael (Taziki's Mediterranean Cafe). Confidence Score: 90/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:33:11.301Z"
+    },
+    {
+      "id": "log-1792787591272-2qha",
+      "execution_id": "exec-1792787591084",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Running evidence-backed enrichment engine across leads. Verifying location counts, operational challenges, buying signals, and sources.",
+      "timestamp": "2026-10-23T20:33:11.272Z"
+    },
+    {
+      "id": "log-1792787591266-ttrh",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "success",
+      "message": "Lead search phase complete. Total active leads in system: 12.",
+      "timestamp": "2026-10-23T20:33:11.266Z"
+    },
+    {
+      "id": "log-1792787591251-m4zp",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 1 decision makers for Clean Eatz (0 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:33:11.251Z"
+    },
+    {
+      "id": "log-1792787591219-y0j3",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for WaBa Grill (0 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:33:11.219Z"
+    },
+    {
+      "id": "log-1792787591193-vb7g",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 1 decision makers for Velvet Taco (0 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:33:11.193Z"
+    },
+    {
+      "id": "log-1792787591169-xt42",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for Piada Italian Street Food (0 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:33:11.169Z"
+    },
+    {
+      "id": "log-1792787591149-gvs9",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for Taziki's Mediterranean Cafe (0 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:33:11.149Z"
+    },
+    {
+      "id": "log-1792787591125-zf95",
+      "execution_id": "exec-1792787591084",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identifying decision-makers for companies. Target roles: Chief Operating Officer, COO, VP of Operations, Director of Operations, Head of Guest Experience, VP of Customer Experience.",
+      "timestamp": "2026-10-23T20:33:11.125Z"
+    },
+    {
+      "id": "log-1792787591118-d95w",
+      "execution_id": "exec-1792787591084",
+      "stage": "company_search",
+      "level": "success",
+      "message": "Discovered 6 companies (0 new records ingested, 6 deduplicated). Provenance: real_public_web",
+      "timestamp": "2026-10-23T20:33:11.118Z"
+    },
+    {
+      "id": "log-1792787591099-uggs",
+      "execution_id": "exec-1792787591084",
+      "stage": "company_search",
+      "level": "info",
+      "message": "Beginning Company Search using public_web. Target ICP: US QSR / Fast-Casual chains (20-200 units).",
+      "timestamp": "2026-10-23T20:33:11.099Z"
+    },
     {
       "id": "log-1792787276166-0v18",
       "execution_id": "exec-1792787275887",
