@@ -3,7 +3,25 @@ import { Store } from '@/lib/storage';
 import { ApprovalGate } from '@/lib/approvals/gate';
 import { EmailDraftRecord, IntegrationSettings } from '@/types';
 
+export class UnsafeEmailRecipientError extends Error {
+  constructor(recipient: string, allowedInbox: string) {
+    super(`CRITICAL EMAIL SAFETY VIOLATION: Refusing to create Gmail draft addressed to prospect (${recipient}). Compliance rules strictly require all Gmail drafts to be sent ONLY to the verified test inbox (${allowedInbox}). Direct prospect outreach is strictly prohibited.`);
+    this.name = 'UnsafeEmailRecipientError';
+  }
+}
+
 export class GmailIntegrationService {
+  /**
+   * Verifies that the recipient email matches the authorized operator/test inbox.
+   */
+  static assertSafeRecipient(toEmail: string, allowedInbox: string): void {
+    const cleanTo = (toEmail || '').toLowerCase().trim();
+    const cleanAllowed = (allowedInbox || '').toLowerCase().trim();
+    if (!cleanTo || cleanTo !== cleanAllowed) {
+      throw new UnsafeEmailRecipientError(toEmail, allowedInbox);
+    }
+  }
+
   /**
    * Generates Google OAuth 2.0 authorization URL for Gmail compose/drafts scope.
    * Includes CSRF-protecting state parameter.
@@ -115,8 +133,12 @@ export class GmailIntegrationService {
     toEmail: string,
     toName: string,
     subject: string,
-    bodyText: string
+    bodyText: string,
+    authorizedInbox?: string
   ): Promise<string> {
+    const allowed = (authorizedInbox || process.env.USER_INBOX || process.env.TEST_INBOX || 'amaymishra1104@gmail.com').toLowerCase().trim();
+    this.assertSafeRecipient(toEmail, allowed);
+
     // Build RFC 2822 MIME message
     const formattedSubject = subject.replace(/[\r\n]/g, '');
     const rawMessage = [
@@ -190,11 +212,10 @@ export class GmailIntegrationService {
       }
     }
 
-    // SAFETY GUARANTEE: Never invent fake emails; send drafts to user's authorized inbox
-    const authorizedUserInbox = settings.gmail_connected_email || process.env.USER_INBOX || 'amaymishra1104@gmail.com';
-    const recipientEmail = (contact.work_email && contact.work_email !== 'unavailable' && !contact.work_email.includes('.demo'))
-      ? contact.work_email
-      : authorizedUserInbox;
+    // SAFETY GUARANTEE: Never send drafts to real prospect addresses.
+    // All Gmail API drafts MUST be sent strictly to the operator's authorized test inbox!
+    const authorizedUserInbox = (settings.gmail_connected_email || process.env.USER_INBOX || process.env.TEST_INBOX || 'amaymishra1104@gmail.com').toLowerCase().trim();
+    const recipientEmail = authorizedUserInbox;
 
     const draftRecords: EmailDraftRecord[] = [];
     let gmailAccessToken = '';
@@ -250,7 +271,8 @@ export class GmailIntegrationService {
             recipientEmail,
             contact.full_name,
             email.subject,
-            email.body
+            email.body,
+            authorizedUserInbox
           );
           createdInGmail = true;
         } catch (err: any) {

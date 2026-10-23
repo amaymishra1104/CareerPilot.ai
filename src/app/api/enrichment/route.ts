@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { leadId } = body;
+    const { leadId, forceRefresh } = body;
 
     if (!leadId) {
       return NextResponse.json({ error: 'leadId is required.' }, { status: 400 });
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     }
 
     const settings = Store.getSettings();
-    const enrichment = await EnrichmentEngine.enrichLead(contact, company, settings);
+    const enrichment = await EnrichmentEngine.enrichLead(contact, company, settings, { forceRefresh: Boolean(forceRefresh) });
     Store.saveEnrichment(enrichment);
 
     return NextResponse.json({

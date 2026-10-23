@@ -1,4 +1,4 @@
-export type Provenance = 'live' | 'manually_sourced' | 'real_curated' | 'demo';
+export type Provenance = 'live' | 'manually_sourced' | 'real_curated' | 'real_public_web' | 'csv_imported' | 'demo';
 
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -204,7 +204,7 @@ export interface IntegrationSettings {
   llm_api_key?: string;
   gemini_api_key?: string;
   llm_model?: string;
-  search_provider: 'apollo' | 'perplexity' | 'hunter' | 'mock_demo';
+  search_provider: 'apollo' | 'public_web' | 'csv' | 'perplexity' | 'hunter' | 'mock_demo';
   search_api_key?: string;
   apollo_api_key?: string;
   gmail_client_id?: string;

@@ -12,12 +12,16 @@ import {
   ApolloMissingApiKeyError, 
   ApolloAuthenticationError, 
   ApolloRateLimitError, 
-  ApolloCreditExhaustedError 
+  ApolloCreditExhaustedError,
+  ApolloPlanRestrictedError
 } from '../src/lib/providers/apollo-provider';
 import { LiveSearchProvider } from '../src/lib/providers/live-provider';
+import { PublicSourceDiscoveryProvider } from '../src/lib/providers/public-source-provider';
 import { GeminiService } from '../src/lib/enrichment/gemini';
+import { EnrichmentEngine } from '../src/lib/enrichment/enricher';
 import { ApprovalGate } from '../src/lib/approvals/gate';
 import { EmailSequenceGenerator } from '../src/lib/sequences/generator';
+import { GmailIntegrationService, UnsafeEmailRecipientError } from '../src/lib/integrations/gmail';
 import { WorkflowRunner } from '../src/lib/workflow/runner';
 import { ICPConfig, Company, Contact, EnrichmentRecord } from '../src/types';
 
@@ -394,6 +398,160 @@ describe('Apollo.io & Google Gemini GTM Integration Test Suite', () => {
       expect(sequence.emails.length).toBe(4);
       expect(sequence.emails[0].personalization_lines.length).toBeGreaterThan(0);
       expect(sequence.emails[0].evidence_references.length).toBeGreaterThan(0);
+    });
+  });
+
+  // 7. Apollo Plan Limitation (HTTP 403) Handling
+  describe('Apollo Plan Tier Discrimination (HTTP 403 Free vs Paid)', () => {
+    it('throws ApolloPlanRestrictedError when Apollo returns HTTP 403 for Free plan search access', async () => {
+      vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+        new Response(JSON.stringify({ 
+          error: 'The api/v1/mixed_companies/search API is not included in your Free plan and is not accessible. All paid plans include full API access. Upgrade your plan from https://www.apollo.io/pricing' 
+        }), {
+          status: 403,
+          statusText: 'Forbidden'
+        })
+      );
+
+      const provider = new ApolloSearchProvider('free-key-xyz');
+      await expect(provider.searchCompanies({}, dummyIcp)).rejects.toThrow(ApolloPlanRestrictedError);
+    });
+  });
+
+  // 8. Real Public-Source Company & Decision-Maker Discovery
+  describe('Real Public-Source Discovery Provider (Permitted Web Sources)', () => {
+    it('discovers genuine US restaurant chains with valid source URLs and verified unit counts', async () => {
+      const provider = new PublicSourceDiscoveryProvider();
+      const res = await provider.searchCompanies({ query: "Taziki's" }, dummyIcp);
+      expect(res.companies.length).toBeGreaterThan(0);
+      const tazikis = res.companies[0];
+      expect(tazikis.name).toContain("Taziki's");
+      expect(tazikis.estimated_locations).toBe(100);
+      expect(tazikis.source_urls.length).toBeGreaterThan(0);
+      expect(tazikis.source_urls[0]).toMatch(/^https?:\/\//);
+      expect(tazikis.provenance).toBe('real_public_web');
+    });
+
+    it('discovers real decision-makers with confirmed company association', async () => {
+      const provider = new PublicSourceDiscoveryProvider();
+      const res = await provider.searchContacts('pub-comp-tazikis-01', "Taziki's Mediterranean Cafe", ['Chief Operating Officer']);
+      expect(res.contacts.length).toBeGreaterThan(0);
+      const coo = res.contacts.find(c => c.job_title === 'Chief Operating Officer');
+      expect(coo).toBeDefined();
+      expect(coo?.full_name).toBe('John Ishmael');
+      expect(coo?.is_company_verified).toBe(true);
+      expect(coo?.source_url).toContain('nrn.com');
+      expect(coo?.work_email).toBe('unavailable'); // Never fabricates emails
+    });
+
+    it('returns empty array when search query matches zero records (no hallucinations)', async () => {
+      const provider = new PublicSourceDiscoveryProvider();
+      const res = await provider.searchCompanies({ query: 'NonExistentRestaurantBrand999' }, dummyIcp);
+      expect(res.companies.length).toBe(0);
+      expect(res.provenance).toBe('real_public_web');
+    });
+  });
+
+  // 9. Strict Email Safety & Recipient Guardrails
+  describe('Strict Email Safety & Recipient Guardrails', () => {
+    it('strictly forbids creating Gmail drafts addressed to real prospects', () => {
+      expect(() => {
+        GmailIntegrationService.assertSafeRecipient('john.ishmael@tazikis.com', 'amaymishra1104@gmail.com');
+      }).toThrow(UnsafeEmailRecipientError);
+    });
+
+    it('allows Gmail draft creation ONLY when addressed to verified operator inbox', () => {
+      expect(() => {
+        GmailIntegrationService.assertSafeRecipient('amaymishra1104@gmail.com', 'amaymishra1104@gmail.com');
+      }).not.toThrow();
+    });
+
+    it('verifies that no messages.send or drafts.send API calls exist in the entire codebase', () => {
+      const srcDir = path.resolve(__dirname, '../src');
+      const allFiles = fs.readdirSync(srcDir, { recursive: true }) as string[];
+      for (const f of allFiles) {
+        if (typeof f === 'string' && (f.endsWith('.ts') || f.endsWith('.tsx'))) {
+          const fullPath = path.join(srcDir, f);
+          const content = fs.readFileSync(fullPath, 'utf-8');
+          expect(content).not.toContain('messages/send');
+          expect(content).not.toContain('drafts/send');
+        }
+      }
+    });
+  });
+
+  // 10. Genuine Google Gemini LLM Sequence Generation
+  describe('Google Gemini LLM Sequence Generation', () => {
+    it('executes generateSequenceWithLLM and produces evidence-grounded copy with citations', async () => {
+      const approved = Store.getContactById('lead-john-01')!;
+      const company = Store.getCompanyById(approved.company_id)!;
+      const enrichment = Store.getEnrichmentByLeadId(approved.id)!;
+
+      vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+        new Response(JSON.stringify({
+          candidates: [{
+            content: {
+              parts: [{
+                text: JSON.stringify({
+                  emails: [
+                    {
+                      sequence_step: 1,
+                      day_offset: 1,
+                      step_title: 'Introduction & Tailored Operational Angle',
+                      subject: "Multi-store execution across Taziki's 100 locations",
+                      body: "Hi John,\n\nI noticed Taziki's operational growth across 100 units...",
+                      personalization_lines: ["I noticed Taziki's operational growth across 100 units"],
+                      evidence_references: ["100 locations across 16 states"]
+                    },
+                    {
+                      sequence_step: 2,
+                      day_offset: 4,
+                      step_title: "Case Study Proof: Domino's India Multi-Agent Scale",
+                      subject: "Case study: Multi-agent coordination for store managers",
+                      body: "Hi John,\n\nFollowing up on our work with Domino's India...",
+                      personalization_lines: ["Following up on our work with Domino's India"],
+                      evidence_references: ["Domino's India 3x chat conversion"]
+                    },
+                    {
+                      sequence_step: 3,
+                      day_offset: 8,
+                      step_title: 'Thoughtful Diagnostic Question',
+                      subject: 'Question on multi-day inquiry handoffs',
+                      body: 'Hi John,\n\nHow do store managers track guest follow-ups?',
+                      personalization_lines: ['How do store managers track guest follow-ups?'],
+                      evidence_references: ['Multi-unit operations']
+                    },
+                    {
+                      sequence_step: 4,
+                      day_offset: 13,
+                      step_title: 'Polite Close-the-Loop',
+                      subject: 'Closing the loop on Journey orchestration',
+                      body: 'Hi John,\n\nWanted to close the loop if this is not a current priority.',
+                      personalization_lines: ['Wanted to close the loop'],
+                      evidence_references: ['Executive signoff']
+                    }
+                  ]
+                })
+              }]
+            }
+          }]
+        }), { status: 200 })
+      );
+
+      const seq = await EmailSequenceGenerator.generateSequenceWithLLM(approved, company, enrichment, {
+        id: 'test',
+        llm_provider: 'gemini',
+        gemini_api_key: 'test-gemini-key',
+        search_provider: 'apollo',
+        demo_mode_active: false,
+        n8n_webhook_secret: '',
+        gmail_connected: false,
+        updated_at: ''
+      });
+
+      expect(seq.emails).toHaveLength(4);
+      expect(seq.emails[0].subject).toContain("Taziki's");
+      expect(seq.emails[0].personalization_lines.length).toBeGreaterThan(0);
     });
   });
 });

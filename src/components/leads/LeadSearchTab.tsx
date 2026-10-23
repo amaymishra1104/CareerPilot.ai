@@ -241,11 +241,16 @@ export function LeadSearchTab({
                     <td className="py-3 px-4">
                       <div className="flex flex-col items-start gap-0.5">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          lead.provenance === 'live' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' :
-                          lead.provenance === 'manually_sourced' ? 'bg-indigo-500/15 text-indigo-300' :
+                          lead.source_provider === 'apollo' || lead.provenance === 'live' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' :
+                          lead.source_provider === 'public_web' || lead.provenance === 'real_public_web' ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30' :
+                          lead.provenance === 'csv_imported' || lead.provenance === 'manually_sourced' ? 'bg-indigo-500/15 text-indigo-300' :
+                          lead.provenance === 'real_curated' ? 'bg-blue-500/15 text-blue-300' :
                           'bg-amber-500/15 text-amber-300'
                         }`}>
-                          {lead.source_provider === 'apollo' ? 'APOLLO LIVE' : lead.provenance.toUpperCase()}
+                          {lead.source_provider === 'apollo' || lead.provenance === 'live' ? 'APOLLO LIVE' :
+                           lead.source_provider === 'public_web' || lead.provenance === 'real_public_web' ? 'PUBLIC WEB' :
+                           lead.provenance === 'csv_imported' || lead.provenance === 'manually_sourced' ? 'IMPORTED CSV' :
+                           lead.provenance === 'real_curated' ? 'CURATED' : 'DEMO DATA'}
                         </span>
                         {lead.provider_person_id && (
                           <span className="text-[9px] font-mono text-slate-400">

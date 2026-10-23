@@ -39,21 +39,14 @@
   "settings": {
     "id": "default",
     "llm_provider": "gemini",
-    "llm_api_key": "",
     "llm_model": "gemini-3.5-flash",
-    "search_provider": "apollo",
-    "search_api_key": "",
+    "search_provider": "public_web",
     "gmail_client_id": "",
-    "gmail_client_secret": "",
     "gmail_redirect_uri": "http://localhost:3000/api/auth/gmail/callback",
-    "gmail_refresh_token": "",
     "gmail_connected_email": "",
     "gmail_connected": false,
-    "n8n_webhook_secret": "",
     "demo_mode_active": true,
-    "updated_at": "2026-10-23T20:00:52.486Z",
-    "gemini_api_key": "",
-    "apollo_api_key": ""
+    "updated_at": "2026-10-23T20:27:49.206Z"
   },
   "companies": [
     {
@@ -163,6 +156,60 @@
       "retrieval_timestamp": "2026-04-20T12:00:00Z",
       "provenance": "real_curated",
       "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    {
+      "id": "pub-comp-tmad-04",
+      "name": "Teriyaki Madness",
+      "website": "https://teriyakimadness.com/",
+      "industry": "Fast-casual Asian bowl chains",
+      "headquarters": "Denver, CO",
+      "estimated_locations": 150,
+      "company_size": "150+ locations across 35 states",
+      "description": "Fast-growing Asian-inspired teriyaki bowl franchise with over 150 stores, recognized in Inc. 5000 and Fast Casual Top 100 Movers & Shakers.",
+      "provider_company_id": "pub-comp-tmad-04",
+      "source_provider": "public_web",
+      "location_count_status": "verified",
+      "restaurant_category": "fast-casual",
+      "buying_signals": [
+        "rapid national franchise expansion aiming for 200+ units",
+        "store-level tech modernization and third-party delivery aggregation",
+        "kitchen throughput acceleration initiatives"
+      ],
+      "source_urls": [
+        "https://teriyakimadness.com/about/",
+        "https://franchise.teriyakimadness.com/",
+        "https://www.qsrmagazine.com/growth/teriyaki-madness-surpasses-150-open-locations/"
+      ],
+      "retrieval_timestamp": "2026-10-23T20:27:55.916Z",
+      "provenance": "real_public_web",
+      "created_at": "2026-10-23T20:27:55.916Z"
+    },
+    {
+      "id": "pub-comp-starbird-05",
+      "name": "Starbird Chicken",
+      "website": "https://www.starbirdchicken.com/",
+      "industry": "Fast-casual specialty chicken & digital-first QSR",
+      "headquarters": "San Francisco, CA",
+      "estimated_locations": 25,
+      "company_size": "~25 locations across California",
+      "description": "Tech-enabled super-premium fried chicken brand founded by The Culinary Edge, pioneering autonomous order kiosks and multi-brand virtual kitchens.",
+      "provider_company_id": "pub-comp-starbird-05",
+      "source_provider": "public_web",
+      "location_count_status": "verified",
+      "restaurant_category": "fast-casual",
+      "buying_signals": [
+        "autonomous in-store ordering kiosk deployment across Bay Area and Southern CA",
+        "virtual brand multi-concept kitchen routing optimization",
+        "expansion from 15 to 25+ locations with multi-lane mobile order pickup"
+      ],
+      "source_urls": [
+        "https://www.starbirdchicken.com/",
+        "https://www.qsrmagazine.com/fast-casual/starbird-expands-footprint-california/",
+        "https://www.nrn.com/fast-casual/starbird-names-new-leadership"
+      ],
+      "retrieval_timestamp": "2026-10-23T20:27:55.916Z",
+      "provenance": "real_public_web",
+      "created_at": "2026-10-23T20:27:55.916Z"
     }
   ],
   "contacts": [
@@ -243,6 +290,139 @@
       "provenance": "real_curated",
       "approval_status": "PENDING",
       "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    {
+      "id": "pub-contact-tazikis-02",
+      "company_id": "pub-comp-tazikis-01",
+      "company_name": "Taziki's Mediterranean Cafe",
+      "full_name": "Dan Simpson",
+      "job_title": "Chief Executive Officer",
+      "professional_profile_url": "https://www.linkedin.com/in/dan-simpson-tazikis",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-tazikis-02",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://www.tazikis.com/our-story",
+      "source_url": "https://www.tazikis.com/our-story",
+      "retrieval_timestamp": "2026-10-23T20:27:55.967Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:55.967Z"
+    },
+    {
+      "id": "pub-contact-piada-01",
+      "company_id": "pub-comp-piada-03",
+      "company_name": "Piada Italian Street Food",
+      "full_name": "Matt Eisenacher",
+      "job_title": "Chief Brand & Growth Officer",
+      "professional_profile_url": "https://www.linkedin.com/in/matteisenacher",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-piada-01",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://mypiada.com/newsroom",
+      "source_url": "https://mypiada.com/newsroom",
+      "retrieval_timestamp": "2026-10-23T20:27:55.982Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:55.982Z"
+    },
+    {
+      "id": "pub-contact-piada-02",
+      "company_id": "pub-comp-piada-03",
+      "company_name": "Piada Italian Street Food",
+      "full_name": "Jason Bailin",
+      "job_title": "VP of Operations",
+      "professional_profile_url": "https://www.linkedin.com/in/jason-bailin-restaurant-ops",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-piada-02",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://mypiada.com/newsroom",
+      "source_url": "https://mypiada.com/newsroom",
+      "retrieval_timestamp": "2026-10-23T20:27:55.982Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:55.982Z"
+    },
+    {
+      "id": "pub-contact-velvet-01",
+      "company_id": "pub-comp-velvet-07",
+      "company_name": "Velvet Taco",
+      "full_name": "Clay Dover",
+      "job_title": "President & Chief Executive Officer",
+      "professional_profile_url": "https://www.linkedin.com/in/clay-dover-velvettaco",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-velvet-01",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://velvettaco.com/about-us/",
+      "source_url": "https://velvettaco.com/about-us/",
+      "retrieval_timestamp": "2026-10-23T20:27:55.991Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:55.991Z"
+    },
+    {
+      "id": "pub-contact-waba-01",
+      "company_id": "pub-comp-wabagrill-02",
+      "company_name": "WaBa Grill",
+      "full_name": "Andrew Kim",
+      "job_title": "VP of Franchise Operations",
+      "professional_profile_url": "https://www.linkedin.com/in/andrew-kim-wabagrill",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-waba-01",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://wabagrillfranchising.com/research/meet-the-team/",
+      "source_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+      "retrieval_timestamp": "2026-10-23T20:27:56.001Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:56.001Z"
+    },
+    {
+      "id": "pub-contact-waba-02",
+      "company_id": "pub-comp-wabagrill-02",
+      "company_name": "WaBa Grill",
+      "full_name": "Adam Morse",
+      "job_title": "Director of Technology",
+      "professional_profile_url": "https://www.linkedin.com/in/adam-morse-restaurant-tech",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-waba-02",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://wabagrillfranchising.com/research/meet-the-team/",
+      "source_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+      "retrieval_timestamp": "2026-10-23T20:27:56.001Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:56.001Z"
+    },
+    {
+      "id": "pub-contact-cleaneatz-01",
+      "company_id": "pub-comp-cleaneatz-06",
+      "company_name": "Clean Eatz",
+      "full_name": "Evonne Varady",
+      "job_title": "Co-Founder & Head of Operational Experience",
+      "professional_profile_url": "https://www.linkedin.com/in/evonne-varady-clean-eatz",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "provider_person_id": "pub-contact-cleaneatz-01",
+      "source_provider": "public_web",
+      "is_company_verified": true,
+      "company_verification_detail": "Verified from official newsroom announcement: https://cleaneatz.com/about-us",
+      "source_url": "https://cleaneatz.com/about-us",
+      "retrieval_timestamp": "2026-10-23T20:27:56.013Z",
+      "provenance": "real_public_web",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T20:27:56.013Z"
     }
   ],
   "enrichments": {
@@ -280,8 +460,8 @@
       "personalization_hook": "Noticed Taziki's ongoing expansion across ~100 locations and your operational initiative connecting frontline guest feedback with multi-unit consistency.",
       "personalization_evidence_claim": "~100 operating units across 16 states and COO appointment documented at tazikisfranchising.com.",
       "confidence_score": 90,
-      "confidence_explanation": "Score 90/100: Sources (40/40, 2 resolved URLs) + Authority (30/30, official franchisor portal) + Recency (20/20, active 2026 disclosures) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
-      "last_verified_timestamp": "2026-04-20T12:00:00Z",
+      "confidence_explanation": "Synthesized from Curated Baseline Dataset (Deterministic Sandbox — No LLM Key)",
+      "last_verified_timestamp": "2026-10-23T20:29:52.982Z",
       "evidence_sources": [
         {
           "id": "ev-tazikis-01",
@@ -302,7 +482,7 @@
           "retrieved_at": "2026-04-20T12:00:00Z"
         }
       ],
-      "created_at": "2026-10-23T19:09:47.215Z"
+      "created_at": "2026-10-23T20:27:09.664Z"
     },
     "lead-lance-02": {
       "id": "enrich-lance-02",
@@ -578,8 +758,8 @@
         }
       ],
       "status": "GENERATED",
-      "created_at": "2026-10-23T19:56:19.157Z",
-      "updated_at": "2026-10-23T19:57:24.640Z"
+      "created_at": "2026-10-23T20:28:58.292Z",
+      "updated_at": "2026-10-23T20:28:58.292Z"
     }
   },
   "emailDrafts": [
@@ -640,6 +820,23 @@
   ],
   "workflowExecutions": [
     {
+      "id": "exec-1792787275887",
+      "started_at": "2026-10-23T20:27:55.894Z",
+      "current_stage": "human_approval",
+      "status": "AWAITING_APPROVAL",
+      "summary": "Workflow paused at Stage 4 (Human Approval Gate). 11 leads pending human review. Only approved leads will proceed to email generation.",
+      "stats": {
+        "companies_found": 7,
+        "leads_identified": 12,
+        "leads_enriched": 5,
+        "pending_approvals": 11,
+        "approved_leads": 1,
+        "rejected_leads": 0,
+        "drafts_created": 0,
+        "workflow_errors": 0
+      }
+    },
+    {
       "id": "exec-1792785675349",
       "started_at": "2026-10-23T20:01:15.355Z",
       "current_stage": "company_search",
@@ -675,6 +872,142 @@
     }
   ],
   "workflowLogs": [
+    {
+      "id": "log-1792787276166-0v18",
+      "execution_id": "exec-1792787275887",
+      "stage": "human_approval",
+      "level": "info",
+      "message": "Pipeline halted at Human Approval Gate. 11 leads require review before sequence generation. Pending leads will NOT generate email drafts.",
+      "timestamp": "2026-10-23T20:27:56.166Z"
+    },
+    {
+      "id": "log-1792787276140-cn3b",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "success",
+      "message": "Completed enrichment for 5 leads with verified evidence citations.",
+      "timestamp": "2026-10-23T20:27:56.140Z"
+    },
+    {
+      "id": "log-1792787276112-jcqb",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Quinn Newhall (Clean Eatz). Confidence Score: 70/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:27:56.112Z"
+    },
+    {
+      "id": "log-1792787276095-10wy",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Jonathan Aguirre (WaBa Grill). Confidence Score: 70/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:27:56.095Z"
+    },
+    {
+      "id": "log-1792787276080-ib37",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Chris Schultz (Velvet Taco). Confidence Score: 85/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:27:56.080Z"
+    },
+    {
+      "id": "log-1792787276065-hjl7",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: Lance Juhas (Piada Italian Street Food). Confidence Score: 90/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:27:56.065Z"
+    },
+    {
+      "id": "log-1792787276052-daj9",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Enriched lead: John Ishmael (Taziki's Mediterranean Cafe). Confidence Score: 90/100. Personalization Hook verified.",
+      "timestamp": "2026-10-23T20:27:56.052Z"
+    },
+    {
+      "id": "log-1792787276032-ffs1",
+      "execution_id": "exec-1792787275887",
+      "stage": "enrichment",
+      "level": "info",
+      "message": "Running evidence-backed enrichment engine across leads. Verifying location counts, operational challenges, buying signals, and sources.",
+      "timestamp": "2026-10-23T20:27:56.032Z"
+    },
+    {
+      "id": "log-1792787276027-rvr0",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "success",
+      "message": "Lead search phase complete. Total active leads in system: 12.",
+      "timestamp": "2026-10-23T20:27:56.027Z"
+    },
+    {
+      "id": "log-1792787276019-9c2z",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 1 decision makers for Clean Eatz (1 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:27:56.019Z"
+    },
+    {
+      "id": "log-1792787276007-f4xf",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for WaBa Grill (2 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:27:56.008Z"
+    },
+    {
+      "id": "log-1792787275995-sma0",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 1 decision makers for Velvet Taco (1 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:27:55.995Z"
+    },
+    {
+      "id": "log-1792787275987-79vi",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for Piada Italian Street Food (2 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:27:55.988Z"
+    },
+    {
+      "id": "log-1792787275975-l28q",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identified 2 decision makers for Taziki's Mediterranean Cafe (1 newly added after person/email deduplication).",
+      "timestamp": "2026-10-23T20:27:55.975Z"
+    },
+    {
+      "id": "log-1792787275946-9a7u",
+      "execution_id": "exec-1792787275887",
+      "stage": "lead_search",
+      "level": "info",
+      "message": "Identifying decision-makers for companies. Target roles: Chief Operating Officer, COO, VP of Operations, Director of Operations, Head of Guest Experience, VP of Customer Experience.",
+      "timestamp": "2026-10-23T20:27:55.946Z"
+    },
+    {
+      "id": "log-1792787275931-20ci",
+      "execution_id": "exec-1792787275887",
+      "stage": "company_search",
+      "level": "success",
+      "message": "Discovered 6 companies (2 new records ingested, 4 deduplicated). Provenance: real_public_web",
+      "timestamp": "2026-10-23T20:27:55.931Z"
+    },
+    {
+      "id": "log-1792787275904-uc38",
+      "execution_id": "exec-1792787275887",
+      "stage": "company_search",
+      "level": "info",
+      "message": "Beginning Company Search using public_web. Target ICP: US QSR / Fast-Casual chains (20-200 units).",
+      "timestamp": "2026-10-23T20:27:55.904Z"
+    },
     {
       "id": "log-1792785676668-dldn",
       "execution_id": "exec-1792785675349",

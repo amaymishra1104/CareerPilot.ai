@@ -29,6 +29,13 @@ export class ApolloCreditExhaustedError extends Error {
   }
 }
 
+export class ApolloPlanRestrictedError extends Error {
+  constructor(message = 'Apollo Plan Limitation (HTTP 403): The Search API requires a paid Apollo plan (Basic or Professional). Free plans cannot perform organization or people searches.') {
+    super(message);
+    this.name = 'ApolloPlanRestrictedError';
+  }
+}
+
 export class ApolloApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -95,6 +102,9 @@ export class ApolloSearchProvider implements SearchProviderInterface {
         if (res.status === 429) {
           throw new ApolloRateLimitError(`Apollo rate limit exceeded (HTTP 429): ${errorDetail}`);
         }
+        if (res.status === 403 && (errorDetail.includes('Free plan') || errorDetail.includes('pricing') || errorDetail.includes('not included'))) {
+          throw new ApolloPlanRestrictedError(`Apollo Plan Limitation (HTTP 403): ${errorDetail}`);
+        }
         if (res.status === 402 || res.status === 403) {
           throw new ApolloCreditExhaustedError(`Apollo plan limitation or exhausted credits (HTTP ${res.status}): ${errorDetail}`);
         }
@@ -111,6 +121,7 @@ export class ApolloSearchProvider implements SearchProviderInterface {
           err instanceof ApolloAuthenticationError ||
           err instanceof ApolloRateLimitError ||
           err instanceof ApolloCreditExhaustedError ||
+          err instanceof ApolloPlanRestrictedError ||
           err instanceof ApolloApiError) {
         throw err;
       }

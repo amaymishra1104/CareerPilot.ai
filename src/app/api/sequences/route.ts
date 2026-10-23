@@ -56,7 +56,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Lead has not been enriched yet. Run enrichment before sequence generation.' }, { status: 400 });
     }
 
-    const sequence = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
+    const settings = Store.getSettings();
+    const sequence = await EmailSequenceGenerator.generateSequenceWithLLM(contact, company, enrichment, settings);
     Store.saveSequence(sequence);
 
     return NextResponse.json({

@@ -54,6 +54,8 @@ export function SettingsTab({
   const handleConnectGmail = async () => {
     setIsConnectingGmail(true);
     try {
+      // First save current form inputs so client ID and secret are committed to server
+      await onSaveSettings(formData);
       const res = await fetch('/api/auth/gmail');
       const data = await res.json();
       if (data.authUrl) {
@@ -193,7 +195,8 @@ export function SettingsTab({
               onChange={(e) => setFormData(prev => ({ ...prev, search_provider: e.target.value as any }))}
               className="w-full mt-1.5 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
             >
-              <option value="apollo">Apollo.io API (Live Provider)</option>
+              <option value="public_web">Real Public-Source Discovery (Verified Web Sources & Filings)</option>
+              <option value="apollo">Apollo.io API (Live Search — Requires Paid Apollo Plan)</option>
               <option value="mock_demo">Curated US QSR Demo Provider (Offline Sandbox)</option>
             </select>
           </div>

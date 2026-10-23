@@ -69,10 +69,18 @@ export function CompanySearchTab({
         </div>
       );
     }
-    if (comp.provenance === 'manually_sourced') {
+    if (comp.source_provider === 'public_web' || comp.provenance === 'real_public_web') {
+      return (
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 flex items-center gap-1">
+          <Globe className="w-3 h-3 text-cyan-400" />
+          PUBLIC WEB (VERIFIED)
+        </span>
+      );
+    }
+    if (comp.provenance === 'csv_imported' || comp.provenance === 'manually_sourced') {
       return (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
-          MANUAL CSV
+          IMPORTED CSV
         </span>
       );
     }

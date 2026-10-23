@@ -26,11 +26,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Sequence not found.' }, { status: 404 });
     }
 
-    const regeneratedEmail = EmailSequenceGenerator.regenerateSingleEmail(
+    const settings = Store.getSettings();
+    const regeneratedEmail = await EmailSequenceGenerator.regenerateSingleEmailWithLLM(
       Number(stepNumber),
       contact,
       company,
-      enrichment
+      enrichment,
+      settings
     );
 
     const emailIdx = seq.emails.findIndex(e => e.sequence_step === Number(stepNumber));

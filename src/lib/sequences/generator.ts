@@ -1,4 +1,6 @@
-import { Contact, Company, EnrichmentRecord, EmailMessage, EmailSequence } from '@/types';
+import { Contact, Company, EnrichmentRecord, EmailMessage, EmailSequence, IntegrationSettings } from '@/types';
+import { Store } from '@/lib/storage';
+import { GeminiService } from '@/lib/enrichment/gemini';
 
 function getScaleDescription(company: Company, enrichment: EnrichmentRecord): string {
   if (enrichment.location_count_verifiable && enrichment.location_count_verifiable > 0) {
@@ -14,6 +16,35 @@ function getScaleDescription(company: Company, enrichment: EnrichmentRecord): st
 }
 
 export class EmailSequenceGenerator {
+  /**
+   * Generates a 4-email sequence using Google Gemini LLM when configured.
+   */
+  static async generateSequenceWithLLM(
+    contact: Contact,
+    company: Company,
+    enrichment: EnrichmentRecord,
+    settings?: IntegrationSettings
+  ): Promise<EmailSequence> {
+    const s = settings || Store.getSettings();
+    const geminiKey = s.gemini_api_key || process.env.GEMINI_API_KEY || (s.llm_provider === 'gemini' ? s.llm_api_key : '');
+
+    if (geminiKey && s.llm_provider !== 'mock_demo') {
+      try {
+        const gemini = new GeminiService(geminiKey, s.llm_model || process.env.LLM_MODEL);
+        if (gemini.isConfigured()) {
+          return await gemini.generatePersonalizedSequence(contact, company, enrichment);
+        }
+      } catch (err: any) {
+        console.warn('Gemini LLM sequence generation failed, falling back to deterministic template:', err.message);
+      }
+    }
+
+    return this.generateSequence(contact, company, enrichment);
+  }
+
+  /**
+   * Synchronous deterministic baseline generator with proven Domino's case study facts.
+   */
   static generateSequence(
     contact: Contact,
     company: Company,
@@ -37,6 +68,32 @@ export class EmailSequenceGenerator {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
+  }
+
+  static async regenerateSingleEmailWithLLM(
+    stepNumber: number,
+    contact: Contact,
+    company: Company,
+    enrichment: EnrichmentRecord,
+    settings?: IntegrationSettings
+  ): Promise<EmailMessage> {
+    const s = settings || Store.getSettings();
+    const geminiKey = s.gemini_api_key || process.env.GEMINI_API_KEY || (s.llm_provider === 'gemini' ? s.llm_api_key : '');
+
+    if (geminiKey && s.llm_provider !== 'mock_demo') {
+      try {
+        const gemini = new GeminiService(geminiKey, s.llm_model || process.env.LLM_MODEL);
+        if (gemini.isConfigured()) {
+          const fullSeq = await gemini.generatePersonalizedSequence(contact, company, enrichment);
+          const found = fullSeq.emails.find(e => e.sequence_step === stepNumber);
+          if (found) return found;
+        }
+      } catch (err: any) {
+        console.warn('Gemini LLM single email regeneration failed, falling back to deterministic template:', err.message);
+      }
+    }
+
+    return this.regenerateSingleEmail(stepNumber, contact, company, enrichment);
   }
 
   static regenerateSingleEmail(

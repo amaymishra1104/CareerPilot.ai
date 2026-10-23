@@ -1,4 +1,5 @@
 import { Contact, Company, EnrichmentRecord, EvidenceSource, IntegrationSettings } from '@/types';
+import { Store } from '@/lib/storage';
 import { DEMO_ENRICHMENTS } from '@/lib/seed';
 import { GeminiService } from './gemini';
 
@@ -6,15 +7,16 @@ export class EnrichmentEngine {
   static async enrichLead(
     contact: Contact,
     company: Company,
-    settings: IntegrationSettings
+    settings: IntegrationSettings,
+    options?: { forceRefresh?: boolean }
   ): Promise<EnrichmentRecord> {
-    // 1. If curated lead and curated enrichment exists, return refreshed record
-    if ((contact.provenance === 'real_curated' || contact.provenance === 'demo') && DEMO_ENRICHMENTS[contact.id]) {
-      const curated = DEMO_ENRICHMENTS[contact.id];
-      return {
-        ...curated,
-        last_verified_timestamp: new Date().toISOString()
-      };
+    // 1. SMART CACHING: If lead already enriched in local database and not forcing refresh,
+    // return cached record to protect LLM credits and stay within rate limits.
+    if (!options?.forceRefresh) {
+      const cached = Store.getEnrichmentByLeadId(contact.id);
+      if (cached) {
+        return cached;
+      }
     }
 
     // 2. Fetch primary public source snippet over HTTP for ground truth
@@ -40,16 +42,16 @@ export class EnrichmentEngine {
       }
     }
 
-    // 3. Check for Google Gemini LLM
+    // 3. PRIORITY: Call Google Gemini LLM if configured and not explicitly in mock_demo mode
     const geminiKey = settings.gemini_api_key || process.env.GEMINI_API_KEY || (settings.llm_provider === 'gemini' ? settings.llm_api_key : '');
-    if (geminiKey) {
+    if (geminiKey && settings.llm_provider !== 'mock_demo') {
       try {
         const gemini = new GeminiService(geminiKey, settings.llm_model || process.env.LLM_MODEL);
         if (gemini.isConfigured()) {
           return await gemini.enrichLeadWithLLM(contact, company, fetchedExcerpt);
         }
-      } catch (geminiErr) {
-        console.warn('Gemini LLM enrichment failed, proceeding with grounded factual synthesis:', geminiErr);
+      } catch (geminiErr: any) {
+        console.warn('Gemini LLM enrichment failed, proceeding with grounded factual synthesis:', geminiErr.message);
       }
     }
 
@@ -57,12 +59,22 @@ export class EnrichmentEngine {
     if (settings.llm_api_key && settings.llm_provider === 'openai') {
       try {
         return await this.callOpenAiEnrichment(contact, company, settings);
-      } catch (err) {
-        console.warn('OpenAI LLM enrichment failed, falling back to deterministic factual extractor:', err);
+      } catch (err: any) {
+        console.warn('OpenAI LLM enrichment failed, falling back to deterministic factual extractor:', err.message);
       }
     }
 
-    // 5. Transparent deterministic factual enrichment engine
+    // 5. If in offline mock_demo sandbox and curated seed exists, return seed record
+    if ((contact.provenance === 'real_curated' || contact.provenance === 'demo' || settings.llm_provider === 'mock_demo') && DEMO_ENRICHMENTS[contact.id]) {
+      const curated = DEMO_ENRICHMENTS[contact.id];
+      return {
+        ...curated,
+        confidence_explanation: 'Synthesized from Curated Baseline Dataset (Deterministic Sandbox — No LLM Key)',
+        last_verified_timestamp: new Date().toISOString()
+      };
+    }
+
+    // 6. Transparent deterministic factual enrichment engine
     return await this.generateGroundedEnrichment(contact, company, fetchedExcerpt);
   }
 

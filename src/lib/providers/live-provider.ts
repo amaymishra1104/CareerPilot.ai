@@ -1,6 +1,7 @@
 import { Company, Contact, ICPConfig, Provenance } from '@/types';
 import { SearchProviderInterface, CompanySearchParams } from './types';
 import { ApolloSearchProvider } from './apollo-provider';
+import { PublicSourceDiscoveryProvider } from './public-source-provider';
 
 export class LiveSearchProvider implements SearchProviderInterface {
   name = 'Live Intelligence Provider';
@@ -9,14 +10,20 @@ export class LiveSearchProvider implements SearchProviderInterface {
   private apiKey: string;
   private providerType: string;
   private apolloProvider: ApolloSearchProvider;
+  private publicWebProvider: PublicSourceDiscoveryProvider;
 
   constructor(apiKey?: string, providerType: string = 'apollo') {
     this.apiKey = apiKey || process.env.APOLLO_API_KEY || process.env.SEARCH_API_KEY || '';
     this.providerType = providerType;
     this.apolloProvider = new ApolloSearchProvider(this.apiKey);
+    this.publicWebProvider = new PublicSourceDiscoveryProvider();
   }
 
   async searchCompanies(params: CompanySearchParams, icp: ICPConfig): Promise<{ companies: Company[]; provenance: Provenance; creditInfo?: any }> {
+    if (this.providerType === 'public_web') {
+      return await this.publicWebProvider.searchCompanies(params, icp);
+    }
+
     if (this.providerType === 'apollo' || !this.providerType || this.providerType === 'live') {
       return await this.apolloProvider.searchCompanies(params, icp);
     }
@@ -87,6 +94,10 @@ Return strictly a JSON array of objects with keys: name, website, headquarters, 
   }
 
   async searchContacts(companyId: string, companyName: string, targetRoles: string[]): Promise<{ contacts: Contact[]; provenance: Provenance; creditInfo?: any }> {
+    if (this.providerType === 'public_web') {
+      return await this.publicWebProvider.searchContacts(companyId, companyName, targetRoles);
+    }
+
     if (this.providerType === 'apollo' || !this.providerType || this.providerType === 'live') {
       return await this.apolloProvider.searchContacts(companyId, companyName, targetRoles);
     }

@@ -243,7 +243,7 @@ export class WorkflowRunner {
           sequence = existingSeq;
           log('email_generation', 'info', `Preserved existing customized sequence for ${lead.full_name} (${company.name}). Not overwriting edits.`);
         } else {
-          sequence = EmailSequenceGenerator.generateSequence(lead, company, enrichment);
+          sequence = await EmailSequenceGenerator.generateSequenceWithLLM(lead, company, enrichment, settings);
           Store.saveSequence(sequence);
           log('email_generation', 'info', `Generated 4-email sequence for approved lead: ${lead.full_name} (${company.name}).`);
         }
