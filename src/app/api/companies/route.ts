@@ -49,28 +49,34 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { query, category, minLocations, maxLocations, buyingSignal, forceProvider } = body;
+    const { query, category, location, domain, minLocations, maxLocations, minEmployees, maxEmployees, buyingSignal, forceProvider } = body;
     const icp = Store.getIcp();
     const settings = Store.getSettings();
 
     const providerType = forceProvider || settings.search_provider;
+    const apiKey = settings.apollo_api_key || settings.search_api_key || process.env.APOLLO_API_KEY;
     const provider = providerType === 'mock_demo'
       ? new DemoSearchProvider()
-      : new LiveSearchProvider(settings.search_api_key, settings.search_provider);
+      : new LiveSearchProvider(apiKey, providerType);
 
-    const { companies, provenance } = await provider.searchCompanies(
-      { query, category, minLocations, maxLocations, buyingSignal },
+    const searchRes: any = await provider.searchCompanies(
+      { query, category, location, domain, minLocations, maxLocations, minEmployees, maxEmployees, buyingSignal },
       icp
     );
+    const companies = searchRes.companies || [];
+    const provenance = searchRes.provenance;
+    const creditInfo = searchRes.creditInfo;
 
     const added = Store.addCompanies(companies);
 
     return NextResponse.json({
       success: true,
       provenance,
+      provider: provider.name,
+      creditInfo,
       totalFound: companies.length,
       newlyAdded: added.length,
-      companies, // Return the actual search results matching the query/filter
+      companies,
       allStoredCount: Store.getCompanies().length
     });
   } catch (error: any) {

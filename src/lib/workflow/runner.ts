@@ -59,22 +59,25 @@ export class WorkflowRunner {
       // STAGE 1: Company Search
       // -------------------------------------------------------------
       execution.current_stage = 'company_search';
-      log('company_search', 'info', `Beginning Company Search using ${settings.search_provider === 'mock_demo' ? 'Demo Sandbox Provider' : 'Live Provider'}. ICP: ${icp.restaurantCategories.join(', ')} (20-200 locations).`);
+      const isApollo = settings.search_provider === 'apollo' || (settings.search_provider as string) === 'live';
+      const providerLabel = isApollo ? 'Apollo.io Live Provider' : (settings.search_provider === 'mock_demo' ? 'Curated Demo Sandbox' : settings.search_provider);
+      
+      log('company_search', 'info', `Beginning Company Search using ${providerLabel}. Target ICP: US QSR / Fast-Casual chains (20-200 units).`);
 
       const provider = settings.search_provider === 'mock_demo'
         ? new DemoSearchProvider()
-        : new LiveSearchProvider(settings.search_api_key, settings.search_provider);
+        : new LiveSearchProvider(settings.apollo_api_key || settings.search_api_key || process.env.APOLLO_API_KEY, settings.search_provider);
 
       let foundCompanies: any[] = [];
       try {
-        const searchRes = await provider.searchCompanies({}, icp);
+        const searchRes = await provider.searchCompanies({ query: 'restaurant', category: icp.restaurantCategories[0] }, icp);
         foundCompanies = searchRes.companies;
         const newlyAdded = Store.addCompanies(foundCompanies);
         execution.stats.companies_found = Store.getCompanies().length;
         log('company_search', 'success', `Discovered ${foundCompanies.length} companies (${newlyAdded.length} new records ingested, ${foundCompanies.length - newlyAdded.length} deduplicated). Provenance: ${searchRes.provenance}`);
       } catch (err: any) {
         log('company_search', 'error', `Company search failed: ${err.message}`);
-        // In demo fallback mode, do not crash the pipeline
+        // In live mode, fail transparently without inventing fake results
         if (settings.search_provider !== 'mock_demo') {
           execution.status = 'FAILED';
           execution.summary = `Failed at Company Search: ${err.message}`;

@@ -26,6 +26,11 @@ export interface Company {
   headquarters: string;
   estimated_locations: number;
   company_size?: string;
+  employee_count?: number; // Apollo employee headcount (distinct from location count!)
+  description?: string;
+  provider_company_id?: string;
+  source_provider?: 'apollo' | 'curated' | 'csv' | 'demo' | string;
+  location_count_status?: 'verified' | 'unknown' | 'estimated';
   restaurant_category: string;
   buying_signals: string[];
   source_urls: string[];
@@ -43,6 +48,10 @@ export interface Contact {
   professional_profile_url?: string;
   work_email?: string;
   email_verification_status: EmailVerificationStatus;
+  provider_person_id?: string;
+  source_provider?: 'apollo' | 'curated' | 'csv' | 'demo' | string;
+  is_company_verified?: boolean;
+  company_verification_detail?: string;
   source_url: string;
   retrieval_timestamp: string;
   provenance: Provenance;
@@ -193,9 +202,11 @@ export interface IntegrationSettings {
   id: string;
   llm_provider: 'openai' | 'anthropic' | 'gemini' | 'mock_demo';
   llm_api_key?: string;
+  gemini_api_key?: string;
   llm_model?: string;
   search_provider: 'apollo' | 'perplexity' | 'hunter' | 'mock_demo';
   search_api_key?: string;
+  apollo_api_key?: string;
   gmail_client_id?: string;
   gmail_client_secret?: string;
   gmail_redirect_uri?: string;

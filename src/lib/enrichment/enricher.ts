@@ -1,5 +1,6 @@
 import { Contact, Company, EnrichmentRecord, EvidenceSource, IntegrationSettings } from '@/types';
 import { DEMO_ENRICHMENTS } from '@/lib/seed';
+import { GeminiService } from './gemini';
 
 export class EnrichmentEngine {
   static async enrichLead(
@@ -16,32 +17,13 @@ export class EnrichmentEngine {
       };
     }
 
-    // 2. Check if live LLM is configured
-    if (settings.llm_api_key && settings.llm_provider !== 'mock_demo') {
-      try {
-        return await this.callLiveLlmEnrichment(contact, company, settings);
-      } catch (err) {
-        console.warn('Live LLM enrichment failed, falling back to deterministic factual extractor:', err);
-      }
-    }
-
-    // 3. Transparent deterministic factual enrichment engine
-    return await this.generateGroundedEnrichment(contact, company);
-  }
-
-  private static async generateGroundedEnrichment(contact: Contact, company: Company): Promise<EnrichmentRecord> {
-    const evidenceList: EvidenceSource[] = [];
-    const operationalChallenges: { description: string; is_hypothesis: boolean; evidence?: string }[] = [];
-    const verifiedBuyingSignals: { signal: string; source_url: string; snippet: string }[] = [];
-
+    // 2. Fetch primary public source snippet over HTTP for ground truth
     const primarySource = company.source_urls[0] || company.website || '';
     let fetchedExcerpt = '';
-
-    // Attempt real HTTP fetch for excerpt if source_url is valid
     if (primarySource && primarySource.startsWith('http')) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
         const res = await fetch(primarySource, { 
           signal: controller.signal,
           headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OSVI-Audit/1.0' }
@@ -49,28 +31,72 @@ export class EnrichmentEngine {
         clearTimeout(timeoutId);
         if (res.ok) {
           const html = await res.text();
-          // Extract title or meta description as real retrieved snippet
           const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
           const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
           fetchedExcerpt = metaDescMatch?.[1] || titleMatch?.[1]?.trim() || '';
         }
       } catch {
-        // Fall back gracefully to factual statement with source link
+        // Fall back gracefully
       }
     }
 
+    // 3. Check for Google Gemini LLM
+    const geminiKey = settings.gemini_api_key || process.env.GEMINI_API_KEY || (settings.llm_provider === 'gemini' ? settings.llm_api_key : '');
+    if (geminiKey) {
+      try {
+        const gemini = new GeminiService(geminiKey, settings.llm_model || process.env.LLM_MODEL);
+        if (gemini.isConfigured()) {
+          return await gemini.enrichLeadWithLLM(contact, company, fetchedExcerpt);
+        }
+      } catch (geminiErr) {
+        console.warn('Gemini LLM enrichment failed, proceeding with grounded factual synthesis:', geminiErr);
+      }
+    }
+
+    // 4. Check for OpenAI LLM if configured
+    if (settings.llm_api_key && settings.llm_provider === 'openai') {
+      try {
+        return await this.callOpenAiEnrichment(contact, company, settings);
+      } catch (err) {
+        console.warn('OpenAI LLM enrichment failed, falling back to deterministic factual extractor:', err);
+      }
+    }
+
+    // 5. Transparent deterministic factual enrichment engine
+    return await this.generateGroundedEnrichment(contact, company, fetchedExcerpt);
+  }
+
+  private static async generateGroundedEnrichment(
+    contact: Contact, 
+    company: Company,
+    fetchedExcerpt: string
+  ): Promise<EnrichmentRecord> {
+    const evidenceList: EvidenceSource[] = [];
+    const operationalChallenges: { description: string; is_hypothesis: boolean; evidence?: string }[] = [];
+    const verifiedBuyingSignals: { signal: string; source_url: string; snippet: string }[] = [];
+
+    const primarySource = company.source_urls[0] || company.website || '';
     const hasRealSnippet = fetchedExcerpt.length > 10;
-    const locationSnippet = hasRealSnippet 
-      ? `Retrieved from source (${primarySource}): "${fetchedExcerpt.slice(0, 180)}..."`
-      : `Reported location count: ${company.estimated_locations} units in ${company.headquarters}.`;
+
+    // Location count handling (strictly never equate Apollo employee count with location count)
+    const hasVerifiedLocations = typeof company.estimated_locations === 'number' && company.estimated_locations > 0;
+    const locationSnippet = hasVerifiedLocations
+      ? (hasRealSnippet 
+          ? `Verified via ${primarySource}: "${fetchedExcerpt.slice(0, 160)}..." (est. ${company.estimated_locations} units in ${company.headquarters})`
+          : `Documented store footprint: approximately ${company.estimated_locations} locations in ${company.headquarters}.`)
+      : (company.employee_count 
+          ? `Apollo provider reports ${company.employee_count} employees. Restaurant location count remains unknown pending verification.`
+          : `Location count unknown. Headquartered in ${company.headquarters}. Requires verification.`);
 
     evidenceList.push({
-      id: `ev-${Date.now()}-loc`,
+      id: `ev-${Date.now()}-scale`,
       lead_id: contact.id,
-      claim: `${company.name} operates approximately ${company.estimated_locations} locations in ${company.headquarters}`,
+      claim: hasVerifiedLocations 
+        ? `${company.name} operates approximately ${company.estimated_locations} locations in ${company.headquarters}`
+        : `${company.name} operations profile based in ${company.headquarters}${company.employee_count ? ` (${company.employee_count} employees)` : ''}`,
       snippet: locationSnippet,
       source_url: primarySource,
-      is_hypothesis: !primarySource,
+      is_hypothesis: !primarySource || !hasVerifiedLocations,
       retrieved_at: new Date().toISOString()
     });
 
@@ -84,16 +110,16 @@ export class EnrichmentEngine {
         signal: sig,
         source_url: sourceUrl,
         snippet: sourceUrl 
-          ? `Disclosed business indicator: "${sig}" associated with operator profile at ${sourceUrl}`
+          ? `Disclosed operational indicator: "${sig}" associated with operator profile at ${sourceUrl}`
           : `Unverified hypothesis: ${sig}`
       });
 
       evidenceList.push({
         id: `ev-${Date.now()}-sig-${i}`,
         lead_id: contact.id,
-        claim: `Observed operational indicator: ${sig}`,
+        claim: `Operational indicator: ${sig}`,
         snippet: sourceUrl 
-          ? `Sourced indicator: ${sig} from public operational filing at ${sourceUrl}`
+          ? `Sourced indicator: ${sig} from public operational profile at ${sourceUrl}`
           : `Hypothesis indicator: ${sig}`,
         source_url: sourceUrl,
         is_hypothesis: isHypothesisSignal,
@@ -101,23 +127,30 @@ export class EnrichmentEngine {
       });
     }
 
-    // Operational challenges: 1 grounded in segment, 1 explicitly labeled as hypothesis
+    // Operational challenges: 1 grounded in multi-unit category, 1 explicitly marked as hypothesis
+    const scaleMention = hasVerifiedLocations 
+      ? `across ${company.estimated_locations} storefronts` 
+      : `across ${company.name}'s multi-unit operational footprint`;
+
     operationalChallenges.push({
-      description: `Synchronizing multi-channel customer communications across ${company.estimated_locations} storefronts during peak volume windows.`,
+      description: `Synchronizing multi-channel customer communications ${scaleMention} during peak meal periods.`,
       is_hypothesis: false,
-      evidence: `Derived from ${company.name}'s multi-unit scale (${company.estimated_locations} stores) and public expansion statements.`
+      evidence: `Derived from ${company.name}'s ${company.restaurant_category || 'restaurant'} operations in ${company.headquarters}.`
     });
 
     operationalChallenges.push({
-      description: `Potential bottleneck in isolated voice or chat bots failing to escalate operational workflows (e.g., catering orders, store-level inventory questions) directly to staff.`,
+      description: `Risk of conversational voice or chat bots creating dead-ends for guest inquiries (catering orders, store-level inventory) without persistent multi-day orchestration.`,
       is_hypothesis: true,
-      evidence: `Operational hypothesis: standard bot architectures create disconnected resolution silos in ${company.restaurant_category} operations.`
+      evidence: `Operational hypothesis: standard bot architectures create resolution silos in restaurant operations.`
     });
 
     // Personalization Hook
-    const signalMention = company.buying_signals[0] || 'multi-unit expansion';
-    const personalizationHook = `Noticed ${company.name}'s ongoing ${signalMention} across ${company.estimated_locations} locations and your leadership in driving store-level operational performance.`;
-    const personalizationClaim = `Expansion across ${company.estimated_locations} units in ${company.headquarters} and executive role as ${contact.job_title}.`;
+    const signalMention = company.buying_signals[0] || 'operational excellence';
+    const scaleText = hasVerifiedLocations 
+      ? `across ${company.estimated_locations} locations` 
+      : `in ${company.headquarters}`;
+    const personalizationHook = `Noticed ${company.name}'s focus on ${signalMention.toLowerCase()} ${scaleText} and your leadership as ${contact.job_title}.`;
+    const personalizationClaim = `${contact.job_title} at ${company.name} in ${company.headquarters}.`;
 
     // Transparent Confidence Score Formula:
     // Sources (40 max) + Authority (30 max) + Recency (20 max) + Reachability (10 max) = 100 max
@@ -125,26 +158,28 @@ export class EnrichmentEngine {
     const hasOfficialDomain = company.source_urls.some(u => {
       try {
         const domain = new URL(u).hostname.toLowerCase();
-        return domain.includes(company.name.toLowerCase().split(' ')[0]) || domain.includes('franchising') || domain.includes('prnewswire.com');
+        return domain.includes(company.name.toLowerCase().split(' ')[0]) || domain.includes('apollo.io') || domain.includes('linkedin.com');
       } catch {
         return false;
       }
     });
     const authorityScore = hasOfficialDomain ? 30 : (company.source_urls.length > 0 ? 20 : 0);
-    const recencyScore = 20; // Verified within active session
+    const recencyScore = 20; // Verified in active session
     const hasReachableEmail = Boolean(contact.work_email && contact.work_email !== 'unavailable' && !contact.work_email.includes('.demo'));
     const reachabilityScore = hasReachableEmail ? 10 : 0;
 
     const totalScore = Math.min(100, sourceCountScore + authorityScore + recencyScore + reachabilityScore);
-    const confidenceExplanation = `Score ${totalScore}/100: Calculated transparently as Sources (${sourceCountScore}/40, ${company.source_urls.length} independent URL(s)) + Authority (${authorityScore}/30) + Recency (${recencyScore}/20) + Reachability (${reachabilityScore}/10, email: ${hasReachableEmail ? 'verified' : 'unavailable'}).`;
+    const confidenceExplanation = `Score ${totalScore}/100: Calculated transparently as Sources (${sourceCountScore}/40, ${company.source_urls.length} independent URL(s)) + Authority (${authorityScore}/30) + Recency (${recencyScore}/20) + Reachability (${reachabilityScore}/10, email: ${hasReachableEmail ? 'verified' : 'unavailable'}). (Rule-based grounded synthesizer)`;
 
     return {
       id: `enrich-${contact.id}`,
       lead_id: contact.id,
       company_id: company.id,
-      company_overview: `${company.name} is a US-based ${company.restaurant_category} operator headquartered in ${company.headquarters}, managing an estimated ${company.estimated_locations} operating units.`,
-      location_count_verifiable: company.estimated_locations,
-      location_count_evidence: primarySource ? `Directly referenced in public registry at ${primarySource}` : 'Unverified location estimate',
+      company_overview: `${company.name} is a US-based ${company.restaurant_category} operator headquartered in ${company.headquarters}${hasVerifiedLocations ? `, managing an estimated ${company.estimated_locations} units` : ''}.`,
+      location_count_verifiable: hasVerifiedLocations ? company.estimated_locations : undefined,
+      location_count_evidence: hasVerifiedLocations 
+        ? (primarySource ? `Directly referenced in public registry at ${primarySource}` : 'Verified location count')
+        : (company.employee_count ? `Apollo reports ${company.employee_count} employees; location count unverified` : 'Location count unknown / unverified'),
       operational_challenges: operationalChallenges,
       verified_buying_signals: verifiedBuyingSignals,
       personalization_hook: personalizationHook,
@@ -157,7 +192,7 @@ export class EnrichmentEngine {
     };
   }
 
-  private static async callLiveLlmEnrichment(
+  private static async callOpenAiEnrichment(
     contact: Contact,
     company: Company,
     settings: IntegrationSettings
@@ -167,7 +202,7 @@ Prospect: ${contact.full_name}, ${contact.job_title} at ${company.name}.
 Company details:
 - Category: ${company.restaurant_category}
 - Headquarters: ${company.headquarters}
-- Estimated locations: ${company.estimated_locations}
+- Estimated locations: ${company.estimated_locations || 'Unknown'}
 - Documented buying signals: ${JSON.stringify(company.buying_signals)}
 - Sources: ${JSON.stringify(company.source_urls)}
 
@@ -206,7 +241,7 @@ Return STRICT JSON matching this schema:
     });
 
     if (!response.ok) {
-      throw new Error(`LLM provider error: ${response.statusText}`);
+      throw new Error(`OpenAI provider error: ${response.statusText}`);
     }
 
     const json = await response.json();
@@ -218,7 +253,7 @@ Return STRICT JSON matching this schema:
       {
         id: `ev-${Date.now()}-llm`,
         lead_id: contact.id,
-        claim: parsed.personalization_evidence_claim || `${company.name} operates ${company.estimated_locations} units`,
+        claim: parsed.personalization_evidence_claim || `${company.name} operations in ${company.headquarters}`,
         snippet: parsed.company_overview,
         source_url: primarySource,
         is_hypothesis: !primarySource,
@@ -231,14 +266,14 @@ Return STRICT JSON matching this schema:
       lead_id: contact.id,
       company_id: company.id,
       company_overview: parsed.company_overview,
-      location_count_verifiable: parsed.location_count_verifiable || company.estimated_locations,
+      location_count_verifiable: parsed.location_count_verifiable || company.estimated_locations || undefined,
       location_count_evidence: parsed.location_count_evidence || (primarySource ? `Documented in company records at ${primarySource}` : 'Unverified'),
       operational_challenges: parsed.operational_challenges || [],
       verified_buying_signals: parsed.verified_buying_signals || [],
       personalization_hook: parsed.personalization_hook,
       personalization_evidence_claim: parsed.personalization_evidence_claim,
       confidence_score: Math.min(100, Math.max(0, parsed.confidence_score || 70)),
-      confidence_explanation: parsed.confidence_explanation || 'Calculated from public operational disclosures.',
+      confidence_explanation: `${parsed.confidence_explanation || 'Calculated from public operational disclosures.'} (Model: OpenAI)`,
       last_verified_timestamp: new Date().toISOString(),
       evidence_sources: evidenceList,
       created_at: new Date().toISOString()

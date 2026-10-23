@@ -371,7 +371,18 @@ export class LocalStore {
   // Workflow
   static getLatestWorkflowExecution(): WorkflowExecution | undefined {
     const db = ensureDbFile();
-    return (db.workflowExecutions || [])[0];
+    const latest = (db.workflowExecutions || [])[0];
+    if (latest && latest.status === 'RUNNING') {
+      const elapsed = Date.now() - new Date(latest.started_at).getTime();
+      // If running for more than 2 minutes without completion, auto-recover from orphaned state
+      if (elapsed > 120000) {
+        latest.status = 'FAILED';
+        latest.summary = 'Execution interrupted or timed out. Ready to re-run.';
+        latest.completed_at = new Date().toISOString();
+        saveDb(db);
+      }
+    }
+    return latest;
   }
 
   static getWorkflowExecutions(): WorkflowExecution[] {

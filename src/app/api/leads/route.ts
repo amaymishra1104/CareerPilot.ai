@@ -35,16 +35,23 @@ export async function POST(req: Request) {
     const settings = Store.getSettings();
     const targetRoles = roles || icp.targetRoles;
 
-    const provider = settings.search_provider === 'mock_demo'
+    const providerType = settings.search_provider;
+    const apiKey = settings.apollo_api_key || settings.search_api_key || process.env.APOLLO_API_KEY;
+    const provider = providerType === 'mock_demo'
       ? new DemoSearchProvider()
-      : new LiveSearchProvider(settings.search_api_key, settings.search_provider);
+      : new LiveSearchProvider(apiKey, providerType);
 
-    const { contacts, provenance } = await provider.searchContacts(company.id, company.name, targetRoles);
+    const contactRes: any = await provider.searchContacts(company.id, company.name, targetRoles);
+    const contacts = contactRes.contacts || [];
+    const provenance = contactRes.provenance;
+    const creditInfo = contactRes.creditInfo;
     const newlyAdded = Store.addContacts(contacts);
 
     return NextResponse.json({
       success: true,
       provenance,
+      provider: provider.name,
+      creditInfo,
       totalFound: contacts.length,
       newlyAdded: newlyAdded.length,
       contacts: Store.getContacts({ company_id: companyId })

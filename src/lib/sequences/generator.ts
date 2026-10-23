@@ -1,5 +1,18 @@
 import { Contact, Company, EnrichmentRecord, EmailMessage, EmailSequence } from '@/types';
 
+function getScaleDescription(company: Company, enrichment: EnrichmentRecord): string {
+  if (enrichment.location_count_verifiable && enrichment.location_count_verifiable > 0) {
+    return `${enrichment.location_count_verifiable} locations`;
+  }
+  if (company.estimated_locations && company.estimated_locations > 0) {
+    return `${company.estimated_locations} locations`;
+  }
+  if (company.employee_count && company.employee_count > 0) {
+    return `growing organization of ${company.employee_count} employees`;
+  }
+  return 'multi-unit operations';
+}
+
 export class EmailSequenceGenerator {
   static generateSequence(
     contact: Contact,
@@ -55,10 +68,10 @@ export class EmailSequenceGenerator {
     const firstName = contact.full_name.split(' ')[0] || contact.full_name;
     const primaryEv = enrichment.evidence_sources[0];
     const secondaryEv = enrichment.evidence_sources[1] || primaryEv;
+    const scaleDesc = getScaleDescription(company, enrichment);
 
-    // Direct use of enrichment.personalization_hook
     const persLine1 = enrichment.personalization_hook;
-    const persLine2 = `Given your role as ${contact.job_title} overseeing operational standards across ${enrichment.location_count_verifiable || company.estimated_locations} units, I wanted to share how multi-unit operators orchestrate complex customer journeys.`;
+    const persLine2 = `Given your role as ${contact.job_title} overseeing operational standards across ${company.name}'s ${scaleDesc}, I wanted to share how multi-unit operators orchestrate complex customer journeys.`;
 
     const evidenceIds: string[] = [];
     if (primaryEv?.id) evidenceIds.push(primaryEv.id);
@@ -91,7 +104,7 @@ Opt-out: If this isn't relevant to your current operational priorities, reply 'u
       personalization_lines: [persLine1, persLine2],
       evidence_references: [
         enrichment.personalization_evidence_claim,
-        `Documented ${enrichment.location_count_verifiable || company.estimated_locations} locations via ${primaryEv?.source_url || company.website}`
+        `Sourced scale profile (${scaleDesc}) via ${primaryEv?.source_url || company.website}`
       ],
       evidence_ids: evidenceIds
     };
@@ -105,12 +118,12 @@ Opt-out: If this isn't relevant to your current operational priorities, reply 'u
   ): EmailMessage {
     const firstName = contact.full_name.split(' ')[0] || contact.full_name;
     const primaryEv = enrichment.evidence_sources[0];
+    const scaleDesc = getScaleDescription(company, enrichment);
 
-    // Frame operational observation honestly without declaring hypotheses as verified facts
     const groundedChallenge = enrichment.operational_challenges.find(c => !c.is_hypothesis)?.description ||
-      `coordinating high-volume customer inquiries across ${company.estimated_locations} storefronts`;
+      `coordinating high-volume customer inquiries across ${scaleDesc}`;
     
-    const persLine = `In reviewing ${company.name}'s multi-unit operations, we often observe that ${groundedChallenge.toLowerCase()} creates coordination strain between customer channels and store general managers.`;
+    const persLine = `In reviewing ${company.name}'s operations, we often observe that ${groundedChallenge.toLowerCase()} creates coordination strain between customer channels and store general managers.`;
 
     const evidenceIds: string[] = primaryEv?.id ? [primaryEv.id] : [];
 
@@ -159,8 +172,9 @@ Opt-out: Reply 'unsubscribe' to stop future emails.`;
   ): EmailMessage {
     const firstName = contact.full_name.split(' ')[0] || contact.full_name;
     const primaryEv = enrichment.evidence_sources[0];
+    const scaleDesc = getScaleDescription(company, enrichment);
 
-    const persLine = `As ${contact.job_title} managing operational execution across ${company.estimated_locations} stores, you know where single-turn AI chatbots hit limits.`;
+    const persLine = `As ${contact.job_title} managing operational execution across ${scaleDesc}, you know where single-turn AI chatbots hit limits.`;
     const evidenceIds: string[] = primaryEv?.id ? [primaryEv.id] : [];
 
     const body = `Hi ${firstName},
@@ -191,7 +205,7 @@ Opt-out: Reply 'unsubscribe' to stop future emails.`;
       body,
       personalization_lines: [persLine],
       evidence_references: [
-        `Role inquiry for ${contact.job_title} across ${company.estimated_locations} units`
+        `Role inquiry for ${contact.job_title} (${scaleDesc})`
       ],
       evidence_ids: evidenceIds
     };
@@ -205,8 +219,9 @@ Opt-out: Reply 'unsubscribe' to stop future emails.`;
   ): EmailMessage {
     const firstName = contact.full_name.split(' ')[0] || contact.full_name;
     const primaryEv = enrichment.evidence_sources[0];
+    const scaleDesc = getScaleDescription(company, enrichment);
 
-    const persLine = `I recognize you're fully focused on running ${company.name}'s ${enrichment.location_count_verifiable || company.estimated_locations} locations and driving store performance.`;
+    const persLine = `I recognize you're fully focused on driving operational performance across ${company.name}'s ${scaleDesc}.`;
     const evidenceIds: string[] = primaryEv?.id ? [primaryEv.id] : [];
 
     const body = `Hi ${firstName},
@@ -233,7 +248,7 @@ Opt-out: Reply 'unsubscribe' to stop future emails.`;
       body,
       personalization_lines: [persLine],
       evidence_references: [
-        `Summary closing referencing ${enrichment.location_count_verifiable || company.estimated_locations} units`
+        `Summary closing referencing ${scaleDesc}`
       ],
       evidence_ids: evidenceIds
     };

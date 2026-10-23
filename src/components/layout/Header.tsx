@@ -15,6 +15,8 @@ import {
 
 interface HeaderProps {
   demoMode: boolean;
+  apolloConnected?: boolean;
+  geminiConnected?: boolean;
   onResetDemo: () => void;
   onOpenGuidedDemo: () => void;
   onOpenLimitations: () => void;
@@ -27,6 +29,8 @@ interface HeaderProps {
 
 export function Header({
   demoMode,
+  apolloConnected = false,
+  geminiConnected = false,
   onResetDemo,
   onOpenGuidedDemo,
   onOpenLimitations,
@@ -45,20 +49,38 @@ export function Header({
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xl font-bold tracking-tight text-white">OSVI<span className="text-indigo-400">.ai</span></span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium">
                 Journey GTM
               </span>
-              {demoMode ? (
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  REAL CURATED BASELINE
+              {apolloConnected ? (
+                <span 
+                  onClick={() => setActiveTab('settings')}
+                  className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium flex items-center gap-1.5 cursor-pointer"
+                  title="Apollo.io live API connected for company and people discovery"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>APOLLO LIVE</span>
                 </span>
               ) : (
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  LIVE CONNECTED
+                <span 
+                  onClick={() => setActiveTab('settings')}
+                  className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-medium flex items-center gap-1.5 cursor-pointer"
+                  title="Apollo API key not configured. Operating in Curated Sandbox Mode. Click to configure in Settings."
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span>CURATED SANDBOX (APOLLO OFF)</span>
+                </span>
+              )}
+              {geminiConnected && (
+                <span 
+                  onClick={() => setActiveTab('settings')}
+                  className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 font-medium flex items-center gap-1 cursor-pointer"
+                  title="Google Gemini LLM connected for evidence synthesis and copy generation"
+                >
+                  <Sparkles className="w-3 h-3 text-purple-400" />
+                  <span>GEMINI LLM</span>
                 </span>
               )}
             </div>

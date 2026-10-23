@@ -11,7 +11,8 @@ import {
   Mail, 
   ShieldCheck,
   Building2,
-  Globe
+  Globe,
+  Filter
 } from 'lucide-react';
 import { Contact, Company, EmailVerificationStatus, Provenance } from '@/types';
 
@@ -34,6 +35,7 @@ export function LeadSearchTab({
 }: LeadSearchTabProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState('');
+  const [isSearchingLeads, setIsSearchingLeads] = useState(false);
 
   const filteredContacts = contacts.filter(c => {
     const matchesComp = selectedCompanyId === 'all' || c.company_id === selectedCompanyId;
@@ -43,6 +45,15 @@ export function LeadSearchTab({
       c.company_name.toLowerCase().includes(searchFilter.toLowerCase());
     return matchesComp && matchesSearch;
   });
+
+  const handleTriggerSearch = async (compId: string) => {
+    setIsSearchingLeads(true);
+    try {
+      await onSearchLeadsForCompany(compId);
+    } finally {
+      setIsSearchingLeads(false);
+    }
+  };
 
   const getEmailStatusBadge = (status: EmailVerificationStatus) => {
     switch (status) {
@@ -76,10 +87,10 @@ export function LeadSearchTab({
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <Users className="w-5 h-5 text-indigo-400" />
-              <span>Stage 2: Decision-Maker Discovery (Lead Search)</span>
+              <span>Stage 2: Real Decision-Maker Discovery (Apollo.io)</span>
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Identifies VP of Operations, COOs, and Customer Experience heads. Deduplicates strictly by email and executive name.
+              Identifies real Operations executives (COO, VP Ops, CX, Technology). Confirms company affiliation and verifies contact availability.
             </p>
           </div>
 
@@ -97,10 +108,12 @@ export function LeadSearchTab({
 
             {selectedCompanyId !== 'all' && (
               <button
-                onClick={() => onSearchLeadsForCompany(selectedCompanyId)}
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold cursor-pointer"
+                onClick={() => handleTriggerSearch(selectedCompanyId)}
+                disabled={isSearchingLeads}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
-                Scan Executives
+                <Search className={`w-3.5 h-3.5 ${isSearchingLeads ? 'animate-spin' : ''}`} />
+                <span>{isSearchingLeads ? 'Querying Apollo...' : 'Search People at Company'}</span>
               </button>
             )}
           </div>
@@ -111,7 +124,7 @@ export function LeadSearchTab({
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
           <input
             type="text"
-            placeholder="Filter leads by executive name, title, or company..."
+            placeholder="Filter leads by executive name, job title (e.g. COO, VP Operations), or company..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
@@ -126,7 +139,7 @@ export function LeadSearchTab({
             {filteredContacts.length} Decision-Makers Identified
           </span>
           <span className="text-[11px] text-slate-400">
-            Unknown emails remain unavailable (never fabricated)
+            Strict deduplication enforced across provider person ID and verified corporate identity
           </span>
         </div>
 
@@ -134,17 +147,22 @@ export function LeadSearchTab({
           <div className="p-12 text-center text-slate-400 space-y-2">
             <Users className="w-8 h-8 mx-auto text-slate-400" />
             <p className="text-xs">No decision-makers found with current filters.</p>
+            {selectedCompanyId !== 'all' && (
+              <p className="text-[11px] text-slate-400">
+                Click &quot;Search People at Company&quot; above to discover live decision-makers from Apollo for this restaurant group.
+              </p>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Executive Name</th>
-                  <th className="py-3 px-4">Title & Company</th>
-                  <th className="py-3 px-4">Work Email & Status</th>
+                  <th className="py-3 px-4">Executive Name &amp; Verification</th>
+                  <th className="py-3 px-4">Title &amp; Company</th>
+                  <th className="py-3 px-4">Work Email &amp; Status</th>
                   <th className="py-3 px-4">Approval Status</th>
-                  <th className="py-3 px-4">Provenance</th>
+                  <th className="py-3 px-4">Source / Provider</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -153,7 +171,15 @@ export function LeadSearchTab({
                   <tr key={lead.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="py-3 px-4">
                       <div className="font-semibold text-slate-100">{lead.full_name}</div>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      
+                      {lead.is_company_verified && (
+                        <div className="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span>{lead.company_verification_detail || 'Company Association Verified'}</span>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2 mt-1">
                         {lead.professional_profile_url && (
                           <a
                             href={lead.professional_profile_url}
@@ -162,18 +188,20 @@ export function LeadSearchTab({
                             className="text-[10px] text-sky-400 hover:text-sky-300 flex items-center gap-0.5"
                           >
                             <Globe className="w-3 h-3" />
-                            <span>Executive Profile</span>
+                            <span>LinkedIn Profile</span>
                           </a>
                         )}
-                        <a
-                          href={lead.source_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5"
-                        >
-                          <ExternalLink className="w-2.5 h-2.5" />
-                          <span>Source URL</span>
-                        </a>
+                        {lead.source_url && (
+                          <a
+                            href={lead.source_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-indigo-400 hover:text-indigo-300 flex items-center gap-0.5"
+                          >
+                            <ExternalLink className="w-2.5 h-2.5" />
+                            <span>Source Reference</span>
+                          </a>
+                        )}
                       </div>
                     </td>
 
@@ -186,7 +214,7 @@ export function LeadSearchTab({
                     </td>
 
                     <td className="py-3 px-4">
-                      {lead.work_email ? (
+                      {lead.work_email && lead.work_email !== 'unavailable' ? (
                         <div className="flex items-center gap-2 font-mono text-[11px] text-slate-200">
                           <Mail className="w-3 h-3 text-slate-400" />
                           <span>{lead.work_email}</span>
@@ -194,7 +222,7 @@ export function LeadSearchTab({
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-slate-400 italic text-[11px]">
-                          <span>Email unavailable</span>
+                          <span>Direct email unavailable (masked)</span>
                           {getEmailStatusBadge('unavailable')}
                         </div>
                       )}
@@ -211,13 +239,20 @@ export function LeadSearchTab({
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        lead.provenance === 'live' ? 'bg-emerald-500/15 text-emerald-300' :
-                        lead.provenance === 'manually_sourced' ? 'bg-indigo-500/15 text-indigo-300' :
-                        'bg-amber-500/15 text-amber-300'
-                      }`}>
-                        {lead.provenance.toUpperCase()}
-                      </span>
+                      <div className="flex flex-col items-start gap-0.5">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          lead.provenance === 'live' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' :
+                          lead.provenance === 'manually_sourced' ? 'bg-indigo-500/15 text-indigo-300' :
+                          'bg-amber-500/15 text-amber-300'
+                        }`}>
+                          {lead.source_provider === 'apollo' ? 'APOLLO LIVE' : lead.provenance.toUpperCase()}
+                        </span>
+                        {lead.provider_person_id && (
+                          <span className="text-[9px] font-mono text-slate-400">
+                            PID: {lead.provider_person_id.slice(0, 10)}...
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     <td className="py-3 px-4 text-right">

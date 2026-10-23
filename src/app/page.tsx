@@ -203,20 +203,26 @@ export default function App() {
   };
 
   const handleSearchLeadsForCompany = async (companyId: string) => {
-    const res = await fetch('/api/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ companyId })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.contacts) {
-        setContacts(prev => {
-          const others = prev.filter(c => c.company_id !== companyId);
-          return [...data.contacts, ...others];
-        });
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companyId })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        if (data.contacts) {
+          setContacts(prev => {
+            const others = prev.filter(c => c.company_id !== companyId);
+            return [...data.contacts, ...others];
+          });
+        }
+        await loadPlatformData();
+      } else {
+        alert(`Decision-Maker Discovery Notice: ${data.error || 'Provider returned an error'}`);
       }
-      await loadPlatformData();
+    } catch (err: any) {
+      alert(`Network error searching decision-makers: ${err.message}`);
     }
   };
 
@@ -228,13 +234,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ leadId })
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.enrichment) {
         setEnrichments(prev => ({
           ...prev,
           [leadId]: data.enrichment
         }));
+      } else {
+        alert(`Enrichment Notice: ${data.error || 'Enrichment failed'}`);
       }
+    } catch (err: any) {
+      alert(`Network error enriching lead: ${err.message}`);
     } finally {
       setIsEnriching(false);
     }
@@ -363,12 +373,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'run' })
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.execution) {
         setLatestExecution(data.execution);
         setLogs(data.logs || []);
         await loadPlatformData();
+      } else {
+        alert(`Pipeline Execution Warning: ${data.error || 'Failed to complete workflow run'}`);
+        await loadPlatformData();
       }
+    } catch (err: any) {
+      alert(`Network error running pipeline: ${err.message}`);
     } finally {
       setIsRunningWorkflow(false);
     }
@@ -382,12 +397,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'resume' })
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.execution) {
         setLatestExecution(data.execution);
         setLogs(data.logs || []);
         await loadPlatformData();
+      } else {
+        alert(`Pipeline Resume Warning: ${data.error || 'Failed to resume workflow'}`);
+        await loadPlatformData();
       }
+    } catch (err: any) {
+      alert(`Network error resuming pipeline: ${err.message}`);
     } finally {
       setIsRunningWorkflow(false);
     }
@@ -416,6 +436,8 @@ export default function App() {
     <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col">
       <Header
         demoMode={settings.demo_mode_active}
+        apolloConnected={Boolean((settings as any).apollo_configured)}
+        geminiConnected={Boolean((settings as any).gemini_configured)}
         onResetDemo={handleResetDemo}
         onOpenGuidedDemo={() => setIsGuidedDemoOpen(true)}
         onOpenLimitations={() => setIsLimitationsOpen(true)}

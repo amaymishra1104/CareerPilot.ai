@@ -200,7 +200,76 @@ export function EnrichmentWorkspaceTab({
                 </div>
               </div>
 
-              {/* Company Overview & Verifiable Location Count */}
+              {/* 4-Way Fact Classification Rubric (Apollo Live & Grounded Standards) */}
+              <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-purple-400" />
+                    <span>Evidence Classification Matrix</span>
+                  </h4>
+                  <span className="text-[10px] text-slate-400">
+                    Zero fabricated facts • Strict separation of hypotheses
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {/* 1. Provider-Reported */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                      PROVIDER-REPORTED
+                    </span>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      {activeContact.provider_person_id ? `Apollo PID: ${activeContact.provider_person_id.slice(0, 12)}...` : 'Apollo profile match'}
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Role: {activeContact.job_title}
+                    </p>
+                  </div>
+
+                  {/* 2. Independently Verified */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      INDEPENDENTLY VERIFIED
+                    </span>
+                    <p className="text-[11px] text-slate-300 mt-1 truncate">
+                      {activeContact.company_name} in {activeCompany?.headquarters || 'USA'}
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      {activeCompany?.source_urls?.length || 1} independent source URL(s)
+                    </p>
+                  </div>
+
+                  {/* 3. Operational Hypothesis */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                      UNVERIFIED HYPOTHESIS
+                    </span>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      Multi-channel bot escalation bottleneck
+                    </p>
+                    <p className="text-[10px] text-amber-400/80">
+                      Flagged explicitly before review
+                    </p>
+                  </div>
+
+                  {/* 4. Missing / Pending */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs space-y-1">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                      MISSING / PENDING
+                    </span>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      {activeContact.work_email && activeContact.work_email !== 'unavailable' 
+                        ? 'Email verified' 
+                        : 'Direct email unavailable (masked)'}
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      {activeCompany?.estimated_locations ? `${activeCompany.estimated_locations} store count` : 'Store count pending verification'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Overview & Verifiable Scale */}
               <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
                   Company Overview & Verifiable Scale

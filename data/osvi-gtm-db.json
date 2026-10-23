@@ -38,10 +38,10 @@
   },
   "settings": {
     "id": "default",
-    "llm_provider": "mock_demo",
+    "llm_provider": "gemini",
     "llm_api_key": "",
-    "llm_model": "gpt-4o-mini",
-    "search_provider": "mock_demo",
+    "llm_model": "gemini-3.5-flash",
+    "search_provider": "apollo",
     "search_api_key": "",
     "gmail_client_id": "",
     "gmail_client_secret": "",
@@ -51,7 +51,9 @@
     "gmail_connected": false,
     "n8n_webhook_secret": "",
     "demo_mode_active": true,
-    "updated_at": "2026-10-23T19:09:47.215Z"
+    "updated_at": "2026-10-23T20:00:52.486Z",
+    "gemini_api_key": "",
+    "apollo_api_key": ""
   },
   "companies": [
     {
@@ -176,8 +178,11 @@
       "source_url": "https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael",
       "retrieval_timestamp": "2026-04-20T12:00:00Z",
       "provenance": "real_curated",
-      "approval_status": "PENDING",
-      "created_at": "2026-10-23T19:09:47.215Z"
+      "approval_status": "APPROVED",
+      "created_at": "2026-10-23T19:09:47.215Z",
+      "approval_evidence_hash": "2682a25af06dbef39e3cdd30618f75a3f08fabe5c9ede449e41a82fb488edcd3",
+      "reviewer_notes": "Approved by reviewer",
+      "reviewed_at": "2026-10-23T19:56:14.770Z"
     },
     {
       "id": "lead-lance-02",
@@ -426,7 +431,7 @@
       "personalization_evidence_claim": "Director of Operations promotion and 190-unit franchise system documented on WaBa Grill leadership roster.",
       "confidence_score": 70,
       "confidence_explanation": "Score 70/100: Sources (20/40, 1 resolved URL) + Authority (30/30, franchisor leadership roster) + Recency (20/20, 2026 appointment) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
-      "last_verified_timestamp": "2026-04-20T12:00:00Z",
+      "last_verified_timestamp": "2026-10-23T19:45:58.859Z",
       "evidence_sources": [
         {
           "id": "ev-waba-01",
@@ -485,9 +490,222 @@
       "created_at": "2026-10-23T19:09:47.215Z"
     }
   },
-  "approvalHistory": [],
-  "emailSequences": {},
-  "emailDrafts": [],
-  "workflowExecutions": [],
-  "workflowLogs": []
+  "approvalHistory": [
+    {
+      "id": "hist-1792785374770-yz2at",
+      "lead_id": "lead-john-01",
+      "previous_status": "PENDING",
+      "new_status": "APPROVED",
+      "reviewer_notes": "Approved by reviewer",
+      "changed_at": "2026-10-23T19:56:14.770Z",
+      "changed_by": "amaymishra1104@gmail.com (Auditor)"
+    }
+  ],
+  "emailSequences": {
+    "lead-john-01": {
+      "id": "seq-lead-john-01",
+      "lead_id": "lead-john-01",
+      "contact_name": "John Ishmael",
+      "contact_email": "unavailable",
+      "company_name": "Taziki's Mediterranean Cafe",
+      "emails": [
+        {
+          "sequence_step": 1,
+          "day_offset": 1,
+          "step_title": "Initial Personalized Introduction",
+          "subject": "Operations & multi-day journey orchestration at Taziki's Mediterranean Cafe",
+          "body": "Hi John,\n\nNoticed Taziki's ongoing expansion across ~100 locations and your operational initiative connecting frontline guest feedback with multi-unit consistency.\n\nGiven your role as Chief Operating Officer overseeing operational standards across Taziki's Mediterranean Cafe's 100 locations, I wanted to share how multi-unit operators orchestrate complex customer journeys.\n\nAt OSVI.ai, we developed Journey — an orchestration layer above traditional voice and chat bots designed for multi-agent teamwork and outcome-driven automation. Rather than deploying isolated point solutions that hit dead-ends when an inquiry requires store intervention, Journey coordinates specialized long-horizon agents with persistent memory across channels and days, backed by strict guardrails and seamless human handoff.\n\nAre you open to a brief conversation next week to see how Journey approaches multi-day customer interaction orchestration across multi-unit operators?\n\nBest regards,\n\n[Amay Mishra / GTM Lead at OSVI.ai]\namaymishra1104@gmail.com\n\n---\nOpt-out: If this isn't relevant to your current operational priorities, reply 'unsubscribe' and I will immediately remove you from future notes.",
+          "personalization_lines": [
+            "Noticed Taziki's ongoing expansion across ~100 locations and your operational initiative connecting frontline guest feedback with multi-unit consistency.",
+            "Given your role as Chief Operating Officer overseeing operational standards across Taziki's Mediterranean Cafe's 100 locations, I wanted to share how multi-unit operators orchestrate complex customer journeys."
+          ],
+          "evidence_references": [
+            "~100 operating units across 16 states and COO appointment documented at tazikisfranchising.com.",
+            "Sourced scale profile (100 locations) via https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael"
+          ],
+          "evidence_ids": [
+            "ev-tazikis-01",
+            "ev-tazikis-02"
+          ]
+        },
+        {
+          "sequence_step": 2,
+          "day_offset": 4,
+          "step_title": "Relevant Use Case & Business Value",
+          "subject": "Multi-day journey orchestration (proof from Domino's India)",
+          "body": "Hi John,\n\nFollowing up on my earlier note.\n\nIn reviewing Taziki's Mediterranean Cafe's operations, we often observe that coordinating high-volume catering inquiries and store-level feedback across ~100 locations without overloading general managers. creates coordination strain between customer channels and store general managers.\n\nWhen standalone chatbots or automated phone menus handle inquiries, they typically lack persistent state. If a customer starts an interaction on mobile and follows up by phone two days later, context is lost.\n\nOSVI.ai Journey solves this by functioning as an orchestration layer above conversational bots:\n- Proven at Scale: In Domino's India's large-scale rider reactivation and recruitment journeys across WhatsApp and voice (supporting 7 languages for 100k+ riders), Journey achieved a 3x increase in chat conversions (case study: https://www.osvi.ai/case-studies/dominos).\n- Multi-Day Memory: Agents maintain persistent conversational context across multiple days for catering inquiries, crew onboarding, and guest feedback loops.\n- Deterministic Guardrails: Safely escalates operational exceptions directly to store managers with complete interaction history.\n\nWould you be open to a 10-minute walkthrough of how our multi-agent architecture coordinates complex workflows?\n\nBest regards,\n\n[Amay Mishra / GTM Lead at OSVI.ai]\namaymishra1104@gmail.com\n\n---\nOpt-out: Reply 'unsubscribe' to stop future emails.",
+          "personalization_lines": [
+            "In reviewing Taziki's Mediterranean Cafe's operations, we often observe that coordinating high-volume catering inquiries and store-level feedback across ~100 locations without overloading general managers. creates coordination strain between customer channels and store general managers."
+          ],
+          "evidence_references": [
+            "Operational challenge assessment: Coordinating high-volume catering inquiries and store-level feedback across ~100 locations without overloading general managers."
+          ],
+          "evidence_ids": [
+            "ev-tazikis-01"
+          ]
+        },
+        {
+          "sequence_step": 3,
+          "day_offset": 8,
+          "step_title": "Thoughtful Workflow Question",
+          "subject": "Question on Taziki's Mediterranean Cafe's multi-day inquiry handoffs",
+          "body": "Hi John,\n\nAs Chief Operating Officer managing operational execution across 100 locations, you know where single-turn AI chatbots hit limits.\n\nI had a quick question regarding how your team currently handles multi-touchpoint interactions:\n\nWhen a customer inquiry spans multiple days — such as a large catering reservation change, a driver onboarding question, or an escalated guest service loop — how do your current systems coordinate that request between front-line channels and store teams?\n\nMost operators tell us their bots either drop the ball or blindly forward unstructured emails to store managers. Journey was built to orchestrate long-horizon teamwork among autonomous agents so customer inquiries reach actual operational resolution.\n\nCurious if this is an area you are exploring this quarter.\n\nBest regards,\n\n[Amay Mishra / GTM Lead at OSVI.ai]\namaymishra1104@gmail.com\n\n---\nOpt-out: Reply 'unsubscribe' to stop future emails.",
+          "personalization_lines": [
+            "As Chief Operating Officer managing operational execution across 100 locations, you know where single-turn AI chatbots hit limits."
+          ],
+          "evidence_references": [
+            "Role inquiry for Chief Operating Officer (100 locations)"
+          ],
+          "evidence_ids": [
+            "ev-tazikis-01"
+          ]
+        },
+        {
+          "sequence_step": 4,
+          "day_offset": 13,
+          "step_title": "Polite Close-the-Loop Message",
+          "subject": "Closing the loop — OSVI Journey & Taziki's Mediterranean Cafe",
+          "body": "Hi John,\n\nI recognize you're fully focused on driving operational performance across Taziki's Mediterranean Cafe's 100 locations. I don't want to crowd your inbox if multi-agent journey orchestration is not a current priority.\n\nIf you ever explore ways to move beyond traditional standalone bots toward long-horizon agent teamwork with persistent memory, guardrails, and safe human handoff, feel free to reach back out.\n\nWishing you and the Taziki's Mediterranean Cafe team continued operational success.\n\nWarm regards,\n\n[Amay Mishra / GTM Lead at OSVI.ai]\namaymishra1104@gmail.com\n\n---\nOpt-out: Reply 'unsubscribe' to stop future emails.",
+          "personalization_lines": [
+            "I recognize you're fully focused on driving operational performance across Taziki's Mediterranean Cafe's 100 locations."
+          ],
+          "evidence_references": [
+            "Summary closing referencing 100 locations"
+          ],
+          "evidence_ids": [
+            "ev-tazikis-01"
+          ]
+        }
+      ],
+      "status": "GENERATED",
+      "created_at": "2026-10-23T19:56:19.157Z",
+      "updated_at": "2026-10-23T19:57:24.640Z"
+    }
+  },
+  "emailDrafts": [
+    {
+      "id": "draft-lead-john-01-step-1",
+      "sequence_id": "seq-lead-john-01",
+      "lead_id": "lead-john-01",
+      "sequence_step": 1,
+      "recipient_email": "amaymishra1104@gmail.com",
+      "recipient_name": "John Ishmael",
+      "subject": "Operations & multi-day journey orchestration at Taziki's Mediterranean Cafe",
+      "body_html": "Hi John,<br/><br/>Noticed Taziki's ongoing expansion across ~100 locations and your operational initiative connecting frontline guest feedback with multi-unit consistency.<br/><br/>Given your role as Chief Operating Officer overseeing operational standards across Taziki's Mediterranean Cafe's 100 locations, I wanted to share how multi-unit operators orchestrate complex customer journeys.<br/><br/>At OSVI.ai, we developed Journey — an orchestration layer above traditional voice and chat bots designed for multi-agent teamwork and outcome-driven automation. Rather than deploying isolated point solutions that hit dead-ends when an inquiry requires store intervention, Journey coordinates specialized long-horizon agents with persistent memory across channels and days, backed by strict guardrails and seamless human handoff.<br/><br/>Are you open to a brief conversation next week to see how Journey approaches multi-day customer interaction orchestration across multi-unit operators?<br/><br/>Best regards,<br/><br/>[Amay Mishra / GTM Lead at OSVI.ai]<br/>amaymishra1104@gmail.com<br/><br/>---<br/>Opt-out: If this isn't relevant to your current operational priorities, reply 'unsubscribe' and I will immediately remove you from future notes.",
+      "scheduled_day_text": "Day 1 (Sequence Step 1)",
+      "created_in_gmail": false,
+      "created_at": "2026-10-23T19:56:26.237Z",
+      "is_approval_revoked": false,
+      "updated_at": "2026-10-23T19:57:24.645Z"
+    },
+    {
+      "id": "draft-lead-john-01-step-2",
+      "sequence_id": "seq-lead-john-01",
+      "lead_id": "lead-john-01",
+      "sequence_step": 2,
+      "recipient_email": "amaymishra1104@gmail.com",
+      "recipient_name": "John Ishmael",
+      "subject": "Multi-day journey orchestration (proof from Domino's India)",
+      "body_html": "Hi John,<br/><br/>Following up on my earlier note.<br/><br/>In reviewing Taziki's Mediterranean Cafe's operations, we often observe that coordinating high-volume catering inquiries and store-level feedback across ~100 locations without overloading general managers. creates coordination strain between customer channels and store general managers.<br/><br/>When standalone chatbots or automated phone menus handle inquiries, they typically lack persistent state. If a customer starts an interaction on mobile and follows up by phone two days later, context is lost.<br/><br/>OSVI.ai Journey solves this by functioning as an orchestration layer above conversational bots:<br/>- Proven at Scale: In Domino's India's large-scale rider reactivation and recruitment journeys across WhatsApp and voice (supporting 7 languages for 100k+ riders), Journey achieved a 3x increase in chat conversions (case study: https://www.osvi.ai/case-studies/dominos).<br/>- Multi-Day Memory: Agents maintain persistent conversational context across multiple days for catering inquiries, crew onboarding, and guest feedback loops.<br/>- Deterministic Guardrails: Safely escalates operational exceptions directly to store managers with complete interaction history.<br/><br/>Would you be open to a 10-minute walkthrough of how our multi-agent architecture coordinates complex workflows?<br/><br/>Best regards,<br/><br/>[Amay Mishra / GTM Lead at OSVI.ai]<br/>amaymishra1104@gmail.com<br/><br/>---<br/>Opt-out: Reply 'unsubscribe' to stop future emails.",
+      "scheduled_day_text": "Day 4 (Sequence Step 2)",
+      "created_in_gmail": false,
+      "created_at": "2026-10-23T19:56:26.246Z"
+    },
+    {
+      "id": "draft-lead-john-01-step-3",
+      "sequence_id": "seq-lead-john-01",
+      "lead_id": "lead-john-01",
+      "sequence_step": 3,
+      "recipient_email": "amaymishra1104@gmail.com",
+      "recipient_name": "John Ishmael",
+      "subject": "Question on Taziki's Mediterranean Cafe's multi-day inquiry handoffs",
+      "body_html": "Hi John,<br/><br/>As Chief Operating Officer managing operational execution across 100 locations, you know where single-turn AI chatbots hit limits.<br/><br/>I had a quick question regarding how your team currently handles multi-touchpoint interactions:<br/><br/>When a customer inquiry spans multiple days — such as a large catering reservation change, a driver onboarding question, or an escalated guest service loop — how do your current systems coordinate that request between front-line channels and store teams?<br/><br/>Most operators tell us their bots either drop the ball or blindly forward unstructured emails to store managers. Journey was built to orchestrate long-horizon teamwork among autonomous agents so customer inquiries reach actual operational resolution.<br/><br/>Curious if this is an area you are exploring this quarter.<br/><br/>Best regards,<br/><br/>[Amay Mishra / GTM Lead at OSVI.ai]<br/>amaymishra1104@gmail.com<br/><br/>---<br/>Opt-out: Reply 'unsubscribe' to stop future emails.",
+      "scheduled_day_text": "Day 8 (Sequence Step 3)",
+      "created_in_gmail": false,
+      "created_at": "2026-10-23T19:56:26.256Z"
+    },
+    {
+      "id": "draft-lead-john-01-step-4",
+      "sequence_id": "seq-lead-john-01",
+      "lead_id": "lead-john-01",
+      "sequence_step": 4,
+      "recipient_email": "amaymishra1104@gmail.com",
+      "recipient_name": "John Ishmael",
+      "subject": "Closing the loop — OSVI Journey & Taziki's Mediterranean Cafe",
+      "body_html": "Hi John,<br/><br/>I recognize you're fully focused on driving operational performance across Taziki's Mediterranean Cafe's 100 locations. I don't want to crowd your inbox if multi-agent journey orchestration is not a current priority.<br/><br/>If you ever explore ways to move beyond traditional standalone bots toward long-horizon agent teamwork with persistent memory, guardrails, and safe human handoff, feel free to reach back out.<br/><br/>Wishing you and the Taziki's Mediterranean Cafe team continued operational success.<br/><br/>Warm regards,<br/><br/>[Amay Mishra / GTM Lead at OSVI.ai]<br/>amaymishra1104@gmail.com<br/><br/>---<br/>Opt-out: Reply 'unsubscribe' to stop future emails.",
+      "scheduled_day_text": "Day 13 (Sequence Step 4)",
+      "created_in_gmail": false,
+      "created_at": "2026-10-23T19:56:26.268Z"
+    }
+  ],
+  "workflowExecutions": [
+    {
+      "id": "exec-1792785675349",
+      "started_at": "2026-10-23T20:01:15.355Z",
+      "current_stage": "company_search",
+      "status": "FAILED",
+      "summary": "Failed at Company Search: Apollo plan limitation or exhausted credits (HTTP 403): The api/v1/mixed_companies/search API is not included in your Free plan and is not accessible. All paid plans include full API access. Upgrade your plan from https://www.apollo.io/pricing",
+      "stats": {
+        "companies_found": 0,
+        "leads_identified": 0,
+        "leads_enriched": 0,
+        "pending_approvals": 0,
+        "approved_leads": 0,
+        "rejected_leads": 0,
+        "drafts_created": 0,
+        "workflow_errors": 1
+      }
+    },
+    {
+      "id": "exec-1792784206463",
+      "started_at": "2026-10-23T19:36:46.472Z",
+      "current_stage": "company_search",
+      "status": "FAILED",
+      "summary": "Failed at Company Search: Live Company Search failed: Live provider returned HTTP 401: Unauthorized",
+      "stats": {
+        "companies_found": 0,
+        "leads_identified": 0,
+        "leads_enriched": 0,
+        "pending_approvals": 0,
+        "approved_leads": 0,
+        "rejected_leads": 0,
+        "drafts_created": 0,
+        "workflow_errors": 1
+      }
+    }
+  ],
+  "workflowLogs": [
+    {
+      "id": "log-1792785676668-dldn",
+      "execution_id": "exec-1792785675349",
+      "stage": "company_search",
+      "level": "error",
+      "message": "Company search failed: Apollo plan limitation or exhausted credits (HTTP 403): The api/v1/mixed_companies/search API is not included in your Free plan and is not accessible. All paid plans include full API access. Upgrade your plan from https://www.apollo.io/pricing",
+      "timestamp": "2026-10-23T20:01:16.668Z"
+    },
+    {
+      "id": "log-1792785675359-xm81",
+      "execution_id": "exec-1792785675349",
+      "stage": "company_search",
+      "level": "info",
+      "message": "Beginning Company Search using Apollo.io Live Provider. Target ICP: US QSR / Fast-Casual chains (20-200 units).",
+      "timestamp": "2026-10-23T20:01:15.359Z"
+    },
+    {
+      "id": "log-1792784207314-t7v8",
+      "execution_id": "exec-1792784206463",
+      "stage": "company_search",
+      "level": "error",
+      "message": "Company search failed: Live Company Search failed: Live provider returned HTTP 401: Unauthorized",
+      "timestamp": "2026-10-23T19:36:47.314Z"
+    },
+    {
+      "id": "log-1792784206479-c83x",
+      "execution_id": "exec-1792784206463",
+      "stage": "company_search",
+      "level": "info",
+      "message": "Beginning Company Search using Live Provider. ICP: fast-casual, sandwiches, chicken, tacos, mediterranean (20-200 locations).",
+      "timestamp": "2026-10-23T19:36:46.479Z"
+    }
+  ]
 }
