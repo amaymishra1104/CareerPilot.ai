@@ -1,4 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import os from 'os';
+import path from 'path';
+import fs from 'fs';
+import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
+
+const testDbPath = path.join(os.tmpdir(), `osvi-test-db-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
+process.env.OSVI_DB_PATH = testDbPath;
+
 import { Store } from '../src/lib/storage';
 import { DemoSearchProvider } from '../src/lib/providers/demo-provider';
 import { LiveSearchProvider } from '../src/lib/providers/live-provider';
@@ -13,6 +20,16 @@ import { Company, Contact, EnrichmentRecord } from '../src/types';
 describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   beforeEach(() => {
     Store.resetToDemo();
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbPath)) {
+      try {
+        fs.unlinkSync(testDbPath);
+      } catch {
+        // ignore
+      }
+    }
   });
 
   // 1. Company and Contact Deduplication

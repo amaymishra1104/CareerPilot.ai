@@ -34,15 +34,25 @@ interface DatabaseSchema {
   workflowLogs: WorkflowLog[];
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_PATH = path.join(DATA_DIR, 'osvi-gtm-db.json');
+function getDbPath(): string {
+  if (process.env.OSVI_DB_PATH) {
+    return process.env.OSVI_DB_PATH;
+  }
+  return path.join(process.cwd(), 'data', 'osvi-gtm-db.json');
+}
+
+function getDataDir(): string {
+  return path.dirname(getDbPath());
+}
 
 function ensureDbFile(): DatabaseSchema {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  const dataDir = getDataDir();
+  const dbPath = getDbPath();
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  if (!fs.existsSync(DB_PATH)) {
+  if (!fs.existsSync(dbPath)) {
     const initialData: DatabaseSchema = {
       icp: INITIAL_ICP,
       settings: INITIAL_SETTINGS,
@@ -55,12 +65,12 @@ function ensureDbFile(): DatabaseSchema {
       workflowExecutions: [],
       workflowLogs: []
     };
-    fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2), 'utf-8');
+    fs.writeFileSync(dbPath, JSON.stringify(initialData, null, 2), 'utf-8');
     return initialData;
   }
 
   try {
-    const raw = fs.readFileSync(DB_PATH, 'utf-8');
+    const raw = fs.readFileSync(dbPath, 'utf-8');
     return JSON.parse(raw) as DatabaseSchema;
   } catch (err) {
     console.error('Error reading local db, resetting:', err);
@@ -76,16 +86,18 @@ function ensureDbFile(): DatabaseSchema {
       workflowExecutions: [],
       workflowLogs: []
     };
-    fs.writeFileSync(DB_PATH, JSON.stringify(fallback, null, 2), 'utf-8');
+    fs.writeFileSync(dbPath, JSON.stringify(fallback, null, 2), 'utf-8');
     return fallback;
   }
 }
 
 function saveDb(data: DatabaseSchema): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  const dataDir = getDataDir();
+  const dbPath = getDbPath();
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
   }
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 export class LocalStore {
