@@ -68,14 +68,14 @@ export function GuidedDemoModal({
     },
     {
       step: 4,
-      title: 'Reject One Lead (e.g. Sarah Jenkins)',
+      title: 'Reject One Lead (e.g. Lance Juhas)',
       description: 'Test the Human Approval Gate by rejecting a lead with explicit reviewer notes and reason. Verified that rejection is logged to the audit history.',
       tab: 'approvals',
-      actionLabel: 'Reject Sarah Jenkins (Torchy\'s)',
+      actionLabel: 'Reject Lance Juhas (Piada)',
       execute: async () => {
         setIsExecutingAction(true);
         try {
-          await onRejectLead('lead-sarah-02', 'Out of target tier this quarter', 'Executive role does not oversee guest operations');
+          await onRejectLead('lead-lance-02', 'Out of target tier this quarter', 'Executive role does not oversee guest operations');
           onNavigateTab('approvals');
         } finally {
           setIsExecutingAction(false);
@@ -84,14 +84,14 @@ export function GuidedDemoModal({
     },
     {
       step: 5,
-      title: 'Approve Another Lead (e.g. Marcus Vance)',
+      title: 'Approve Another Lead (e.g. John Ishmael)',
       description: 'Grant explicit human approval with reviewer notes. Lead status transitions from PENDING to APPROVED, unlocking sequence synthesis.',
       tab: 'approvals',
-      actionLabel: 'Approve Marcus Vance (Firehouse)',
+      actionLabel: 'Approve John Ishmael (Taziki\'s)',
       execute: async () => {
         setIsExecutingAction(true);
         try {
-          await onApproveLead('lead-marcus-01', 'Verified 48 locations in Carolinas and active ops hiring.');
+          await onApproveLead('lead-john-01', 'Verified ~100 locations across Southeast and active catering surge.');
           onNavigateTab('approvals');
         } finally {
           setIsExecutingAction(false);
@@ -103,11 +103,11 @@ export function GuidedDemoModal({
       title: 'Generate Four Emails for Approved Lead',
       description: 'Synthesize the 4 distinct emails (Day 1 Intro, Day 4 Value, Day 8 Question, Day 13 Close Loop) highlighting personalization lines derived from enrichment.',
       tab: 'sequences',
-      actionLabel: 'Synthesize 4 Emails for Marcus Vance',
+      actionLabel: 'Synthesize 4 Emails for John Ishmael',
       execute: async () => {
         setIsExecutingAction(true);
         try {
-          await onGenerateSequence('lead-marcus-01');
+          await onGenerateSequence('lead-john-01');
           onNavigateTab('sequences');
         } finally {
           setIsExecutingAction(false);
@@ -125,14 +125,14 @@ export function GuidedDemoModal({
     {
       step: 8,
       title: 'Demonstrate Server Gate (Zero Drafts for Rejected Leads)',
-      description: 'Attempt to force-generate an email sequence or draft for the rejected lead (Sarah Jenkins). Confirm the server returns HTTP 403 Forbidden.',
+      description: 'Attempt to force-generate an email sequence or draft for the rejected lead (Lance Juhas). Confirm the server returns HTTP 403 Forbidden.',
       tab: 'approvals',
       actionLabel: 'Test Server Gate on Rejected Lead',
       execute: async () => {
         setIsExecutingAction(true);
         setTestResult(null);
         try {
-          const res = await onTestRejectedLeadGate('lead-sarah-02');
+          const res = await onTestRejectedLeadGate('lead-lance-02');
           setTestResult(res);
         } finally {
           setIsExecutingAction(false);

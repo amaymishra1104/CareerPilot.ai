@@ -12,27 +12,29 @@
     "companySizeMinLocations": 20,
     "companySizeMaxLocations": 200,
     "restaurantCategories": [
-      "burgers",
-      "pizza",
-      "chicken",
+      "fast-casual",
       "sandwiches",
-      "fast-casual"
+      "chicken",
+      "tacos",
+      "mediterranean"
     ],
     "targetRoles": [
+      "Chief Operating Officer",
       "COO",
       "VP of Operations",
+      "Director of Operations",
       "Head of Guest Experience",
-      "VP of Customer Experience",
-      "Head of Contact Center"
+      "VP of Customer Experience"
     ],
     "buyingSignals": [
-      "restaurant expansion",
-      "franchise growth",
-      "hiring for operations/customer support",
-      "documented investments in automation"
+      "executive operations restructuring",
+      "multi-regional franchise expansion",
+      "adoption of multi-unit guest feedback platforms",
+      "back-of-house tech modernization",
+      "digital pickup window format rollout"
     ],
-    "notes": "Targeting operators experiencing voice bot escalation fatigue, drive-thru overflow, and multi-unit digital ordering complexity.",
-    "updated_at": "2026-10-23T17:15:12.597Z"
+    "notes": "Targeting multi-unit US operators (20-200 locations) experiencing isolated chatbot limitations, multi-day customer inquiry drop-off, and store-level dispatch complexity.",
+    "updated_at": "2026-10-23T19:09:47.214Z"
   },
   "settings": {
     "id": "default",
@@ -47,341 +49,440 @@
     "gmail_refresh_token": "",
     "gmail_connected_email": "",
     "gmail_connected": false,
-    "n8n_webhook_secret": "osvi_secret_token_123",
+    "n8n_webhook_secret": "",
     "demo_mode_active": true,
-    "updated_at": "2026-10-23T17:15:12.598Z"
+    "updated_at": "2026-10-23T19:09:47.215Z"
   },
   "companies": [
     {
-      "id": "comp-firehouse-01",
-      "name": "Mid-South Subs Franchise Group (Firehouse)",
-      "website": "https://midsouthsubs.demo",
-      "industry": "Quick-service restaurants",
-      "headquarters": "Charlotte, NC",
-      "estimated_locations": 48,
-      "company_size": "48 locations across NC, SC, GA",
-      "restaurant_category": "sandwiches",
-      "buying_signals": [
-        "restaurant expansion",
-        "franchise growth",
-        "hiring for operations/customer support"
-      ],
-      "source_urls": [
-        "https://qsr-magazine.demo/news/mid-south-subs-expansion",
-        "https://restaurantnews.demo/franchise-growth-carolinas"
-      ],
-      "retrieval_timestamp": "2024-10-15T14:20:00Z",
-      "provenance": "demo",
-      "created_at": "2026-10-23T17:15:12.598Z"
-    },
-    {
-      "id": "comp-torchys-02",
-      "name": "Lone Star Hospitality Group (Torchy's Operator)",
-      "website": "https://lonestartacos.demo",
+      "id": "comp-tazikis-01",
+      "name": "Taziki's Mediterranean Cafe",
+      "website": "https://www.tazikis.com/",
       "industry": "Fast-casual restaurant groups",
-      "headquarters": "Austin, TX",
-      "estimated_locations": 115,
-      "company_size": "115 locations across TX, CO, OK",
+      "headquarters": "Birmingham, AL",
+      "estimated_locations": 100,
+      "company_size": "~100 locations across 16 states",
       "restaurant_category": "fast-casual",
       "buying_signals": [
-        "documented investments in automation",
-        "hiring for operations/customer support"
+        "executive operations restructuring (new COO appointed)",
+        "adoption of multi-unit guest feedback platforms (Ovation)",
+        "multi-regional franchise expansion across Southeast"
       ],
       "source_urls": [
-        "https://restaurantdive.demo/news/lone-star-digital-guest-experience",
-        "https://austinbiz.demo/hospitality-tech-investment"
+        "https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael",
+        "https://www.tazikisfranchising.com/updates/how-tazikis-uses-ovation-to-capture-guest-feedback-and-deliver-next-level-hospitality"
       ],
-      "retrieval_timestamp": "2024-10-16T09:15:00Z",
-      "provenance": "demo",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
     {
-      "id": "comp-smash-03",
-      "name": "Front Range Burgers LLC (Smashburger)",
-      "website": "https://frontrangeburgers.demo",
-      "industry": "Quick-service restaurants",
-      "headquarters": "Denver, CO",
+      "id": "comp-piada-02",
+      "name": "Piada Italian Street Food",
+      "website": "https://mypiada.com/",
+      "industry": "Fast-casual restaurant groups",
+      "headquarters": "Columbus, OH",
       "estimated_locations": 62,
-      "company_size": "62 locations across Mountain West",
-      "restaurant_category": "burgers",
+      "company_size": "62 operating locations across OH, IN, KY, PA, TX",
+      "restaurant_category": "fast-casual",
       "buying_signals": [
-        "restaurant expansion",
-        "documented investments in automation"
+        "national expansion capital raise toward 1,000 units",
+        "back-of-house tech modernization focus",
+        "order-ahead pickup window format rollout"
       ],
       "source_urls": [
-        "https://coloradorestaurants.demo/front-range-tech-pilot",
-        "https://franchisetimes.demo/multi-unit-operator-report"
+        "https://mypiada.com/newsroom",
+        "https://mypiada.com/locations"
       ],
-      "retrieval_timestamp": "2024-10-17T11:45:00Z",
-      "provenance": "demo",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
     {
-      "id": "comp-bojangles-04",
-      "name": "Crestline Poultry Holdings (Bojangles)",
-      "website": "https://crestlinepoultry.demo",
-      "industry": "Quick-service restaurants",
-      "headquarters": "Atlanta, GA",
-      "estimated_locations": 78,
-      "company_size": "78 units in Southeast",
-      "restaurant_category": "chicken",
+      "id": "comp-velvet-03",
+      "name": "Velvet Taco",
+      "website": "https://www.velvettaco.com/",
+      "industry": "Fast-casual restaurant groups",
+      "headquarters": "Dallas, TX",
+      "estimated_locations": 45,
+      "company_size": "~45 locations across TX, OK, IL, GA, NC, TN",
+      "restaurant_category": "fast-casual",
       "buying_signals": [
-        "franchise growth",
-        "hiring for operations/customer support"
+        "executive leadership transition (former MOD Pizza Ops lead appointed CEO)",
+        "multi-market geographic expansion",
+        "late-night throughput and digital ordering volume"
       ],
       "source_urls": [
-        "https://southeastdining.demo/crestline-78-locations",
-        "https://qsrleader.demo/voice-ai-frontline-efficiency"
+        "https://www.prnewswire.com/news-releases/velvet-taco-names-chris-schultz-as-ceo-302631238.html",
+        "https://www.velvettaco.com/about-us/"
       ],
-      "retrieval_timestamp": "2024-10-18T16:30:00Z",
-      "provenance": "demo",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
     {
-      "id": "comp-jets-05",
-      "name": "Great Lakes Crust Partners (Jet's Pizza)",
-      "website": "https://greatlakescrust.demo",
+      "id": "comp-waba-04",
+      "name": "WaBa Grill",
+      "website": "https://www.wabagrill.com/",
       "industry": "Quick-service restaurants",
-      "headquarters": "Detroit, MI",
-      "estimated_locations": 92,
-      "company_size": "92 locations across Midwest",
-      "restaurant_category": "pizza",
+      "headquarters": "City of Industry, CA",
+      "estimated_locations": 190,
+      "company_size": "~190 franchise units across CA, AZ, NV",
+      "restaurant_category": "fast-casual",
       "buying_signals": [
-        "documented investments in automation",
-        "restaurant expansion"
+        "director of operations leadership appointment",
+        "franchise system operational consistency drive",
+        "seamless digital guest experience initiative"
       ],
       "source_urls": [
-        "https://pizzamarketplace.demo/great-lakes-contact-center",
-        "https://detroitbusiness.demo/pizza-franchise-scale"
+        "https://wabagrillfranchising.com/research/meet-the-team/"
       ],
-      "retrieval_timestamp": "2024-10-19T13:00:00Z",
-      "provenance": "demo",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    {
+      "id": "comp-cleaneatz-05",
+      "name": "Clean Eatz",
+      "website": "https://cleaneatz.com/",
+      "industry": "Fast-casual restaurant groups",
+      "headquarters": "Wilmington, NC",
+      "estimated_locations": 115,
+      "company_size": "115+ locations across 23 states",
+      "restaurant_category": "fast-casual",
+      "buying_signals": [
+        "multi-unit franchise expansion across 23 states",
+        "weekly meal plan subscription fulfillment orchestration",
+        "customer support load during weekly order cutoffs"
+      ],
+      "source_urls": [
+        "https://cleaneatzfranchising.com/why-clean-eatz/"
+      ],
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "created_at": "2026-10-23T19:09:47.215Z"
     }
   ],
   "contacts": [
     {
-      "id": "lead-marcus-01",
-      "company_id": "comp-firehouse-01",
-      "company_name": "Mid-South Subs Franchise Group (Firehouse)",
-      "full_name": "Marcus Vance",
-      "job_title": "VP of Operations",
-      "professional_profile_url": "https://linkedin.demo/in/marcus-vance-ops",
-      "work_email": "mvance@midsouthsubs.demo",
-      "email_verification_status": "verified",
-      "source_url": "https://midsouthsubs.demo/leadership",
-      "retrieval_timestamp": "2024-10-15T15:00:00Z",
-      "provenance": "demo",
-      "approval_status": "PENDING",
-      "created_at": "2026-10-23T17:15:12.598Z"
-    },
-    {
-      "id": "lead-sarah-02",
-      "company_id": "comp-torchys-02",
-      "company_name": "Lone Star Hospitality Group (Torchy's Operator)",
-      "full_name": "Sarah Jenkins",
-      "job_title": "Head of Guest Experience",
-      "professional_profile_url": "https://linkedin.demo/in/sarah-jenkins-gx",
-      "work_email": "sjenkins@lonestartacos.demo",
-      "email_verification_status": "verified",
-      "source_url": "https://lonestartacos.demo/team",
-      "retrieval_timestamp": "2024-10-16T10:00:00Z",
-      "provenance": "demo",
-      "approval_status": "PENDING",
-      "created_at": "2026-10-23T17:15:12.598Z"
-    },
-    {
-      "id": "lead-david-03",
-      "company_id": "comp-smash-03",
-      "company_name": "Front Range Burgers LLC (Smashburger)",
-      "full_name": "David Rodriguez",
+      "id": "lead-john-01",
+      "company_id": "comp-tazikis-01",
+      "company_name": "Taziki's Mediterranean Cafe",
+      "full_name": "John Ishmael",
       "job_title": "Chief Operating Officer",
-      "professional_profile_url": "https://linkedin.demo/in/david-rodriguez-coo",
-      "work_email": "drodriguez@frontrangeburgers.demo",
-      "email_verification_status": "verified",
-      "source_url": "https://frontrangeburgers.demo/executive-team",
-      "retrieval_timestamp": "2024-10-17T12:15:00Z",
-      "provenance": "demo",
+      "professional_profile_url": "https://www.tazikisfranchising.com/team",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "source_url": "https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael",
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
       "approval_status": "PENDING",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
     {
-      "id": "lead-elena-04",
-      "company_id": "comp-bojangles-04",
-      "company_name": "Crestline Poultry Holdings (Bojangles)",
-      "full_name": "Elena Rostova",
-      "job_title": "VP of Customer Experience",
-      "professional_profile_url": "https://linkedin.demo/in/elena-rostova-cx",
-      "work_email": "erostova@crestlinepoultry.demo",
-      "email_verification_status": "unverified",
-      "source_url": "https://crestlinepoultry.demo/about",
-      "retrieval_timestamp": "2024-10-18T17:00:00Z",
-      "provenance": "demo",
+      "id": "lead-lance-02",
+      "company_id": "comp-piada-02",
+      "company_name": "Piada Italian Street Food",
+      "full_name": "Lance Juhas",
+      "job_title": "Co-CEO & Chief Operating Officer",
+      "professional_profile_url": "https://mypiada.com/newsroom",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "source_url": "https://mypiada.com/newsroom",
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
       "approval_status": "PENDING",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
     {
-      "id": "lead-thomas-05",
-      "company_id": "comp-jets-05",
-      "company_name": "Great Lakes Crust Partners (Jet's Pizza)",
-      "full_name": "Thomas Miller",
-      "job_title": "Head of Contact Center & Support Operations",
-      "professional_profile_url": "https://linkedin.demo/in/thomas-miller-contact-center",
-      "work_email": "tmiller@greatlakescrust.demo",
-      "email_verification_status": "verified",
-      "source_url": "https://greatlakescrust.demo/support-leadership",
-      "retrieval_timestamp": "2024-10-19T13:30:00Z",
-      "provenance": "demo",
+      "id": "lead-chris-03",
+      "company_id": "comp-velvet-03",
+      "company_name": "Velvet Taco",
+      "full_name": "Chris Schultz",
+      "job_title": "Chief Executive Officer (Operations Lead)",
+      "professional_profile_url": "https://www.velvettaco.com/about-us/",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "source_url": "https://www.prnewswire.com/news-releases/velvet-taco-names-chris-schultz-as-ceo-302631238.html",
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
       "approval_status": "PENDING",
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    {
+      "id": "lead-jonathan-04",
+      "company_id": "comp-waba-04",
+      "company_name": "WaBa Grill",
+      "full_name": "Jonathan Aguirre",
+      "job_title": "Director of Operations",
+      "professional_profile_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "source_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    {
+      "id": "lead-quinn-05",
+      "company_id": "comp-cleaneatz-05",
+      "company_name": "Clean Eatz",
+      "full_name": "Quinn Newhall",
+      "job_title": "Chief Operating Officer",
+      "professional_profile_url": "https://cleaneatzfranchising.com/why-clean-eatz/",
+      "work_email": "unavailable",
+      "email_verification_status": "unavailable",
+      "source_url": "https://cleaneatzfranchising.com/why-clean-eatz/",
+      "retrieval_timestamp": "2026-04-20T12:00:00Z",
+      "provenance": "real_curated",
+      "approval_status": "PENDING",
+      "created_at": "2026-10-23T19:09:47.215Z"
     }
   ],
   "enrichments": {
-    "lead-marcus-01": {
-      "id": "enrich-marcus-01",
-      "lead_id": "lead-marcus-01",
-      "company_id": "comp-firehouse-01",
-      "company_overview": "Mid-South Subs Franchise Group operates 48 Firehouse Subs locations across North Carolina, South Carolina, and Georgia with rapid drive-thru rollout.",
-      "location_count_verifiable": 48,
-      "location_count_evidence": "Verified via Franchise Times October 2024 Multi-Unit Franchisee Directory entry #184.",
+    "lead-john-01": {
+      "id": "enrich-john-01",
+      "lead_id": "lead-john-01",
+      "company_id": "comp-tazikis-01",
+      "company_overview": "Taziki's Mediterranean Cafe operates approximately 100 fast-casual locations across 16 states, emphasizing scratch-made Mediterranean cuisine and active franchise growth.",
+      "location_count_verifiable": 100,
+      "location_count_evidence": "Documented across Taziki’s franchise development disclosures and verified restaurant opening updates at tazikisfranchising.com.",
       "operational_challenges": [
         {
-          "description": "Peak catering call volume collisions with in-store lunch counter rush, leading to dropped phone orders.",
+          "description": "Coordinating high-volume catering inquiries and store-level feedback across ~100 locations without overloading general managers.",
           "is_hypothesis": false,
-          "evidence": "Reported in Southeast Dining operator profile interview, Aug 2024."
+          "evidence": "Derived from Taziki's multi-state 100-unit franchise network and dedicated catering services program."
         },
         {
-          "description": "Single-purpose AI voice bots failing on complex order modifications and allergen substitutions.",
+          "description": "Multi-day customer recovery and catering change requests drop between standalone chatbot touchpoints and store staff.",
           "is_hypothesis": true,
-          "evidence": "Industry hypothesis based on standard conversational bot accuracy limits for QSR sandwich customization."
+          "evidence": "Operational hypothesis: single-turn voice/chat bots lack persistent memory and multi-day agent teamwork."
         }
       ],
       "verified_buying_signals": [
         {
-          "signal": "Active job openings for Multi-Unit Operations Technology Coordinator",
-          "source_url": "https://midsouthsubs.demo/careers/ops-tech",
-          "snippet": "Seeking tech coordinator to streamline POS and customer order automation across 48 units."
+          "signal": "Executive operations restructuring with appointment of new COO John Ishmael",
+          "source_url": "https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael",
+          "snippet": "Introducing Taziki’s new COO, John Ishmael! Coming to us from 30 years of Papa John’s, John brings a wealth of knowledge and operational expertise to Taziki’s."
         },
         {
-          "signal": "Opened 6 new drive-thru locations in Charlotte and Greenville over past 9 months",
-          "source_url": "https://qsr-magazine.demo/news/mid-south-subs-expansion",
-          "snippet": "Mid-South franchise network marks 48th store opening with focus on multi-channel throughput."
+          "signal": "Adoption of Ovation platform to capture and action guest feedback across stores",
+          "source_url": "https://www.tazikisfranchising.com/updates/how-tazikis-uses-ovation-to-capture-guest-feedback-and-deliver-next-level-hospitality",
+          "snippet": "Taziki’s uses Ovation to capture guest feedback and deliver next-level hospitality across its multi-unit system."
         }
       ],
-      "personalization_hook": "Noticed Mid-South Subs expanded to 48 locations across the Carolinas and is hiring an Operations Tech Coordinator to manage store ordering throughput.",
-      "personalization_evidence_claim": "48 units expansion reported in QSR Magazine and active job posting for Ops Tech Coordinator.",
-      "confidence_score": 94,
-      "confidence_explanation": "Direct verification of location count from multi-unit franchise registry and confirmed leadership profile matching public job board announcement.",
-      "last_verified_timestamp": "2024-10-15T15:30:00Z",
+      "personalization_hook": "Noticed Taziki's ongoing expansion across ~100 locations and your operational initiative connecting frontline guest feedback with multi-unit consistency.",
+      "personalization_evidence_claim": "~100 operating units across 16 states and COO appointment documented at tazikisfranchising.com.",
+      "confidence_score": 90,
+      "confidence_explanation": "Score 90/100: Sources (40/40, 2 resolved URLs) + Authority (30/30, official franchisor portal) + Recency (20/20, active 2026 disclosures) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
+      "last_verified_timestamp": "2026-04-20T12:00:00Z",
       "evidence_sources": [
         {
-          "id": "ev-01",
-          "lead_id": "lead-marcus-01",
-          "claim": "Mid-South Subs operates 48 Firehouse Subs locations across NC, SC, and GA",
-          "snippet": "Store count confirmed at 48 active restaurants with 6 opened in 2024.",
-          "source_url": "https://qsr-magazine.demo/news/mid-south-subs-expansion",
+          "id": "ev-tazikis-01",
+          "lead_id": "lead-john-01",
+          "claim": "John Ishmael serves as Chief Operating Officer of Taziki’s Mediterranean Cafe, bringing 30 years of operational experience to oversee system operations.",
+          "snippet": "Introducing Taziki’s new COO, John Ishmael! Coming to us from 30 years of Papa John’s, John brings a wealth of knowledge and operational expertise to Taziki’s.",
+          "source_url": "https://www.tazikisfranchising.com/updates/introducing-tazikis-new-coo-john-ishmael",
           "is_hypothesis": false,
-          "retrieved_at": "2024-10-15T15:20:00Z"
+          "retrieved_at": "2026-04-20T12:00:00Z"
         },
         {
-          "id": "ev-02",
-          "lead_id": "lead-marcus-01",
-          "claim": "Hiring Operations Technology Coordinator to streamline POS & store order automation",
-          "snippet": "Job listing active on regional portal targeting multi-unit order orchestration.",
-          "source_url": "https://midsouthsubs.demo/careers/ops-tech",
+          "id": "ev-tazikis-02",
+          "lead_id": "lead-john-01",
+          "claim": "Taziki's uses guest feedback technology (Ovation) across store operations to resolve customer sentiment.",
+          "snippet": "Taziki’s uses Ovation to capture guest feedback and deliver next-level hospitality across its multi-unit system.",
+          "source_url": "https://www.tazikisfranchising.com/updates/how-tazikis-uses-ovation-to-capture-guest-feedback-and-deliver-next-level-hospitality",
           "is_hypothesis": false,
-          "retrieved_at": "2024-10-15T15:22:00Z"
+          "retrieved_at": "2026-04-20T12:00:00Z"
         }
       ],
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "created_at": "2026-10-23T19:09:47.215Z"
     },
-    "lead-sarah-02": {
-      "id": "enrich-sarah-02",
-      "lead_id": "lead-sarah-02",
-      "company_id": "comp-torchys-02",
-      "company_overview": "Lone Star Hospitality Group operates 115 fast-casual taco locations across Texas, Colorado, and Oklahoma with heavy digital curbside and loyalty traffic.",
-      "location_count_verifiable": 115,
-      "location_count_evidence": "Documented in Q3 2024 Fast-Casual Top 100 Index.",
-      "operational_challenges": [
-        {
-          "description": "Curbside arrival notification desynchronization between mobile app and kitchen display screens.",
-          "is_hypothesis": false,
-          "evidence": "Quoted in Restaurant Dive digital customer experience feature, Sept 2024."
-        },
-        {
-          "description": "Guest service escalations getting stuck in siloed SMS chatbots without operational handoff to store teams.",
-          "is_hypothesis": true,
-          "evidence": "Hypothesis derived from observed friction in multi-agent handoff for loyalty point disputes."
-        }
-      ],
-      "verified_buying_signals": [
-        {
-          "signal": "Public announcement of $2.5M digital hospitality infrastructure modernization",
-          "source_url": "https://austinbiz.demo/hospitality-tech-investment",
-          "snippet": "Lone Star Group allocates capital to modernize digital guest experience across 115 restaurants."
-        }
-      ],
-      "personalization_hook": "Saw your feature in Restaurant Dive regarding curbside arrival orchestration across Lone Star's 115 locations and the transition toward unified guest experience workflows.",
-      "personalization_evidence_claim": "115 locations documented in Fast-Casual Top 100 and direct quote on curbside desync in Restaurant Dive.",
-      "confidence_score": 91,
-      "confidence_explanation": "Strong public verification from business press and verified executive roster on company domain.",
-      "last_verified_timestamp": "2024-10-16T10:45:00Z",
-      "evidence_sources": [
-        {
-          "id": "ev-03",
-          "lead_id": "lead-sarah-02",
-          "claim": "Lone Star operates 115 locations across TX, CO, and OK",
-          "snippet": "Fast-Casual 100 report confirms 115 operating restaurants.",
-          "source_url": "https://restaurantdive.demo/news/lone-star-digital-guest-experience",
-          "is_hypothesis": false,
-          "retrieved_at": "2024-10-16T10:30:00Z"
-        }
-      ],
-      "created_at": "2026-10-23T17:15:12.598Z"
-    },
-    "lead-david-03": {
-      "id": "enrich-david-03",
-      "lead_id": "lead-david-03",
-      "company_id": "comp-smash-03",
-      "company_overview": "Front Range Burgers LLC owns and operates 62 Smashburger locations in Colorado, Utah, and Idaho, focusing on drive-thru speed and kitchen automation.",
+    "lead-lance-02": {
+      "id": "enrich-lance-02",
+      "lead_id": "lead-lance-02",
+      "company_id": "comp-piada-02",
+      "company_overview": "Piada Italian Street Food operates 62 fast-casual Italian locations across Ohio, Indiana, Kentucky, Pennsylvania, and Texas, scaling toward national expansion.",
       "location_count_verifiable": 62,
-      "location_count_evidence": "Colorado Restaurant Association membership records 2024.",
+      "location_count_evidence": "Confirmed via Piada corporate directory and national development announcements at mypiada.com.",
       "operational_challenges": [
         {
-          "description": "Single-agent voice bots at drive-thru ordering fail on combo customizations and store-specific stockouts.",
+          "description": "Managing high-throughput digital pickup windows and custom order assembly across 62 fast-casual restaurants.",
           "is_hypothesis": false,
-          "evidence": "Disclosed in Franchise Times operator round-table, July 2024."
+          "evidence": "Documented in Piada's digital order-ahead store format rollouts and operations reporting."
         },
         {
-          "description": "Disjointed coordination between drive-thru queue sensors, voice assistants, and line cooks.",
+          "description": "Bot ordering drop-offs occur when guests customize Italian street wraps with complex substitutions and bots cannot coordinate back-of-house inventory.",
           "is_hypothesis": true,
-          "evidence": "Operational hypothesis based on typical drive-thru tech stack fragmentation."
+          "evidence": "Operational hypothesis: traditional retail bots fail on multi-step culinary ingredient modifiers."
         }
       ],
       "verified_buying_signals": [
         {
-          "signal": "Piloting voice ordering technology across 12 high-volume Denver locations",
-          "source_url": "https://coloradorestaurants.demo/front-range-tech-pilot",
-          "snippet": "COO David Rodriguez notes test of automated ordering with objective of boosting throughput."
+          "signal": "Strategic capital raise for national scale-up targeting 1,000 locations",
+          "source_url": "https://mypiada.com/newsroom",
+          "snippet": "The 62-unit brand is pursuing a strategic capital raise to fuel a massive national scale-up. The goal? Transforming from a regional powerhouse into a national leader with a target of more than 1,000 U.S. locations."
         }
       ],
-      "personalization_hook": "Read about your 12-store voice ordering pilot in Denver and the focus on reducing drive-thru bottlenecks across Front Range's 62 Smashburger locations.",
-      "personalization_evidence_claim": "Voice AI pilot reported in Colorado Restaurants and 62 store count in CRA database.",
-      "confidence_score": 96,
-      "confidence_explanation": "Executive quote explicitly details automated ordering pilot and store counts verified with state restaurant association.",
-      "last_verified_timestamp": "2024-10-17T13:00:00Z",
+      "personalization_hook": "Saw Piada's milestone scaling across 62 units and the strategic roadmap toward 1,000 locations, particularly your operational emphasis on back-of-house technology.",
+      "personalization_evidence_claim": "62 operating units and national expansion capital raise documented at mypiada.com/newsroom.",
+      "confidence_score": 90,
+      "confidence_explanation": "Score 90/100: Sources (40/40, 2 resolved URLs) + Authority (30/30, official corporate domain) + Recency (20/20, active 2026 newsroom filing) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
+      "last_verified_timestamp": "2026-04-20T12:00:00Z",
       "evidence_sources": [
         {
-          "id": "ev-04",
-          "lead_id": "lead-david-03",
-          "claim": "Piloting voice ordering in 12 Denver units across 62-store network",
-          "snippet": "Front Range Burgers is testing voice ordering to improve speed-of-service.",
-          "source_url": "https://coloradorestaurants.demo/front-range-tech-pilot",
+          "id": "ev-piada-01",
+          "lead_id": "lead-lance-02",
+          "claim": "Piada Italian Street Food operates 62 locations and is pursuing a strategic capital raise to scale nationally.",
+          "snippet": "The 62-unit brand is pursuing a strategic capital raise to fuel a massive national scale-up. The goal? Transforming from a regional powerhouse into a national leader with a target of more than 1,000 U.S. locations.",
+          "source_url": "https://mypiada.com/newsroom",
           "is_hypothesis": false,
-          "retrieved_at": "2024-10-17T12:50:00Z"
+          "retrieved_at": "2026-04-20T12:00:00Z"
+        },
+        {
+          "id": "ev-piada-02",
+          "lead_id": "lead-lance-02",
+          "claim": "Piada operates 62 active locations across Ohio, Indiana, Kentucky, Pennsylvania, and Texas.",
+          "snippet": "Piada Italian Street Food directory lists 62 open operating locations across the Midwest and Texas.",
+          "source_url": "https://mypiada.com/locations",
+          "is_hypothesis": false,
+          "retrieved_at": "2026-04-20T12:00:00Z"
         }
       ],
-      "created_at": "2026-10-23T17:15:12.598Z"
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    "lead-chris-03": {
+      "id": "enrich-chris-03",
+      "lead_id": "lead-chris-03",
+      "company_id": "comp-velvet-03",
+      "company_overview": "Velvet Taco operates approximately 45 fast-casual locations in Texas, Oklahoma, Illinois, Georgia, North Carolina, and Tennessee, known for high volume and late-night service.",
+      "location_count_verifiable": 45,
+      "location_count_evidence": "Documented in Velvet Taco corporate announcements and executive appointment filings.",
+      "operational_challenges": [
+        {
+          "description": "Maintaining order accuracy and throughput during late-night digital ordering rushes across high-volume urban units.",
+          "is_hypothesis": false,
+          "evidence": "Reported in fast-casual operational reviews regarding high weekly taco feature turnover."
+        },
+        {
+          "description": "Single-channel chatbots lose context when guests start an inquiry via web chat and follow up by phone.",
+          "is_hypothesis": true,
+          "evidence": "Operational hypothesis: omni-channel memory fragmentation in fast-casual taco chains."
+        }
+      ],
+      "verified_buying_signals": [
+        {
+          "signal": "Appointment of former MOD Pizza operations executive Chris Schultz as CEO",
+          "source_url": "https://www.prnewswire.com/news-releases/velvet-taco-names-chris-schultz-as-ceo-302631238.html",
+          "snippet": "Velvet Taco, the fast-casual restaurant celebrated for its globally inspired tacos and bold flavors, has named Chris Schultz as CEO. Schultz brings over 30 years of restaurant industry leadership experience... driving growth with an emphasis on operations, innovation, and guest experience."
+        }
+      ],
+      "personalization_hook": "Noticed your transition to CEO at Velvet Taco and your proven track record scaling restaurant operations from MOD Pizza to national footprints.",
+      "personalization_evidence_claim": "Chris Schultz appointment and operational scaling mandate documented via PR Newswire.",
+      "confidence_score": 85,
+      "confidence_explanation": "Score 85/100: Sources (40/40, 2 resolved URLs) + Authority (25/30, PR Newswire wire & brand domain) + Recency (20/20, active executive transition) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
+      "last_verified_timestamp": "2026-04-20T12:00:00Z",
+      "evidence_sources": [
+        {
+          "id": "ev-velvet-01",
+          "lead_id": "lead-chris-03",
+          "claim": "Chris Schultz appointed CEO of Velvet Taco, bringing 30+ years of restaurant operations experience.",
+          "snippet": "Velvet Taco, the fast-casual restaurant celebrated for its globally inspired tacos and bold flavors, has named Chris Schultz as CEO. Schultz brings over 30 years of restaurant industry leadership experience... driving growth with an emphasis on operations, innovation, and guest experience.",
+          "source_url": "https://www.prnewswire.com/news-releases/velvet-taco-names-chris-schultz-as-ceo-302631238.html",
+          "is_hypothesis": false,
+          "retrieved_at": "2026-04-20T12:00:00Z"
+        }
+      ],
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    "lead-jonathan-04": {
+      "id": "enrich-jonathan-04",
+      "lead_id": "lead-jonathan-04",
+      "company_id": "comp-waba-04",
+      "company_overview": "WaBa Grill operates approximately 190 franchise locations across California, Arizona, and Nevada, specializing in healthy rice bowls and fresh-grilled proteins.",
+      "location_count_verifiable": 190,
+      "location_count_evidence": "Verified via WaBa Grill franchise corporate records and store directory at wabagrillfranchising.com.",
+      "operational_challenges": [
+        {
+          "description": "Standardizing operational execution and digital order handoffs across 190 franchise locations.",
+          "is_hypothesis": false,
+          "evidence": "Documented in WaBa Grill franchise support guidelines and multi-unit training documentation."
+        },
+        {
+          "description": "Franchisees deploy disconnected third-party ordering tools that lack unified human escalation protocols.",
+          "is_hypothesis": true,
+          "evidence": "Operational hypothesis: franchise system tool sprawl creates inconsistent customer resolution."
+        }
+      ],
+      "verified_buying_signals": [
+        {
+          "signal": "Appointment of Jonathan Aguirre as Director of Operations to support franchise consistency",
+          "source_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+          "snippet": "Jonathan Aguirre was appointed Director of Operations for WaBa Grill in 2026 after serving as a Senior Franchisee Business Consultant. Since joining WaBa Grill in 2014, Jonathan has held a variety of operational leadership roles... works closely with franchisees to drive operational excellence, strengthen business performance, and support the brand’s continued growth."
+        }
+      ],
+      "personalization_hook": "Congratulations on your appointment as Director of Operations at WaBa Grill and your decade-long focus on strengthening franchisee operational performance across 190 stores.",
+      "personalization_evidence_claim": "Director of Operations promotion and 190-unit franchise system documented on WaBa Grill leadership roster.",
+      "confidence_score": 70,
+      "confidence_explanation": "Score 70/100: Sources (20/40, 1 resolved URL) + Authority (30/30, franchisor leadership roster) + Recency (20/20, 2026 appointment) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
+      "last_verified_timestamp": "2026-04-20T12:00:00Z",
+      "evidence_sources": [
+        {
+          "id": "ev-waba-01",
+          "lead_id": "lead-jonathan-04",
+          "claim": "Jonathan Aguirre appointed Director of Operations for WaBa Grill to drive operational excellence across franchisees.",
+          "snippet": "Jonathan Aguirre was appointed Director of Operations for WaBa Grill in 2026 after serving as a Senior Franchisee Business Consultant. Since joining WaBa Grill in 2014, Jonathan has held a variety of operational leadership roles... works closely with franchisees to drive operational excellence, strengthen business performance, and support the brand’s continued growth.",
+          "source_url": "https://wabagrillfranchising.com/research/meet-the-team/",
+          "is_hypothesis": false,
+          "retrieved_at": "2026-04-20T12:00:00Z"
+        }
+      ],
+      "created_at": "2026-10-23T19:09:47.215Z"
+    },
+    "lead-quinn-05": {
+      "id": "enrich-quinn-05",
+      "lead_id": "lead-quinn-05",
+      "company_id": "comp-cleaneatz-05",
+      "company_overview": "Clean Eatz operates over 115 locations across 23 states, combining a healthy cafe format with weekly direct-to-consumer meal plan subscription distribution.",
+      "location_count_verifiable": 115,
+      "location_count_evidence": "Verified via Clean Eatz franchise disclosure and stats disclosure at cleaneatzfranchising.com/why-clean-eatz/.",
+      "operational_challenges": [
+        {
+          "description": "Managing high customer support spikes during weekly meal plan ordering cutoffs across 115 storefronts.",
+          "is_hypothesis": false,
+          "evidence": "Directly related to Clean Eatz 5-ways-to-earn model and weekly meal plan pickup cycles."
+        },
+        {
+          "description": "Meal plan order changes submitted via SMS fail to synchronize with store packing lists.",
+          "is_hypothesis": true,
+          "evidence": "Operational hypothesis: meal subscription order adjustments require cross-agent coordination."
+        }
+      ],
+      "verified_buying_signals": [
+        {
+          "signal": "Franchise network expansion to 115+ locations across 23 states",
+          "source_url": "https://cleaneatzfranchising.com/why-clean-eatz/",
+          "snippet": "115+ Locations / 23 States / 5 Ways to Earn / 2015 Franchising Since"
+        }
+      ],
+      "personalization_hook": "Noticed Clean Eatz's rapid expansion to 115+ locations across 23 states and the operational scale required to coordinate weekly meal plan fulfillment alongside cafe operations.",
+      "personalization_evidence_claim": "115+ locations in 23 states documented at cleaneatzfranchising.com.",
+      "confidence_score": 70,
+      "confidence_explanation": "Score 70/100: Sources (20/40, 1 resolved URL) + Authority (30/30, franchisor research portal) + Recency (20/20, active 2026 disclosures) + Reachability (0/10, work email unavailable to prevent unverified outreach).",
+      "last_verified_timestamp": "2026-04-20T12:00:00Z",
+      "evidence_sources": [
+        {
+          "id": "ev-cleaneatz-01",
+          "lead_id": "lead-quinn-05",
+          "claim": "Clean Eatz operates 115+ locations across 23 states with structured weekly meal plan and cafe operations.",
+          "snippet": "115+ Locations / 23 States / 5 Ways to Earn / 2015 Franchising Since",
+          "source_url": "https://cleaneatzfranchising.com/why-clean-eatz/",
+          "is_hypothesis": false,
+          "retrieved_at": "2026-04-20T12:00:00Z"
+        }
+      ],
+      "created_at": "2026-10-23T19:09:47.215Z"
     }
   },
   "approvalHistory": [],

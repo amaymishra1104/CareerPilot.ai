@@ -1,4 +1,4 @@
-export type Provenance = 'live' | 'manually_sourced' | 'demo';
+export type Provenance = 'live' | 'manually_sourced' | 'real_curated' | 'demo';
 
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -47,6 +47,7 @@ export interface Contact {
   retrieval_timestamp: string;
   provenance: Provenance;
   approval_status: ApprovalStatus;
+  approval_evidence_hash?: string;
   reviewer_notes?: string;
   rejection_reason?: string;
   reviewed_at?: string;
@@ -108,6 +109,7 @@ export interface EmailMessage {
   body: string;
   personalization_lines: string[];
   evidence_references: string[];
+  evidence_ids?: string[]; // IDs pointing to EvidenceSource.id
   is_edited?: boolean;
 }
 
@@ -137,7 +139,10 @@ export interface EmailDraftRecord {
   gmail_draft_id?: string;
   created_in_gmail: boolean;
   creation_error?: string;
+  is_stale?: boolean;
+  is_approval_revoked?: boolean;
   created_at: string;
+  updated_at?: string;
 }
 
 export type PipelineStage = 
