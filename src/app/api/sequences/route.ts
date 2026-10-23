@@ -110,6 +110,16 @@ export async function PUT(req: Request) {
 
     Store.saveSequence(seq);
 
+    // Propagate edits to existing drafts if already drafted
+    const existingDrafts = Store.getDrafts(leadId, true);
+    const targetDraft = existingDrafts.find(d => d.sequence_step === stepNumber);
+    if (targetDraft) {
+      if (subject !== undefined) targetDraft.subject = subject;
+      if (emailBody !== undefined) targetDraft.body_html = emailBody.replace(/\n/g, '<br/>');
+      targetDraft.updated_at = new Date().toISOString();
+      Store.saveDraft(targetDraft);
+    }
+
     return NextResponse.json({
       success: true,
       sequence: seq

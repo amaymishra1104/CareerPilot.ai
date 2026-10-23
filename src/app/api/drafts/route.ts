@@ -7,7 +7,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const leadId = searchParams.get('leadId') || undefined;
-    const drafts = Store.getDrafts(leadId);
+    const includeRevoked = searchParams.get('includeRevoked') === 'true';
+    const drafts = Store.getDrafts(leadId, includeRevoked);
     return NextResponse.json(drafts);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

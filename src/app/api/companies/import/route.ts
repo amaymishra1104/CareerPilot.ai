@@ -16,7 +16,15 @@ export async function POST(req: Request) {
     }
 
     const addedCompanies = Store.addCompanies(parsed.companies);
-    const addedContacts = Store.addContacts(parsed.contacts);
+    const allCompanies = Store.getCompanies();
+    const mappedContacts = parsed.contacts.map(contact => {
+      const parent = allCompanies.find(c => c.name.toLowerCase() === contact.company_name?.toLowerCase());
+      if (parent) {
+        return { ...contact, company_id: parent.id };
+      }
+      return contact;
+    });
+    const addedContacts = Store.addContacts(mappedContacts);
 
     return NextResponse.json({
       success: true,

@@ -39,7 +39,7 @@ export function WorkflowLogsTab({
   const [copiedCurl, setCopiedCurl] = useState(false);
   const [stageFilter, setStageFilter] = useState<string>('all');
 
-  const webhookSecret = settings.n8n_webhook_secret || 'osvi_secret_token_123';
+  const webhookSecret = settings.n8n_webhook_secret || '<SET_IN_SETTINGS_OR_ENV>';
   const curlExample = `curl -X POST http://localhost:3000/api/workflows/webhook \\
   -H "Content-Type: application/json" \\
   -H "x-osvi-secret: ${webhookSecret}" \\

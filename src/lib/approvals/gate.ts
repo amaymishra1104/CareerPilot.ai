@@ -24,15 +24,15 @@ export class ApprovalGate {
     return contact;
   }
 
-  static approveLead(leadId: string, reviewerNotes?: string): Contact {
-    return Store.updateContactApproval(leadId, 'APPROVED', reviewerNotes);
+  static approveLead(leadId: string, reviewerNotes?: string, changedBy?: string): Contact {
+    return Store.updateContactApproval(leadId, 'APPROVED', reviewerNotes, undefined, changedBy);
   }
 
-  static rejectLead(leadId: string, reviewerNotes?: string, rejectionReason?: string): Contact {
-    return Store.updateContactApproval(leadId, 'REJECTED', reviewerNotes, rejectionReason);
+  static rejectLead(leadId: string, reviewerNotes?: string, rejectionReason?: string, changedBy?: string): Contact {
+    return Store.updateContactApproval(leadId, 'REJECTED', reviewerNotes, rejectionReason, changedBy);
   }
 
-  static resetToPending(leadId: string, reviewerNotes?: string): Contact {
-    return Store.updateContactApproval(leadId, 'PENDING', reviewerNotes);
+  static resetToPending(leadId: string, reviewerNotes?: string, changedBy?: string): Contact {
+    return Store.updateContactApproval(leadId, 'PENDING', reviewerNotes, undefined, changedBy);
   }
 }

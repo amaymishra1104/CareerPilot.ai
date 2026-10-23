@@ -43,6 +43,16 @@ export async function POST(req: Request) {
     seq.updated_at = new Date().toISOString();
     Store.saveSequence(seq);
 
+    // Propagate reset to existing drafts if already drafted
+    const existingDrafts = Store.getDrafts(leadId, true);
+    const targetDraft = existingDrafts.find(d => d.sequence_step === Number(stepNumber));
+    if (targetDraft) {
+      targetDraft.subject = regeneratedEmail.subject;
+      targetDraft.body_html = regeneratedEmail.body.replace(/\n/g, '<br/>');
+      targetDraft.updated_at = new Date().toISOString();
+      Store.saveDraft(targetDraft);
+    }
+
     return NextResponse.json({
       success: true,
       email: regeneratedEmail,

@@ -1,5 +1,4 @@
 import { LocalStore } from './local-store';
-import { getSupabase } from './supabase-store';
 import { 
   ICPConfig, 
   Company, 
@@ -14,10 +13,11 @@ import {
   ApprovalStatus 
 } from '@/types';
 
-export const isSupabaseConfigured = (): boolean => {
-  return getSupabase() !== null;
-};
-
+/**
+ * Universal Store Facade.
+ * Standardized across the application, backed by local transactional JSON persistence
+ * with isolated test environment support via OSVI_DB_PATH.
+ */
 export class Store {
   static getIcp(): ICPConfig {
     return LocalStore.getIcp();
@@ -71,9 +71,10 @@ export class Store {
     lead_id: string, 
     status: ApprovalStatus, 
     reviewer_notes?: string, 
-    rejection_reason?: string
+    rejection_reason?: string,
+    changed_by?: string
   ): Contact {
-    return LocalStore.updateContactApproval(lead_id, status, reviewer_notes, rejection_reason);
+    return LocalStore.updateContactApproval(lead_id, status, reviewer_notes, rejection_reason, changed_by);
   }
 
   static getApprovalHistory(lead_id?: string): ApprovalHistoryItem[] {
@@ -100,8 +101,8 @@ export class Store {
     return LocalStore.saveSequence(sequence);
   }
 
-  static getDrafts(lead_id?: string): EmailDraftRecord[] {
-    return LocalStore.getDrafts(lead_id);
+  static getDrafts(lead_id?: string, includeRevoked: boolean = false): EmailDraftRecord[] {
+    return LocalStore.getDrafts(lead_id, includeRevoked);
   }
 
   static saveDraft(draft: EmailDraftRecord): EmailDraftRecord {

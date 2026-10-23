@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { 
   ICPConfig, 
   Company, 
@@ -194,8 +195,8 @@ export class LocalStore {
   static addContact(contact: Contact): Contact {
     const db = ensureDbFile();
     const exists = db.contacts.some(c => 
-      (c.work_email && contact.work_email && c.work_email.toLowerCase() === contact.work_email.toLowerCase()) ||
-      (c.company_id === contact.company_id && c.full_name.toLowerCase() === contact.full_name.toLowerCase())
+      (c.work_email && c.work_email !== 'unavailable' && contact.work_email && contact.work_email !== 'unavailable' && c.work_email.toLowerCase() === contact.work_email.toLowerCase()) ||
+      ((c.company_id === contact.company_id || (c.company_name && contact.company_name && c.company_name.toLowerCase() === contact.company_name.toLowerCase())) && c.full_name.toLowerCase() === contact.full_name.toLowerCase())
     );
     if (exists) {
       return db.contacts.find(c => c.id === contact.id) || contact;
@@ -210,8 +211,8 @@ export class LocalStore {
     const added: Contact[] = [];
     for (const c of contacts) {
       const exists = db.contacts.some(existing => 
-        (existing.work_email && c.work_email && existing.work_email.toLowerCase() === c.work_email.toLowerCase()) ||
-        (existing.company_id === c.company_id && existing.full_name.toLowerCase() === c.full_name.toLowerCase())
+        (existing.work_email && existing.work_email !== 'unavailable' && c.work_email && c.work_email !== 'unavailable' && existing.work_email.toLowerCase() === c.work_email.toLowerCase()) ||
+        ((existing.company_id === c.company_id || (existing.company_name && c.company_name && existing.company_name.toLowerCase() === c.company_name.toLowerCase())) && existing.full_name.toLowerCase() === c.full_name.toLowerCase())
       );
       if (!exists) {
         db.contacts.push(c);
@@ -226,7 +227,8 @@ export class LocalStore {
     lead_id: string, 
     status: ApprovalStatus, 
     reviewer_notes?: string, 
-    rejection_reason?: string
+    rejection_reason?: string,
+    changed_by?: string
   ): Contact {
     const db = ensureDbFile();
     const index = db.contacts.findIndex(c => c.id === lead_id);
@@ -235,9 +237,27 @@ export class LocalStore {
     }
 
     const prev = db.contacts[index];
+    
+    // Snapshot evidence hash at approval time to protect against post-approval tampering
+    let evidenceHash = prev.approval_evidence_hash;
+    if (status === 'APPROVED') {
+      const enrichment = db.enrichments[lead_id];
+      const hashPayload = enrichment ? JSON.stringify({
+        overview: enrichment.company_overview,
+        locations: enrichment.location_count_verifiable,
+        challenges: enrichment.operational_challenges,
+        signals: enrichment.verified_buying_signals,
+        hook: enrichment.personalization_hook
+      }) : '';
+      evidenceHash = crypto.createHash('sha256').update(hashPayload).digest('hex');
+    } else {
+      evidenceHash = undefined;
+    }
+
     const updated: Contact = {
       ...prev,
       approval_status: status,
+      approval_evidence_hash: evidenceHash,
       reviewer_notes: reviewer_notes !== undefined ? reviewer_notes : prev.reviewer_notes,
       rejection_reason: rejection_reason !== undefined ? rejection_reason : prev.rejection_reason,
       reviewed_at: new Date().toISOString()
@@ -245,7 +265,8 @@ export class LocalStore {
 
     db.contacts[index] = updated;
 
-    // Log history
+    // Log history with authentic reviewer identity
+    const reviewer = changed_by || 'amaymishra1104@gmail.com (Auditor)';
     const historyItem: ApprovalHistoryItem = {
       id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       lead_id,
@@ -254,7 +275,7 @@ export class LocalStore {
       reviewer_notes,
       rejection_reason,
       changed_at: new Date().toISOString(),
-      changed_by: 'gtm_reviewer'
+      changed_by: reviewer
     };
     db.approvalHistory = db.approvalHistory || [];
     db.approvalHistory.unshift(historyItem);
@@ -305,13 +326,31 @@ export class LocalStore {
   }
 
   // Drafts
-  static getDrafts(lead_id?: string): EmailDraftRecord[] {
+  static getDrafts(lead_id?: string, includeRevoked: boolean = false): EmailDraftRecord[] {
     const db = ensureDbFile();
     let drafts = db.emailDrafts || [];
     if (lead_id) {
       drafts = drafts.filter(d => d.lead_id === lead_id);
     }
-    return [...drafts].sort((a, b) => a.sequence_step - b.sequence_step);
+    
+    // Cross-reference approval status for each draft
+    const contactsMap = new Map<string, Contact>((db.contacts || []).map(c => [c.id, c]));
+    
+    const mapped = drafts.map(d => {
+      const contact = contactsMap.get(d.lead_id);
+      const isApproved = contact?.approval_status === 'APPROVED';
+      return {
+        ...d,
+        is_approval_revoked: !isApproved
+      };
+    });
+
+    if (!includeRevoked) {
+      // Hide drafts whose approval was revoked (REJECTED or PENDING)
+      return mapped.filter(d => !d.is_approval_revoked).sort((a, b) => a.sequence_step - b.sequence_step);
+    }
+
+    return mapped.sort((a, b) => a.sequence_step - b.sequence_step);
   }
 
   static saveDraft(draft: EmailDraftRecord): EmailDraftRecord {

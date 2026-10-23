@@ -165,8 +165,13 @@ export class WorkflowRunner {
 
   /**
    * Resumes workflow after human approval has been performed.
+   * STRICT SAFETY GUARANTEE: Does not auto-create drafts without explicit confirmation flag,
+   * and NEVER overwrites user-edited sequences.
    */
-  static async resumeAfterApproval(executionId: string): Promise<WorkflowExecution> {
+  static async resumeAfterApproval(
+    executionId: string,
+    options?: { autoCreateDrafts?: boolean }
+  ): Promise<WorkflowExecution> {
     const execution = Store.getLatestWorkflowExecution() || {
       id: executionId,
       started_at: new Date().toISOString(),
@@ -228,15 +233,26 @@ export class WorkflowRunner {
           continue;
         }
 
-        // Generate 4-email sequence
-        const sequence = EmailSequenceGenerator.generateSequence(lead, company, enrichment);
-        Store.saveSequence(sequence);
-        log('email_generation', 'info', `Generated 4-email sequence for approved lead: ${lead.full_name} (${company.name}).`);
+        // Check if sequence already exists and was customized by user
+        const existingSeq = Store.getSequenceByLeadId(lead.id);
+        let sequence;
+        if (existingSeq && (existingSeq.status === 'MODIFIED' || existingSeq.emails.some(e => e.is_edited))) {
+          sequence = existingSeq;
+          log('email_generation', 'info', `Preserved existing customized sequence for ${lead.full_name} (${company.name}). Not overwriting edits.`);
+        } else {
+          sequence = EmailSequenceGenerator.generateSequence(lead, company, enrichment);
+          Store.saveSequence(sequence);
+          log('email_generation', 'info', `Generated 4-email sequence for approved lead: ${lead.full_name} (${company.name}).`);
+        }
 
-        // Create drafts
-        const draftRes = await GmailIntegrationService.createDraftsForSequence(sequence.id, settings);
-        draftsCount += draftRes.draftsCreated;
-        log('email_generation', 'success', `Saved ${draftRes.draftsCreated} email drafts for ${lead.full_name} in ${settings.gmail_connected ? 'Gmail Drafts' : 'Internal Draft Queue'}.`);
+        // Draft creation requires explicit confirmation
+        if (options?.autoCreateDrafts) {
+          const draftRes = await GmailIntegrationService.createDraftsForSequence(sequence.id, settings);
+          draftsCount += draftRes.draftsCreated;
+          log('email_generation', 'success', `Saved ${draftRes.draftsCreated} email drafts for ${lead.full_name} in ${settings.gmail_connected ? 'Gmail Drafts' : 'Internal Draft Queue'}.`);
+        } else {
+          log('email_generation', 'info', `Draft creation queued for ${lead.full_name}. Requires explicit per-lead confirmation to protect against accidental sending.`);
+        }
       } catch (err: any) {
         log('email_generation', 'error', `Failed generating sequence/drafts for ${lead.full_name}: ${err.message}`);
         execution.stats.workflow_errors++;
@@ -246,7 +262,9 @@ export class WorkflowRunner {
     execution.stats.drafts_created = draftsCount;
     execution.status = 'COMPLETED';
     execution.completed_at = new Date().toISOString();
-    execution.summary = `Workflow successfully completed! Generated sequences and created ${draftsCount} drafts for approved leads. Zero drafts created for rejected/pending leads.`;
+    execution.summary = options?.autoCreateDrafts
+      ? `Workflow successfully completed! Created ${draftsCount} drafts for approved leads.`
+      : `Workflow completed! Prepared sequences for ${approvedLeads.length} approved leads. Draft creation held for explicit operator review.`;
     Store.saveWorkflowExecution(execution);
 
     return execution;

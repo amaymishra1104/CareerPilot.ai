@@ -5,7 +5,15 @@ import { WorkflowRunner } from '@/lib/workflow/runner';
 export async function POST(req: Request) {
   try {
     const settings = Store.getSettings();
-    const configuredSecret = settings.n8n_webhook_secret || 'osvi_secret_token_123';
+    const configuredSecret = settings.n8n_webhook_secret;
+
+    // Fail closed: Webhook MUST NOT authenticate if secret is unconfigured
+    if (!configuredSecret || configuredSecret.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Unauthorized: N8N webhook secret is not configured on the server. Webhook endpoint is closed.' },
+        { status: 401 }
+      );
+    }
 
     // Verify authentication secret
     const headerSecret = req.headers.get('x-osvi-secret') || 
