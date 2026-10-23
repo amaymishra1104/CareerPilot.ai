@@ -20,21 +20,20 @@ import {
 export function DentalAdaptationTab() {
   const [copied, setCopied] = React.useState(false);
 
-  const tenLineAnswer = [
-    "1. Target ICP: US Dental Service Organizations (DSOs) & regional practice networks (15–150 clinics; e.g. Heartland, Aspen Dental).",
-    "2. Decision-Makers: Chief Operating Officer, VP of Clinical Operations, Head of Patient Experience, Director of Practice Operations.",
-    "3. Buying Signals: Practice acquisitions (M&A rollups), de novo clinic expansion, appointment backlog, and hygiene recall leakage.",
-    "4. Stage 1 (Search): Queries state dental registries and DSO databases instead of restaurant franchisee directories; filters by clinic count.",
+  const nineLineAnswer = [
+    "1. Target ICP: US Dental Service Organizations (DSOs) & regional practice networks (15–150 clinics; e.g. regional group practices).",
+    "2. Target Roles: Chief Operating Officer, VP of Clinical Operations, VP/Director of Patient Experience, Director of Practice Operations.",
+    "3. Buying Signals: M&A clinic integrations, multi-location front-desk hiring, online booking friction, and hygiene recall leakage.",
+    "4. Stage 1 (Search): Queries state dental board registries and DSO directories filtering by 15–150 clinic count instead of restaurant franchisee lists.",
     "5. Stage 2 (Leads): Targets clinical operations and patient experience executives instead of store operations directors.",
-    "6. Stage 3 (Enrichment): Scrapes clinic counts, practice management software (Dentrix/Eaglesoft), and intake friction instead of drive-thru/POS data.",
+    "6. Stage 3 (Enrichment): Detects practice management software (Dentrix/Eaglesoft) via job postings and technographics (not EHR scraping).",
     "7. Stage 4 (Approval): 100% UNCHANGED — Mandatory human review gate, evidence auditing, and duplicate prevention remain identical.",
-    "8. Stage 5 (Outreach): 4-email cadence (Days 1, 4, 8, 13) and draft-only queue remain 100% UNCHANGED.",
-    "9. Messaging: Shifts from order exception coordination to patient intake orchestration, appointment reminder sequences, and recall rebooking.",
-    "10. Safety Boundaries: Strict non-clinical triage boundary (never diagnose; escalate medical inquiries to clinicians) and HIPAA/PHI compliance with BAA."
+    "8. Stage 5 (Outreach): 4-email cadence (Days 1, 4, 8, 13) and draft-only queue addressing amaymishra1104@gmail.com remain 100% UNCHANGED.",
+    "9. Messaging & Compliance: Shifts to patient intake and recall loops; product requires HIPAA/BAA boundaries (cold email itself has no PHI)."
   ];
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(tenLineAnswer.join('\n'));
+    navigator.clipboard.writeText(nineLineAnswer.join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };
@@ -43,7 +42,7 @@ export function DentalAdaptationTab() {
     {
       stage: '1. Company Search',
       qsrCurrent: 'US QSR & Fast-Casual restaurant franchisee networks (20–200 locations).',
-      dentalAdaptation: 'US Dental Service Organizations (DSOs) & Multi-Location Dental Practices (15–150 clinics) like Heartland Dental, Aspen Dental, Pacific Dental Services affiliates, or regional DSOs.',
+      dentalAdaptation: 'US Dental Service Organizations (DSOs) & Multi-Location Dental Practices (15–150 clinics) such as regional DSO platforms and group practices.',
       changed: true
     },
     {
@@ -66,8 +65,8 @@ export function DentalAdaptationTab() {
     },
     {
       stage: '5. Email Outreach',
-      qsrCurrent: 'Focus on multi-agent journey orchestration above standalone voice/chat bots for store order exceptions.',
-      dentalAdaptation: 'Focus on Journey coordinating routine appointment coordination, reminders, and new patient enquiries — strictly routing clinical triage to licensed staff.',
+      qsrCurrent: 'Focus on multi-agent journey orchestration above standalone voice/chat bots for multi-unit restaurant workflows.',
+      dentalAdaptation: 'Focus on Journey coordinating routine appointment reminders, intake, and recall loops — strictly routing clinical triage to licensed staff. (Product requires HIPAA/BAA; cold email outreach contains no PHI).',
       changed: true
     }
   ];
@@ -95,7 +94,7 @@ export function DentalAdaptationTab() {
               Assignment Requirement #4
             </span>
             <span className="text-xs font-bold text-white">
-              Official Submission Response (Exactly 10 Lines)
+              Official Submission Response (Exactly 9 Lines — Under 10 Lines)
             </span>
           </div>
 
@@ -104,12 +103,12 @@ export function DentalAdaptationTab() {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-500 text-white shadow-md transition cursor-pointer"
           >
             {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied to Clipboard!' : 'Copy 10-Line Answer'}</span>
+            <span>{copied ? 'Copied to Clipboard!' : 'Copy 9-Line Answer'}</span>
           </button>
         </div>
 
         <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1.5 font-mono text-[11.5px] leading-relaxed text-slate-200">
-          {tenLineAnswer.map((line, idx) => (
+          {nineLineAnswer.map((line, idx) => (
             <div key={idx} className="flex items-start gap-2">
               <span className="text-teal-400 font-bold shrink-0">{line.slice(0, 3)}</span>
               <span className="text-slate-300">{line.slice(3)}</span>

@@ -1,19 +1,23 @@
+import crypto from 'crypto';
 import { Store } from '@/lib/storage';
 import { ApprovalGate } from '@/lib/approvals/gate';
-import { EmailSequence, EmailDraftRecord, IntegrationSettings } from '@/types';
+import { EmailDraftRecord, IntegrationSettings } from '@/types';
 
 export class GmailIntegrationService {
   /**
    * Generates Google OAuth 2.0 authorization URL for Gmail compose/drafts scope.
+   * Includes CSRF-protecting state parameter.
    */
-  static getAuthUrl(clientId: string, redirectUri: string): string {
+  static getAuthUrl(clientId: string, redirectUri: string, state?: string): string {
     const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const authState = state || crypto.randomBytes(16).toString('hex');
     const options = {
       redirect_uri: redirectUri,
       client_id: clientId,
       access_type: 'offline',
       response_type: 'code',
       prompt: 'consent',
+      state: authState,
       scope: [
         'https://www.googleapis.com/auth/gmail.compose',
         'https://www.googleapis.com/auth/userinfo.email'
@@ -154,7 +158,8 @@ export class GmailIntegrationService {
 
   /**
    * Orchestrates draft creation for an approved lead's 4-email sequence.
-   * STRICT SERVER GATE: Re-checks approval status before executing!
+   * STRICT SERVER GATE & TOCTOU DEFENSE: Re-checks approval status before each draft write.
+   * Verifies evidence hash has not changed since approval.
    */
   static async createDraftsForSequence(
     sequenceId: string,
@@ -166,10 +171,31 @@ export class GmailIntegrationService {
       throw new Error(`Sequence ${sequenceId} not found.`);
     }
 
-    // MANDATORY GATE: Recheck approval status on the server
+    // MANDATORY GATE: Initial assertion of approved status
     const contact = ApprovalGate.assertApproved(seq.lead_id);
 
-    const recipientEmail = contact.work_email || `${contact.full_name.toLowerCase().replace(/[^a-z0-9]/g, '.')}@prospect.demo`;
+    // EVIDENCE INTEGRITY CHECK: Snapshot hash comparison
+    const enrichment = Store.getEnrichmentByLeadId(seq.lead_id);
+    if (enrichment && contact.approval_evidence_hash) {
+      const currentHash = crypto.createHash('sha256').update(JSON.stringify({
+        overview: enrichment.company_overview,
+        locations: enrichment.location_count_verifiable,
+        challenges: enrichment.operational_challenges,
+        signals: enrichment.verified_buying_signals,
+        hook: enrichment.personalization_hook
+      })).digest('hex');
+
+      if (currentHash !== contact.approval_evidence_hash) {
+        throw new Error(`Evidence integrity violation: Enrichment record for ${contact.full_name} was modified after approval. Please re-review and re-approve the updated evidence before creating drafts.`);
+      }
+    }
+
+    // SAFETY GUARANTEE: Never invent fake emails; send drafts to user's authorized inbox
+    const authorizedUserInbox = settings.gmail_connected_email || process.env.USER_INBOX || 'amaymishra1104@gmail.com';
+    const recipientEmail = (contact.work_email && contact.work_email !== 'unavailable' && !contact.work_email.includes('.demo'))
+      ? contact.work_email
+      : authorizedUserInbox;
+
     const draftRecords: EmailDraftRecord[] = [];
     let gmailAccessToken = '';
 
@@ -194,11 +220,21 @@ export class GmailIntegrationService {
     }
 
     for (const email of seq.emails) {
+      // TOCTOU DEFENSE: Re-verify approval status immediately before saving each draft
+      ApprovalGate.assertApproved(seq.lead_id);
+
       // Check for duplicate draft prevention during retries
-      const existingDrafts = Store.getDrafts(seq.lead_id);
+      const existingDrafts = Store.getDrafts(seq.lead_id, true);
       const alreadyCreated = existingDrafts.find(d => d.sequence_step === email.sequence_step);
 
       if (alreadyCreated && (alreadyCreated.created_in_gmail || !hasLiveGmail)) {
+        // If content changed via sequence editing, update existing draft copy
+        if (alreadyCreated.subject !== email.subject || alreadyCreated.body_html !== email.body.replace(/\n/g, '<br/>')) {
+          alreadyCreated.subject = email.subject;
+          alreadyCreated.body_html = email.body.replace(/\n/g, '<br/>');
+          alreadyCreated.updated_at = new Date().toISOString();
+          Store.saveDraft(alreadyCreated);
+        }
         draftRecords.push(alreadyCreated);
         continue;
       }

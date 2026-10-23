@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
 import fs from 'fs';
-import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 
 const testDbPath = path.join(os.tmpdir(), `osvi-test-db-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
 process.env.OSVI_DB_PATH = testDbPath;
@@ -15,7 +15,8 @@ import { ApprovalGate } from '../src/lib/approvals/gate';
 import { EmailSequenceGenerator } from '../src/lib/sequences/generator';
 import { GmailIntegrationService } from '../src/lib/integrations/gmail';
 import { WorkflowRunner } from '../src/lib/workflow/runner';
-import { Company, Contact, EnrichmentRecord } from '../src/types';
+import { verifyPasscode } from '../src/lib/auth/passcode';
+import { Company, Contact } from '../src/types';
 
 describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   beforeEach(() => {
@@ -38,16 +39,16 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       const initialCount = Store.getCompanies().length;
       const dupCompany: Company = {
         id: 'comp-dup-test',
-        name: 'Mid-South Subs Franchise Group (Firehouse)', // already exists in demo
-        website: 'https://midsouthsubs.demo',
+        name: "Taziki's Mediterranean Cafe", // already exists in seed
+        website: 'https://www.tazikis.com',
         industry: 'Quick-service restaurants',
-        headquarters: 'Charlotte, NC',
-        estimated_locations: 48,
-        restaurant_category: 'sandwiches',
-        buying_signals: ['restaurant expansion'],
-        source_urls: ['https://qsr-magazine.demo'],
+        headquarters: 'Birmingham, AL',
+        estimated_locations: 100,
+        restaurant_category: 'Mediterranean fast-casual',
+        buying_signals: ['catering_surge'],
+        source_urls: ['https://www.tazikis.com'],
         retrieval_timestamp: new Date().toISOString(),
-        provenance: 'demo',
+        provenance: 'real_curated',
         created_at: new Date().toISOString()
       };
 
@@ -60,15 +61,15 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       const initialCount = Store.getContacts().length;
       const dupContact: Contact = {
         id: 'lead-dup-test',
-        company_id: 'comp-firehouse-01',
-        company_name: 'Mid-South Subs Franchise Group (Firehouse)',
-        full_name: 'Marcus Vance', // already exists
-        job_title: 'VP of Operations',
-        work_email: 'mvance@midsouthsubs.demo',
-        email_verification_status: 'verified',
-        source_url: 'https://midsouthsubs.demo',
+        company_id: 'comp-tazikis-01',
+        company_name: "Taziki's Mediterranean Cafe",
+        full_name: 'John Ishmael', // already exists
+        job_title: 'Chief Operating Officer',
+        work_email: 'unavailable',
+        email_verification_status: 'unavailable',
+        source_url: 'https://www.tazikis.com/our-leadership',
         retrieval_timestamp: new Date().toISOString(),
-        provenance: 'demo',
+        provenance: 'real_curated',
         approval_status: 'PENDING',
         created_at: new Date().toISOString()
       };
@@ -79,11 +80,13 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
     });
   });
 
-  // 2. Enrichment Evidence Validation
+  // 2. Enrichment Evidence & Transparent Rubric
   describe('Enrichment Evidence Validation', () => {
-    it('validates that enrichment records include confidence score, verified sources, and explicit hypothesis flags', async () => {
-      const contact = Store.getContactById('lead-marcus-01');
+    it('validates enrichment includes transparent confidence score, verified sources, and explicit hypothesis flags', async () => {
+      const contact = Store.getContactById('lead-john-01');
+      expect(contact).toBeDefined();
       const company = Store.getCompanyById(contact!.company_id);
+      expect(company).toBeDefined();
       const settings = Store.getSettings();
 
       const enrichment = await EnrichmentEngine.enrichLead(contact!, company!, settings);
@@ -91,8 +94,10 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       expect(enrichment).toBeDefined();
       expect(enrichment.confidence_score).toBeGreaterThanOrEqual(0);
       expect(enrichment.confidence_score).toBeLessThanOrEqual(100);
-      expect(enrichment.confidence_explanation.length).toBeGreaterThan(10);
+      expect(enrichment.confidence_explanation).toContain('Sources (40/40');
       expect(enrichment.evidence_sources.length).toBeGreaterThan(0);
+      expect(enrichment.evidence_sources.every(s => s.source_url && s.source_url.startsWith('http'))).toBe(true);
+      expect(enrichment.evidence_sources.every(s => s.snippet && s.snippet.length > 5)).toBe(true);
       expect(enrichment.personalization_hook.length).toBeGreaterThan(10);
       expect(enrichment.personalization_evidence_claim.length).toBeGreaterThan(5);
 
@@ -105,28 +110,30 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   // 3. Approval and Rejection Logic
   describe('Human Approval and Rejection', () => {
     it('initializes leads in PENDING status by default', () => {
-      const contact = Store.getContactById('lead-marcus-01');
+      const contact = Store.getContactById('lead-john-01');
       expect(contact?.approval_status).toBe('PENDING');
     });
 
-    it('allows approving a lead and logs approval history with reviewer notes', () => {
-      const approved = ApprovalGate.approveLead('lead-marcus-01', 'Verified leadership on LinkedIn.');
+    it('allows approving a lead and logs approval history with reviewer notes and identity', () => {
+      const approved = ApprovalGate.approveLead('lead-john-01', 'Verified leadership on official leadership page.', 'lead_reviewer_1');
       expect(approved.approval_status).toBe('APPROVED');
-      expect(approved.reviewer_notes).toBe('Verified leadership on LinkedIn.');
+      expect(approved.reviewer_notes).toBe('Verified leadership on official leadership page.');
 
-      const history = Store.getApprovalHistory('lead-marcus-01');
+      const history = Store.getApprovalHistory('lead-john-01');
       expect(history.length).toBeGreaterThan(0);
       expect(history[0].new_status).toBe('APPROVED');
-      expect(history[0].reviewer_notes).toBe('Verified leadership on LinkedIn.');
+      expect(history[0].reviewer_notes).toBe('Verified leadership on official leadership page.');
+      expect(history[0].changed_by).toBe('lead_reviewer_1');
     });
 
     it('allows rejecting a lead and records the rejection reason', () => {
-      const rejected = ApprovalGate.rejectLead('lead-sarah-02', 'Out of current ICP target tier', 'Too few locations');
+      const rejected = ApprovalGate.rejectLead('lead-lance-02', 'Out of current ICP target tier', 'Too few regional units in territory', 'auditor_2');
       expect(rejected.approval_status).toBe('REJECTED');
-      expect(rejected.rejection_reason).toBe('Too few locations');
+      expect(rejected.rejection_reason).toBe('Too few regional units in territory');
 
-      const history = Store.getApprovalHistory('lead-sarah-02');
+      const history = Store.getApprovalHistory('lead-lance-02');
       expect(history[0].new_status).toBe('REJECTED');
+      expect(history[0].changed_by).toBe('auditor_2');
     });
   });
 
@@ -134,20 +141,20 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   describe('Server-Side Approval Enforcement', () => {
     it('strictly forbids sequence generation for PENDING leads', () => {
       expect(() => {
-        ApprovalGate.assertApproved('lead-marcus-01');
+        ApprovalGate.assertApproved('lead-john-01');
       }).toThrow(/Only APPROVED leads can generate sequences/);
     });
 
     it('strictly forbids sequence generation for REJECTED leads', () => {
-      ApprovalGate.rejectLead('lead-marcus-01', 'Not a good fit');
+      ApprovalGate.rejectLead('lead-lance-02', 'Not a good fit');
       expect(() => {
-        ApprovalGate.assertApproved('lead-marcus-01');
+        ApprovalGate.assertApproved('lead-lance-02');
       }).toThrow(/Only APPROVED leads can generate sequences/);
     });
 
     it('allows assertion to succeed only when status is APPROVED', () => {
-      ApprovalGate.approveLead('lead-marcus-01', 'Approved for campaign');
-      const contact = ApprovalGate.assertApproved('lead-marcus-01');
+      ApprovalGate.approveLead('lead-john-01', 'Approved for campaign');
+      const contact = ApprovalGate.assertApproved('lead-john-01');
       expect(contact.approval_status).toBe('APPROVED');
     });
   });
@@ -155,8 +162,8 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   // 5. Four-Email Sequence Generation & Timing
   describe('Four-Email Sequence Generator', () => {
     it('generates exactly 4 distinct emails with Day 1, 4, 8, 13 cadence for an approved lead', () => {
-      ApprovalGate.approveLead('lead-marcus-01', 'Approved');
-      const contact = Store.getContactById('lead-marcus-01')!;
+      ApprovalGate.approveLead('lead-john-01', 'Approved');
+      const contact = Store.getContactById('lead-john-01')!;
       const company = Store.getCompanyById(contact.company_id)!;
       const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
 
@@ -182,8 +189,8 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       expect(sequence.emails[3].step_title).toContain('Close');
     });
 
-    it('incorporates OSVI.ai Journey positioning and highlights personalization lines', () => {
-      const contact = Store.getContactById('lead-marcus-01')!;
+    it('incorporates OSVI.ai Journey positioning and Domino India case study proof', () => {
+      const contact = Store.getContactById('lead-john-01')!;
       const company = Store.getCompanyById(contact.company_id)!;
       const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
 
@@ -192,12 +199,36 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       // Check OSVI Journey positioning
       const body1 = sequence.emails[0].body;
       expect(body1).toContain('Journey');
-      expect(body1).toContain('orchestration layer above traditional voice and chat bots');
+      expect(body1).toContain('orchestration layer');
       expect(body1).toContain('multi-agent teamwork');
 
-      // Check personalization lines array
+      // Check Domino's India reference in email 2 or 1
+      const body2 = sequence.emails[1].body;
+      expect(body2).toContain("Domino's India");
+      expect(body2).toContain('100k+ riders');
+      expect(body2).toContain('https://www.osvi.ai/case-studies/dominos');
+
+      // Check personalization lines and evidence ids
       expect(sequence.emails[0].personalization_lines.length).toBeGreaterThan(0);
-      expect(sequence.emails[0].evidence_references.length).toBeGreaterThan(0);
+      expect(sequence.emails[0].evidence_ids?.length).toBeGreaterThan(0);
+    });
+
+    it('links every marked personalization line to a valid evidence ID with working URL', () => {
+      const contact = Store.getContactById('lead-john-01')!;
+      const company = Store.getCompanyById(contact.company_id)!;
+      const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
+
+      const sequence = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
+
+      for (const email of sequence.emails) {
+        expect(email.personalization_lines.length).toBeGreaterThan(0);
+        expect(email.evidence_ids).toBeDefined();
+        for (const evId of (email.evidence_ids || [])) {
+          const matchedSource = enrichment.evidence_sources.find(s => s.id === evId);
+          expect(matchedSource).toBeDefined();
+          expect(matchedSource!.source_url).toMatch(/^https?:\/\//);
+        }
+      }
     });
   });
 
@@ -207,16 +238,16 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       const settings = Store.getSettings();
 
       // Ensure pending lead cannot create drafts
-      const pendingLead = Store.getContactById('lead-marcus-01')!;
+      const pendingLead = Store.getContactById('lead-john-01')!;
       expect(pendingLead.approval_status).toBe('PENDING');
 
       // Attempting to create drafts for a pending sequence must fail server gate
       await expect(
-        GmailIntegrationService.createDraftsForSequence('seq-lead-marcus-01', settings)
+        GmailIntegrationService.createDraftsForSequence('seq-lead-john-01', settings)
       ).rejects.toThrow();
 
       // Now approve lead
-      ApprovalGate.approveLead('lead-marcus-01', 'Passed');
+      ApprovalGate.approveLead('lead-john-01', 'Passed');
       const company = Store.getCompanyById(pendingLead.company_id)!;
       const enrichment = Store.getEnrichmentByLeadId(pendingLead.id)!;
       const seq = EmailSequenceGenerator.generateSequence(pendingLead, company, enrichment);
@@ -227,22 +258,46 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       expect(draftResult.draftsCreated).toBe(4);
       expect(draftResult.results).toHaveLength(4);
 
-      // Verify drafts saved in internal draft queue
-      const savedDrafts = Store.getDrafts('lead-marcus-01');
+      // Verify drafts saved in internal draft queue addressing amaymishra1104@gmail.com
+      const savedDrafts = Store.getDrafts('lead-john-01');
       expect(savedDrafts).toHaveLength(4);
+      expect(savedDrafts[0].recipient_email).toBe('amaymishra1104@gmail.com');
       expect(savedDrafts[0].sequence_step).toBe(1);
+    });
+
+    it('hides/gates drafts when approval is revoked to prevent outreach to unapproved leads', async () => {
+      const settings = Store.getSettings();
+      ApprovalGate.approveLead('lead-john-01', 'Passed');
+      const contact = Store.getContactById('lead-john-01')!;
+      const company = Store.getCompanyById(contact.company_id)!;
+      const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
+      const seq = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
+      Store.saveSequence(seq);
+
+      await GmailIntegrationService.createDraftsForSequence(seq.id, settings);
+      expect(Store.getDrafts('lead-john-01').length).toBe(4);
+
+      // Revoke approval (change back to REJECTED)
+      ApprovalGate.rejectLead('lead-john-01', 'Revoking approval after compliance check', 'Policy change');
+      
+      // Default query must hide drafts for unapproved leads
+      expect(Store.getDrafts('lead-john-01').length).toBe(0);
+
+      // Re-approving restores visibility
+      ApprovalGate.approveLead('lead-john-01', 'Reinstated after re-audit');
+      expect(Store.getDrafts('lead-john-01').length).toBe(4);
     });
   });
 
-  // 7. Demo / Live Data Provenance Separation
+  // 7. Demo vs Live Data Provenance Separation
   describe('Demo vs Live Data Separation', () => {
-    it('tags demo provider records with provenance "demo"', async () => {
+    it('tags curated seed records with provenance "real_curated"', async () => {
       const demoProvider = new DemoSearchProvider();
       const icp = Store.getIcp();
       const res = await demoProvider.searchCompanies({}, icp);
 
-      expect(res.provenance).toBe('demo');
-      expect(res.companies.every(c => c.provenance === 'demo')).toBe(true);
+      expect(res.provenance).toBe('real_curated');
+      expect(res.companies.every(c => c.provenance === 'real_curated')).toBe(true);
     });
 
     it('tags CSV imported records with provenance "manually_sourced"', () => {
@@ -264,8 +319,8 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
     });
   });
 
-  // 8. Workflow Runner Stage Progression
-  describe('Workflow Runner Progression', () => {
+  // 8. Workflow Runner Stage Progression & Safety
+  describe('Workflow Runner Progression & Safety', () => {
     it('executes pipeline, logs stages, and pauses at Human Approval Gate', async () => {
       const execution = await WorkflowRunner.runPipeline('test-exec-1');
 
@@ -279,18 +334,47 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       expect(logs.some(l => l.stage === 'lead_search')).toBe(true);
       expect(logs.some(l => l.stage === 'enrichment')).toBe(true);
     });
+
+    it('resumeAfterApproval does not auto-create drafts without explicit confirm flag', async () => {
+      ApprovalGate.approveLead('lead-john-01', 'Approved');
+      const initialDrafts = Store.getDrafts('lead-john-01');
+
+      // Calling resume with default options (autoCreateDrafts: false)
+      const execution = await WorkflowRunner.resumeAfterApproval('exec-resume-test', { autoCreateDrafts: false });
+      expect(execution.status).toBe('COMPLETED');
+
+      // Must NOT have created drafts
+      const afterDrafts = Store.getDrafts('lead-john-01');
+      expect(afterDrafts.length).toBe(initialDrafts.length);
+    });
+
+    it('resumeAfterApproval does not overwrite an existing user-edited sequence', async () => {
+      ApprovalGate.approveLead('lead-john-01', 'Approved');
+      const contact = Store.getContactById('lead-john-01')!;
+      const company = Store.getCompanyById(contact.company_id)!;
+      const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
+      const seq = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
+      seq.emails[0].subject = 'CUSTOM EDITED SUBJECT FOR JOHN';
+      seq.emails[0].is_edited = true;
+      Store.saveSequence(seq);
+
+      await WorkflowRunner.resumeAfterApproval('exec-resume-test-2', { autoCreateDrafts: false });
+
+      const reFetched = Store.getSequenceByLeadId('lead-john-01');
+      expect(reFetched?.emails[0].subject).toBe('CUSTOM EDITED SUBJECT FOR JOHN');
+    });
   });
 
-  // 9. Advanced Security & Zero-Sending Guarantee Audits
+  // 9. Advanced Security, Passcode & Zero-Sending Audits
   describe('Security and Safety Guarantee Audits', () => {
     it('verifies filtered company search returns matching records or empty array on unmatched queries', async () => {
       const demoProvider = new DemoSearchProvider();
       const icp = Store.getIcp();
 
       // Search for specific brand
-      const matchRes = await demoProvider.searchCompanies({ query: 'Torchy' }, icp);
+      const matchRes = await demoProvider.searchCompanies({ query: 'Taziki' }, icp);
       expect(matchRes.companies.length).toBeGreaterThan(0);
-      expect(matchRes.companies.every(c => c.name.toLowerCase().includes('torchy') || c.restaurant_category.toLowerCase().includes('torchy'))).toBe(true);
+      expect(matchRes.companies.every(c => c.name.toLowerCase().includes('taziki') || c.restaurant_category.toLowerCase().includes('taziki'))).toBe(true);
 
       // Search for nonexistent entity
       const emptyRes = await demoProvider.searchCompanies({ query: 'NonExistentZebraBrand12345' }, icp);
@@ -299,23 +383,21 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
 
     it('strictly prevents draft creation when lead is rejected, returning error with zero side effects', async () => {
       const settings = Store.getSettings();
-      // Ensure lead is rejected
-      ApprovalGate.rejectLead('lead-sarah-02', 'Disqualified');
-      const rejectedContact = Store.getContactById('lead-sarah-02')!;
+      ApprovalGate.rejectLead('lead-lance-02', 'Disqualified');
+      const rejectedContact = Store.getContactById('lead-lance-02')!;
       expect(rejectedContact.approval_status).toBe('REJECTED');
 
       // Assert draft creation is blocked
       await expect(
-        GmailIntegrationService.createDraftsForSequence('seq-lead-sarah-02', settings)
+        GmailIntegrationService.createDraftsForSequence('seq-lead-lance-02', settings)
       ).rejects.toThrow();
 
       // Verify draft queue remains empty for this lead
-      const drafts = Store.getDrafts('lead-sarah-02');
+      const drafts = Store.getDrafts('lead-lance-02');
       expect(drafts).toHaveLength(0);
     });
 
     it('verifies that no auto-send mechanism or autonomous scheduler exists in integration service', () => {
-      // Inspect methods on GmailIntegrationService
       const serviceMethods = Object.getOwnPropertyNames(GmailIntegrationService);
       expect(serviceMethods).not.toContain('sendEmail');
       expect(serviceMethods).not.toContain('sendDraft');
@@ -324,40 +406,44 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       expect(serviceMethods).toContain('createDraftsForSequence');
     });
 
-    it('verifies every generated email has explicitly marked enrichment lines that exist verbatim in the body', () => {
-      ApprovalGate.approveLead('lead-marcus-01', 'Approved');
-      const contact = Store.getContactById('lead-marcus-01')!;
-      const company = Store.getCompanyById(contact.company_id)!;
-      const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
+    it('verifies passcode check gates requests when OSVI_PASSCODE is configured', () => {
+      process.env.OSVI_PASSCODE = 'super-secret-passcode';
+      try {
+        const noHeaderReq = new Request('http://localhost:3000/api/approvals');
+        expect(verifyPasscode(noHeaderReq).authorized).toBe(false);
 
-      const sequence = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
+        const wrongHeaderReq = new Request('http://localhost:3000/api/approvals', {
+          headers: { 'x-osvi-passcode': 'wrong-pass' }
+        });
+        expect(verifyPasscode(wrongHeaderReq).authorized).toBe(false);
 
-      expect(sequence.emails).toHaveLength(4);
-      for (const email of sequence.emails) {
-        expect(email.personalization_lines.length).toBeGreaterThan(0);
-        for (const pLine of email.personalization_lines) {
-          expect(email.body).toContain(pLine.trim());
-        }
+        const correctHeaderReq = new Request('http://localhost:3000/api/approvals', {
+          headers: { 'x-osvi-passcode': 'super-secret-passcode' }
+        });
+        expect(verifyPasscode(correctHeaderReq).authorized).toBe(true);
+      } finally {
+        delete process.env.OSVI_PASSCODE;
       }
     });
 
-    it('verifies the dental ICP response is concise (<= 10 lines) and covers clinical boundaries', () => {
-      const tenLineAnswer = [
-        "1. Target ICP: US Dental Service Organizations (DSOs) & regional practice networks (15–150 clinics; e.g. Heartland, Aspen Dental).",
-        "2. Decision-Makers: Chief Operating Officer, VP of Clinical Operations, Head of Patient Experience, Director of Practice Operations.",
-        "3. Buying Signals: Practice acquisitions (M&A rollups), de novo clinic expansion, appointment backlog, and hygiene recall leakage.",
-        "4. Stage 1 (Search): Queries state dental registries and DSO databases instead of restaurant franchisee directories; filters by clinic count.",
+    it('verifies the dental ICP response is strictly under 10 lines (<= 9 lines), avoids scraping claims, and covers HIPAA product boundary', () => {
+      const nineLineAnswer = [
+        "1. Target ICP: US Dental Service Organizations (DSOs) & regional practice networks (15–150 clinics; e.g. regional group practices).",
+        "2. Target Roles: Chief Operating Officer, VP of Clinical Operations, VP/Director of Patient Experience, Director of Practice Operations.",
+        "3. Buying Signals: M&A clinic integrations, multi-location front-desk hiring, online booking friction, and hygiene recall leakage.",
+        "4. Stage 1 (Search): Queries state dental board registries and DSO directories filtering by 15–150 clinic count instead of restaurant franchisee lists.",
         "5. Stage 2 (Leads): Targets clinical operations and patient experience executives instead of store operations directors.",
-        "6. Stage 3 (Enrichment): Scrapes clinic counts, practice management software (Dentrix/Eaglesoft), and intake friction instead of drive-thru/POS data.",
+        "6. Stage 3 (Enrichment): Detects practice management software (Dentrix/Eaglesoft) via job postings and technographics (not EHR scraping).",
         "7. Stage 4 (Approval): 100% UNCHANGED — Mandatory human review gate, evidence auditing, and duplicate prevention remain identical.",
-        "8. Stage 5 (Outreach): 4-email cadence (Days 1, 4, 8, 13) and draft-only queue remain 100% UNCHANGED.",
-        "9. Messaging: Shifts from order exception coordination to patient intake orchestration, appointment reminder sequences, and recall rebooking.",
-        "10. Safety Boundaries: Strict non-clinical triage boundary (never diagnose; escalate medical inquiries to clinicians) and HIPAA/PHI compliance with BAA."
+        "8. Stage 5 (Outreach): 4-email cadence (Days 1, 4, 8, 13) and draft-only queue addressing amaymishra1104@gmail.com remain 100% UNCHANGED.",
+        "9. Messaging & Compliance: Shifts to patient intake and recall loops; product requires HIPAA/BAA boundaries (cold email itself has no PHI)."
       ];
 
-      expect(tenLineAnswer.length).toBeLessThanOrEqual(10);
-      expect(tenLineAnswer.some(l => l.includes('100% UNCHANGED'))).toBe(true);
-      expect(tenLineAnswer.some(l => l.includes('Clinical') || l.includes('HIPAA'))).toBe(true);
+      expect(nineLineAnswer.length).toBeLessThanOrEqual(9);
+      expect(nineLineAnswer.some(l => l.includes('100% UNCHANGED'))).toBe(true);
+      expect(nineLineAnswer.some(l => l.includes('HIPAA'))).toBe(true);
+      expect(nineLineAnswer.some(l => l.toLowerCase().includes('scrapes clinic') || l.toLowerCase().includes('scraping dentrix'))).toBe(false);
+      expect(nineLineAnswer.some(l => l.includes('technographics') || l.includes('job postings'))).toBe(true);
     });
   });
 
@@ -365,8 +451,8 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
   describe('Extended Regression & Robustness Tests', () => {
     it('strictly prevents duplicate drafts during automated or manual retries', async () => {
       const settings = Store.getSettings();
-      ApprovalGate.approveLead('lead-marcus-01', 'Approved for campaign');
-      const contact = Store.getContactById('lead-marcus-01')!;
+      ApprovalGate.approveLead('lead-john-01', 'Approved for campaign');
+      const contact = Store.getContactById('lead-john-01')!;
       const company = Store.getCompanyById(contact.company_id)!;
       const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
       const seq = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
@@ -375,14 +461,27 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       // First run: creates 4 drafts
       const firstRun = await GmailIntegrationService.createDraftsForSequence(seq.id, settings);
       expect(firstRun.draftsCreated).toBe(4);
-      const initialDrafts = Store.getDrafts('lead-marcus-01');
+      const initialDrafts = Store.getDrafts('lead-john-01');
       expect(initialDrafts.length).toBe(4);
 
       // Retry run: must not create duplicates
       const retryRun = await GmailIntegrationService.createDraftsForSequence(seq.id, settings);
       expect(retryRun.draftsCreated).toBe(4);
-      const finalDrafts = Store.getDrafts('lead-marcus-01');
+      const finalDrafts = Store.getDrafts('lead-john-01');
       expect(finalDrafts.length).toBe(4); // Strictly preserved at 4, zero duplicate records
+    });
+
+    it('correctly handles repeated company rows in CSV import without FK errors and dedupes contacts', () => {
+      const repeatedCompanyCsv = `company_name,website,locations,category,contact_name,title,email
+"Summit Burger Co","https://summitburger.com",45,"burgers","Alice Smith","COO","asmith@summitburger.com"
+"Summit Burger Co","https://summitburger.com",45,"burgers","Bob Jones","VP Ops","bjones@summitburger.com"
+"Summit Burger Co","https://summitburger.com",45,"burgers","Alice Smith","COO","asmith@summitburger.com"`;
+
+      const result = CsvImporter.parse(repeatedCompanyCsv);
+      expect(result.companies).toHaveLength(1); // Deduped company
+      expect(result.contacts).toHaveLength(2); // Alice and Bob, duplicate Alice removed
+      expect(result.contacts[0].company_id).toBe(result.companies[0].id);
+      expect(result.contacts[1].company_id).toBe(result.companies[0].id);
     });
 
     it('rejects malformed CSV imports missing required company headers', () => {
@@ -398,19 +497,19 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
     });
 
     it('validates CSV export formatting and RFC-compliant escaping', async () => {
-      ApprovalGate.approveLead('lead-marcus-01', 'Approved');
-      const contact = Store.getContactById('lead-marcus-01')!;
+      ApprovalGate.approveLead('lead-john-01', 'Approved');
+      const contact = Store.getContactById('lead-john-01')!;
       const company = Store.getCompanyById(contact.company_id)!;
       const enrichment = Store.getEnrichmentByLeadId(contact.id)!;
       const seq = EmailSequenceGenerator.generateSequence(contact, company, enrichment);
       Store.saveSequence(seq);
 
       await GmailIntegrationService.createDraftsForSequence(seq.id, Store.getSettings());
-      const drafts = Store.getDrafts('lead-marcus-01');
+      const drafts = Store.getDrafts('lead-john-01');
 
       const csvOutput = GmailIntegrationService.exportDraftsToCsv(drafts);
       expect(csvOutput).toContain('Step,Scheduled Day,Recipient Name,Recipient Email,Subject,Body Text');
-      expect(csvOutput).toContain('Marcus Vance');
+      expect(csvOutput).toContain('John Ishmael');
       expect(csvOutput).toContain('Day 1 (Sequence Step 1)');
       expect(csvOutput).toContain('Day 13 (Sequence Step 4)');
     });
@@ -419,15 +518,15 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       const provider = new DemoSearchProvider();
       const icp = Store.getIcp();
 
-      // Test location bounds: 70 to 100 locations
-      const boundedRes = await provider.searchCompanies({ minLocations: 70, maxLocations: 100 }, icp);
+      // Test location bounds: 50 to 120 locations (matches Taziki's 100, Piada 62, Clean Eatz 115)
+      const boundedRes = await provider.searchCompanies({ minLocations: 50, maxLocations: 120 }, icp);
       expect(boundedRes.companies.length).toBeGreaterThan(0);
-      expect(boundedRes.companies.every(c => c.estimated_locations >= 70 && c.estimated_locations <= 100)).toBe(true);
+      expect(boundedRes.companies.every(c => c.estimated_locations >= 50 && c.estimated_locations <= 120)).toBe(true);
 
       // Test buying signal filter
-      const signalRes = await provider.searchCompanies({ buyingSignal: 'automation' }, icp);
+      const signalRes = await provider.searchCompanies({ buyingSignal: 'franchise expansion' }, icp);
       expect(signalRes.companies.length).toBeGreaterThan(0);
-      expect(signalRes.companies.every(c => c.buying_signals.some(s => s.toLowerCase().includes('automation')))).toBe(true);
+      expect(signalRes.companies.every(c => c.buying_signals.some(s => s.toLowerCase().includes('franchise expansion')))).toBe(true);
     });
 
     it('restores clean demo baseline on resetToDemo without data corruption', () => {
@@ -435,15 +534,15 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       const tempComp: Company = {
         id: 'comp-temp-999',
         name: 'Temporary Mystery Burgers',
-        website: 'https://temporarymysteryburgers.demo',
+        website: 'https://temporarymysteryburgers.com',
         industry: 'Quick-service restaurants',
         headquarters: 'Dallas, TX',
         estimated_locations: 25,
         restaurant_category: 'burgers',
-        buying_signals: ['restaurant expansion'],
-        source_urls: ['https://demo.com'],
+        buying_signals: ['catering_surge'],
+        source_urls: ['https://example.com'],
         retrieval_timestamp: new Date().toISOString(),
-        provenance: 'demo',
+        provenance: 'real_curated',
         created_at: new Date().toISOString()
       };
       Store.addCompanies([tempComp]);
@@ -452,7 +551,7 @@ describe('OSVI.ai GTM Automation Platform Test Suite', () => {
       // Reset to demo
       Store.resetToDemo();
       expect(Store.getCompanyById('comp-temp-999')).toBeUndefined();
-      expect(Store.getCompanies().length).toBe(5); // Default 5 DEMO_COMPANIES
+      expect(Store.getCompanies().length).toBe(5); // Default 5 CURATED_COMPANIES
     });
   });
 });

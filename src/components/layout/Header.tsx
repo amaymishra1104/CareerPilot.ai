@@ -9,13 +9,15 @@ import {
   Database, 
   HelpCircle,
   Play,
-  FileText
+  FileText,
+  AlertTriangle
 } from 'lucide-react';
 
 interface HeaderProps {
   demoMode: boolean;
   onResetDemo: () => void;
   onOpenGuidedDemo: () => void;
+  onOpenLimitations: () => void;
   gmailConnected: boolean;
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -27,6 +29,7 @@ export function Header({
   demoMode,
   onResetDemo,
   onOpenGuidedDemo,
+  onOpenLimitations,
   gmailConnected,
   activeTab,
   setActiveTab,
@@ -50,7 +53,7 @@ export function Header({
               {demoMode ? (
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  DEMO MODE (Sample Data)
+                  REAL CURATED BASELINE
                 </span>
               ) : (
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium flex items-center gap-1">
@@ -67,6 +70,17 @@ export function Header({
 
         {/* Global Action Bar */}
         <div className="flex items-center gap-2.5">
+          {/* Limitations & Architectural Disclosures */}
+          <button
+            onClick={onOpenLimitations}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm transition-all hover:scale-[1.02] cursor-pointer"
+            title="Read transparent architectural audit, boundaries, and zero-send safeguards"
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Known Limitations &amp; Audit</span>
+            <span className="sm:hidden">Audit</span>
+          </button>
+
           {/* Quick Guided Demo Tour */}
           <button
             onClick={onOpenGuidedDemo}
@@ -103,7 +117,7 @@ export function Header({
           {/* Reset Demo Data */}
           <button
             onClick={onResetDemo}
-            title="Reset dataset back to fresh demo baseline"
+            title="Reset dataset back to fresh curated baseline"
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -119,7 +133,7 @@ export function Header({
                   ? 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400' 
                   : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
               }`}
-              title={gmailConnected ? 'Gmail OAuth connected: creates real drafts in Gmail' : 'Gmail not connected: will save into internal Draft Queue'}
+              title={gmailConnected ? 'Gmail OAuth connected: creates real drafts in amaymishra1104@gmail.com' : 'Gmail not connected: will save into internal Draft Queue'}
             >
               <Mail className="w-3.5 h-3.5" />
               <span>{gmailConnected ? 'Gmail Drafts' : 'Draft Queue'}</span>
@@ -128,10 +142,10 @@ export function Header({
             <div 
               onClick={() => setActiveTab('settings')}
               className="flex items-center gap-1.5 px-2 py-1 rounded-md border bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer"
-              title="Storage Persistence: Active (Persistent JSON / Supabase DB)"
+              title="Storage Persistence: Atomic local JSON store with temp DB test isolation"
             >
               <Database className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Storage Persistent</span>
+              <span>Atomic JSON DB</span>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ import { DentalAdaptationTab } from '@/components/dental/DentalAdaptationTab';
 import { DocumentationTab } from '@/components/docs/DocumentationTab';
 import { SettingsTab } from '@/components/settings/SettingsTab';
 import { GuidedDemoModal } from '@/components/demo/GuidedDemoModal';
+import { KnownLimitationsModal } from '@/components/common/KnownLimitationsModal';
 
 import { 
   ICPConfig, 
@@ -53,6 +54,7 @@ export default function App() {
   const [isDrafting, setIsDrafting] = useState(false);
   const [isRunningWorkflow, setIsRunningWorkflow] = useState(false);
   const [isGuidedDemoOpen, setIsGuidedDemoOpen] = useState(false);
+  const [isLimitationsOpen, setIsLimitationsOpen] = useState(false);
 
   // Load all initial data
   const loadPlatformData = useCallback(async () => {
@@ -416,6 +418,7 @@ export default function App() {
         demoMode={settings.demo_mode_active}
         onResetDemo={handleResetDemo}
         onOpenGuidedDemo={() => setIsGuidedDemoOpen(true)}
+        onOpenLimitations={() => setIsLimitationsOpen(true)}
         gmailConnected={settings.gmail_connected}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -586,6 +589,11 @@ export default function App() {
         onRejectLead={handleRejectLead}
         onGenerateSequence={handleGenerateSequence}
         onTestRejectedLeadGate={handleTestRejectedLeadGate}
+      />
+
+      <KnownLimitationsModal
+        isOpen={isLimitationsOpen}
+        onClose={() => setIsLimitationsOpen(false)}
       />
     </div>
   );
