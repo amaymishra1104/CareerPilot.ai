@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "title": "Search matching company",
+    "status": "PASS",
+    "output": "HTTP 200: Found 1 match (Taziki's Mediterranean Cafe, ~100 units)"
+  },
+  {
+    "id": 2,
+    "title": "Search nonexistent company",
+    "status": "PASS",
+    "output": "HTTP 200: Successfully returned empty array (0 matches)"
+  },
+  {
+    "id": 3,
+    "title": "Import valid CSV incl quoted commas and repeated company rows",
+    "status": "PASS",
+    "output": "HTTP 200: Ingested 1 unique company and 2 contacts with shared foreign key"
+  },
+  {
+    "id": 4,
+    "title": "Re-import deduplication (no duplicates)",
+    "status": "PASS",
+    "output": "HTTP 200: Zero duplicate companies (0) or contacts (0) created on re-import"
+  },
+  {
+    "id": 5,
+    "title": "Enrich lead and show evidence with real source excerpts",
+    "status": "PASS",
+    "output": "HTTP 200: Score 90/100, formula: \"Score 90/100: Sources (40/40, 2 resolved URLs) + Authority (30/30, official...\", snippet excerpt: \"Introducing Taziki’s new COO, John Ishmael! Coming to us fro...\""
+  },
+  {
+    "id": 6,
+    "title": "Sequence generation on PENDING lead returns HTTP 403",
+    "status": "PASS",
+    "output": "HTTP 403: Blocked by server ApprovalGate (Server Gate Violation: Lead John Ishmael (Taziki's Mediterranean Cafe) has status 'PENDING'. Only APPROVED leads can generate sequences or email drafts.)"
+  },
+  {
+    "id": 7,
+    "title": "Draft creation on PENDING lead returns HTTP 403",
+    "status": "PASS",
+    "output": "HTTP 403: Blocked by server ApprovalGate (Server Gate Violation: Lead John Ishmael (Taziki's Mediterranean Cafe) has status 'PENDING'. Only APPROVED leads can generate sequences or email drafts.)"
+  },
+  {
+    "id": 8,
+    "title": "POST/PUT/Regenerate sequences on REJECTED lead all return HTTP 403",
+    "status": "PASS",
+    "output": "HTTP 403 on POST /api/sequences, PUT /api/sequences, and POST /api/sequences/regenerate"
+  },
+  {
+    "id": 9,
+    "title": "Approve lead then generate exactly 4 emails on days 1/4/8/13",
+    "status": "PASS",
+    "output": "HTTP 200: Generated 4 emails with cadence offsets [1, 4, 8, 13]"
+  },
+  {
+    "id": 10,
+    "title": "Every enrichment line resolves to an evidence id with working URL",
+    "status": "PASS",
+    "output": "Verified 5 evidence ID mappings resolving to official URLs"
+  },
+  {
+    "id": 11,
+    "title": "Create drafts produces exactly 4 records",
+    "status": "PASS",
+    "output": "HTTP 200: 4 drafts created addressing amaymishra1104@gmail.com in internal queue"
+  },
+  {
+    "id": 12,
+    "title": "Draft creation retry idempotency (still 4 records)",
+    "status": "PASS",
+    "output": "HTTP 200: Zero duplicate drafts created on retry (queue strictly preserved at 4)"
+  },
+  {
+    "id": 13,
+    "title": "State persists across server restarts in local atomic store",
+    "status": "PASS",
+    "output": "Verified on disk in data/osvi-gtm-db.json: lead-john-01 APPROVED with 4 persisted emailDrafts"
+  },
+  {
+    "id": 14,
+    "title": "Missing/invalid entities return informative 4xx error messages",
+    "status": "PASS",
+    "output": "HTTP 404: Informative message returned: \"Contact with id non-existent-lead-999 not found\""
+  },
+  {
+    "id": 15,
+    "title": "Grep confirms zero messages.send paths in src/ (Zero Auto-Send)",
+    "status": "PASS",
+    "output": "Static code analysis proves 0 calls to .messages.send() or sendEmail() in codebase"
+  },
+  {
+    "id": 16,
+    "title": "Anonymous call to protected route without secret is rejected",
+    "status": "PASS",
+    "output": "HTTP 401: Fails closed with \"Unauthorized: N8N webhook secret is not configured on the server. Webhook endpoint is closed.\""
+  },
+  {
+    "id": 17,
+    "title": "GET /api/settings exposes no secrets (all tokens masked or empty)",
+    "status": "PASS",
+    "output": "HTTP 200: Sensitive secrets safely masked (tokens & webhook secret masked)"
+  },
+  {
+    "id": 18,
+    "title": "Revoking lead approval hides/gates drafts from output queues",
+    "status": "PASS",
+    "output": "HTTP 200: GET /api/drafts returned 0 visible drafts when lead status is REJECTED"
+  },
+  {
+    "id": 19,
+    "title": "Resume workflow does not auto-draft or overwrite user edits",
+    "status": "PASS",
+    "output": "HTTP 200: Sequence edit strictly preserved and draft count unchanged (4)"
+  },
+  {
+    "id": 20,
+    "title": "Clean npm ci, npx tsc --noEmit, npm test, npm run build all pass",
+    "status": "PASS",
+    "output": "All 31 Vitest tests pass in 597ms with isolated temp DB; tsc has 0 errors; build compiles 16 routes cleanly."
+  }
+]

@@ -47,31 +47,32 @@ Ending in a strict **Draft-Only queue** (saving to Gmail or an internal queue wi
   * Implemented multi-criteria search filtering: brand query, restaurant categories (`burgers`, `pizza`, `chicken`, `sandwiches`, `fast-casual`), location bounds, and documented buying signals.
   * Added RFC-compliant CSV importer handling quoted text and missing fields.
   * Enforced company deduplication by name in storage.
-  * Embedded provenance tagging: `demo`, `manually_sourced`, and `live`.
+  * Embedded provenance tagging: `real_curated`, `manually_sourced`, and `live`.
 * **Stage 2: Lead Search & Role Alignment:**
-  * Linked executive decision-makers directly to their parent company (`COO`, `VP of Operations`, `Head of Guest Experience`, `VP of Customer Experience`, `Head of Contact Center`).
+  * Linked executive decision-makers directly to their parent company (`COO`, `VP of Operations`, `Head of Guest Experience`, `VP of Customer Experience`).
   * Enforced contact deduplication by work email and `company_id` + `full_name`.
-  * Enforced data honesty: missing corporate emails are marked `'unavailable'` rather than fabricated. Synthetic demo emails use `.demo` domains to eliminate any risk of emailing real people.
+  * Enforced data honesty: prospect corporate emails are marked `'unavailable'` to prevent unverified cold outreach. Generated drafts exclusively address the candidate's test inbox (`amaymishra1104@gmail.com`) or the internal queue.
 * **Stage 3: Grounded Enrichment Engine:**
-  * Grounded all personalization claims in verifiable public evidence (e.g. store counts from Franchise Times #184, job listings for Ops Tech Coordinator).
-  * Built an algorithmic confidence score (0–100) with detailed human-readable explanations.
+  * Grounded all personalization claims in verifiable public evidence (real excerpts fetched from official franchisor websites and leadership portals).
+  * Built a transparent, visible scoring formula (Sources 40 + Authority 30 + Recency 20 + Reachability 10 = 100).
   * Differentiated between documented operational facts and operational hypotheses using explicit `is_hypothesis: boolean` flags.
 * **Stage 4: Mandatory Human Approval Gate:**
   * Guaranteed every new lead starts in status `PENDING`.
-  * Built approval and rejection flows with reviewer notes and rejection reasons.
+  * Built approval and rejection flows with reviewer notes and rejection reasons, recording reviewer identity.
   * Stored an immutable approval audit history.
-  * **Dual Server Enforcement:** Enforced `ApprovalGate.assertApproved(leadId)` in `POST /api/sequences`, `PUT /api/sequences`, `POST /api/sequences/regenerate`, and `POST /api/drafts`. Any attempt to bypass the gate via API returns `HTTP 403 Forbidden` (`{ violatesApprovalGate: true }`).
+  * **Strict Server Enforcement:** Enforced `ApprovalGate.assertApproved(leadId)` in `POST /api/sequences`, `PUT /api/sequences`, `POST /api/sequences/regenerate`, and `POST /api/drafts`. Any attempt to bypass the gate via API returns `HTTP 403 Forbidden` (`{ violatesApprovalGate: true }`).
+  * Revoking approval immediately hides drafts from output queues.
 * **Stage 5: Four-Email Sequence Builder:**
-  * Generates exactly 4 distinct emails across the proven cadence:
+  * Generates exactly 4 distinct emails across an operational cadence hypothesis:
     * **Day 1:** Initial personalized introduction (store footprint + guest interaction handoff).
-    * **Day 4:** Relevant operational use case (drive-thru & curbside order exceptions).
-    * **Day 8:** Thoughtful workflow question (peak lunch rush phone/POS coordination).
+    * **Day 4:** Relevant operational use case referencing OSVI.ai's Domino's India case study (100k+ riders, WhatsApp + voice in 7 languages, 3x chat conversion).
+    * **Day 8:** Thoughtful workflow question (multi-day catering follow-up and crew onboarding coordination).
     * **Day 13:** Polite close-the-loop message.
-  * Highlighted enrichment-derived lines with amber badges in the UI and linked them to primary evidence claims.
-  * Accurately positioned **OSVI.ai Journey** as an orchestration layer above point chatbots, emphasizing multi-agent teamwork and store-level resolution.
+  * Highlighted enrichment-derived lines in the UI and linked every marked line to an `evidence_ids` array referencing verified sources.
+  * Accurately positioned **OSVI.ai Journey** as an orchestration layer above point chatbots, emphasizing multi-agent teamwork and persistent memory across days.
   * Supported inline copy editing and single-email regeneration (`Regenerate Email {step}`).
 * **Draft-Only Outreach Safeguard:**
-  * Static code analysis confirms zero automatic sending methods exist (`sendEmail` and autonomous schedulers are completely absent).
+  * Static code analysis confirms zero automatic sending methods exist (`sendEmail`, `messages.send`, and autonomous schedulers are completely absent).
   * Added interactive confirmation modal before draft creation.
   * Enforced retry idempotency: retrying draft creation reuses existing drafts without creating duplicates.
   * Supported live Gmail draft creation via OAuth 2.0 (`users.drafts.create`) with seamless fallback to the local **Internal Draft Queue**.
@@ -81,21 +82,23 @@ Ending in a strict **Draft-Only queue** (saving to Gmail or an internal queue wi
 * Designed a dark-mode SaaS UI with tailored HSL palettes, smooth transitions, and zero dead buttons.
 * Built real-time dashboard metrics (companies ingested, leads identified, enrichment rate, approval count, draft queue size).
 * Added comprehensive error handling and user-facing notifications for API and network failures.
+* Added a dedicated **Known Limitations & Architectural Audit** modal for transparent disclosure.
 
 ### Phase 4 — Guided Evaluator Demo & Dental DSO Adaptation
-* **9-Step Guided Evaluator Demo:** Built an interactive walkthrough stepper (`GuidedDemoModal.tsx`) that guides interviewers through all 9 evaluation steps in ~3 minutes.
-* **Dental DSO Adaptation (`DentalAdaptationTab.tsx`):** Authored an official, exact 10-line response and side-by-side comparison matrix showing how the pipeline adapts to Dental Service Organizations (15–150 clinics) while keeping the Approval Gate and 4-email cadence 100% unchanged.
+* **9-Step Guided Evaluator Demo:** Built an interactive walkthrough stepper (`GuidedDemoModal.tsx`) that guides interviewers through all evaluation steps in ~3 minutes using real curated operators (John Ishmael at Taziki's and Lance Juhas at Piada).
+* **Dental DSO Adaptation (`DentalAdaptationTab.tsx`):** Authored an official, exact 9-line response (strictly under 10 lines) showing how the pipeline adapts to Dental Service Organizations (15–150 clinics) while keeping the Approval Gate and 4-email cadence 100% unchanged, noting technographics/job postings instead of EHR scraping and covering HIPAA boundaries.
 
 ### Phase 5 — Testing & Build Hardening
-* Expanded Vitest test suite to **26 passing automated unit and integration tests** (100% pass rate in <1s).
+* Expanded Vitest test suite to **31 passing automated unit and integration tests** (100% pass rate in <1s).
+* Configured isolated temporary DB path (`OSVI_DB_PATH`) for tests to prevent test runs from dirtying committed database files.
 * Verified complete TypeScript compilation (`npx tsc --noEmit`) with 0 errors.
-* Verified Next.js Turbopack production build (`npm run build`) compiling all 20 pages and 17 routes cleanly.
+* Verified Next.js Turbopack production build (`npm run build`) compiling all 16 API route handlers cleanly.
 * Ran end-to-end live HTTP audit script (`scripts/test-endpoints.mjs`), confirming all gates and endpoints function live.
 
 ### Phase 6 — Documentation & Version Control
-* Authored `OSVI_Interview_Preparation.md` (9 comprehensive first-person defense sections).
+* Authored `OSVI_Interview_Preparation.md` (comprehensive first-person defense sections).
 * Authored `OSVI_Prototype_Audit.md` (QA scorecard, defect matrix, verification results).
-* Initialized local Git repository, created initial commit `4af98d8`, and pushed to GitHub at [https://github.com/amaymishra1104/osvi.ai.git](https://github.com/amaymishra1104/osvi.ai.git) on branch `main`.
+* Initialized local Git repository, pushed to GitHub at [https://github.com/amaymishra1104/osvi.ai.git](https://github.com/amaymishra1104/osvi.ai.git) on branch `main`.
 
 ---
 
@@ -105,7 +108,7 @@ Ending in a strict **Draft-Only queue** (saving to Gmail or an internal queue wi
 osvi.ai/
 ├── src/
 │   ├── app/                     # Next.js 16 App Router
-│   │   ├── api/                 # 17 Dynamic REST API Routes
+│   │   ├── api/                 # 16 Dynamic REST API Routes
 │   │   │   ├── approvals/       # GET/POST approval status & audit history
 │   │   │   ├── auth/gmail/      # Google OAuth authorization & callback
 │   │   │   ├── companies/       # GET/POST company search & CSV import
@@ -125,7 +128,7 @@ osvi.ai/
 │   │   ├── companies/           # Company table, search filters, CSV import modal
 │   │   ├── dashboard/           # Overview metrics, pipeline visualizer, logs
 │   │   ├── demo/                # 9-Step Guided Evaluator Demo modal
-│   │   ├── dental/              # Dental DSO adaptation blueprint & 10-line answer
+│   │   ├── dental/              # Dental DSO adaptation blueprint & 9-line answer
 │   │   ├── docs/                # PDF viewer & embedded documentation
 │   │   ├── drafts/              # Draft queue table, export actions, Gmail status
 │   │   ├── enrichment/          # Evidence grounding inspector, confidence scores
@@ -137,12 +140,13 @@ osvi.ai/
 │   │   └── workflow/            # Workflow execution console & stage logs
 │   ├── lib/                     # Business Logic & Infrastructure
 │   │   ├── approvals/gate.ts    # Central server ApprovalGate (assertApproved)
+│   │   ├── auth/passcode.ts     # Shared passcode protection & secret masking
 │   │   ├── enrichment/          # Grounded enrichment engine (deterministic + LLM)
 │   │   ├── integrations/        # Gmail OAuth service & draft MIME builder
 │   │   ├── providers/           # Search provider interface (Demo, Live, CSV)
 │   │   ├── seed.ts              # Authentic US QSR seed dataset & citations
 │   │   ├── sequences/           # Four-email sequence generator (Days 1, 4, 8, 13)
-│   │   ├── storage/             # Dual persistence: Local JSON DB + Supabase SQL
+│   │   ├── storage/             # Persistent Local JSON DB with test isolation
 │   │   └── workflow/runner.ts   # 5-stage pipeline runner with Stage 4 pause
 │   └── types/index.ts           # Central TypeScript interfaces & data contracts
 ├── data/
@@ -150,7 +154,7 @@ osvi.ai/
 ├── scripts/
 │   └── test-endpoints.mjs       # Live HTTP end-to-end lifecycle verification script
 └── tests/
-    └── gtm-pipeline.test.ts     # 26 automated unit & integration tests
+    └── gtm-pipeline.test.ts     # 31 automated unit & integration tests
 ```
 
 ---
