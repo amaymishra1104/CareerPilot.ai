@@ -1,15 +1,23 @@
-# OSVI.ai GTM Automation Platform (QSR Journey Orchestration)
+# CareerPilot.ai — Autonomous Career Copilot & Job Application Platform
 
-> **OSVI.ai GTM Intern Challenge Submission**  
 > **Candidate:** Amay Mishra (`amaymishra1104@gmail.com`)  
-> **Target:** US Quick-Service Restaurant (QSR) & Fast-Casual Operators (20–200 Units)  
-> **Product Positioning:** Osvi AI "Journey" — Multi-agent orchestration layer above traditional voice/chat bots with persistent memory, multi-day inquiry management, and governed human handoffs.
+> **Repository:** [https://github.com/amaymishra1104/osvi.ai.git](https://github.com/amaymishra1104/osvi.ai.git)  
+> **Platform:** CareerPilot.ai (Autonomous Job Search & Application Engine) with integrated GTM Outbound Engine
 
 ---
 
-## 1. Executive Summary & Authoritative Challenge Scope
+## 1. Executive Summary & Overview
 
-This application is an audited, production-grade Go-To-Market (GTM) outreach engine built specifically to solve the OSVI.ai GTM Intern Challenge. It implements a strict, 5-stage governed pipeline designed to prospect, enrich, review, and draft personalized multi-day outreach into mid-market US restaurant operators.
+**CareerPilot.ai** is a production-grade autonomous career copilot designed for automated, honest, and high-impact job search operations:
+- **Multi-Profile Resume Management:** Supports Technical SWE, AI/ML Specialist, and Business/GTM resumes with immutable originals and automatic profile routing.
+- **Real Job Discovery:** Integrates public live job sources (Remotive API) and CSV ingestion with case-insensitive whitespace deduplication.
+- **Transparent Matching Engine:** Transparent 0–100 match scoring, requirement overlap analysis, and clear rationale breakdowns.
+- **Zero-Hallucination Factual Tailoring:** Strict re-ordering of verified experience and highlighted skills without fabricating missing qualifications; requires explicit operator approval before use.
+- **Recruiter Discovery & Outreach:** Uncovers real hiring managers and generates multi-tone personalized emails (Professional, Enthusiastic Student, Concise Impactful).
+- **Test-Inbox Gated Gmail Integration:** Restricted to `users.drafts.create` with strict recipient filtering targeting operator test inbox `amaymishra1104@gmail.com`.
+- **Kanban Application Lifecycle Tracker:** Full lifecycle tracking from discovery to interviews and offers, with automatic follow-up reminders.
+- **Autonomous Daily Automation:** One-click daily discovery, matching, and drafting runner with pause/resume support.
+
 
 ### Core Architectural Decisions & Integrity Commitments
 - **Zero Fabrication:** 100% of default operators, decision-makers, URLs, and store counts are real and publicly verifiable. No synthetic or hallucinated `.demo` domains.

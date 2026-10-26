@@ -217,3 +217,254 @@ export interface IntegrationSettings {
   demo_mode_active: boolean;
   updated_at: string;
 }
+
+// ============================================================================
+// CareerPilot AI Core Domain Interfaces
+// ============================================================================
+
+export type ResumeProfileType = 'technical' | 'ai_ml' | 'business_gtm' | 'custom';
+
+export interface ResumeStructuredData {
+  summary?: string;
+  skills: string[];
+  education: Array<{
+    institution: string;
+    degree: string;
+    field_of_study: string;
+    start_date?: string;
+    end_date?: string;
+    gpa?: string;
+    honors?: string[];
+  }>;
+  experience: Array<{
+    company: string;
+    role: string;
+    location?: string;
+    start_date: string;
+    end_date?: string;
+    current?: boolean;
+    description_bullets: string[];
+    technologies?: string[];
+  }>;
+  projects: Array<{
+    title: string;
+    description: string;
+    bullet_points: string[];
+    technologies: string[];
+    link?: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    issue_date?: string;
+    credential_url?: string;
+  }>;
+  achievements: string[];
+}
+
+export interface ResumeRecord {
+  id: string;
+  user_id: string;
+  profile_type: ResumeProfileType;
+  title: string;
+  version: number;
+  is_default?: boolean;
+  file_name: string;
+  file_type: 'pdf' | 'docx' | 'txt' | 'json';
+  raw_content: string;
+  extracted_text: string;
+  structured_data: ResumeStructuredData;
+  is_immutable_original: boolean;
+  parent_resume_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  headline: string;
+  bio?: string;
+  phone?: string;
+  location?: string;
+  linkedin_url?: string;
+  github_url?: string;
+  portfolio_url?: string;
+  default_signature?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobPreferences {
+  id: string;
+  user_id: string;
+  target_roles: string[];
+  employment_types: string[]; // 'internship' | 'full_time' | 'contract'
+  locations: string[];
+  remote_preference: 'remote_only' | 'hybrid' | 'on_site' | 'any';
+  skills: string[];
+  industries: string[];
+  experience_level: 'internship' | 'entry_level' | 'associate' | 'mid_level';
+  willing_to_relocate: boolean;
+  expected_salary_or_stipend?: string;
+  preferred_company_types: string[];
+  updated_at: string;
+}
+
+export interface JobListing {
+  id: string;
+  user_id?: string;
+  title: string;
+  company: string;
+  description: string;
+  location: string;
+  employment_type: string;
+  experience_level?: string;
+  required_skills: string[];
+  preferred_skills?: string[];
+  salary_range?: string;
+  job_url: string;
+  publication_date?: string;
+  application_deadline?: string;
+  data_source: string;
+  retrieval_timestamp: string;
+  provenance: Provenance;
+  is_expired: boolean;
+  created_at: string;
+}
+
+export interface JobMatchResult {
+  id: string;
+  job_id: string;
+  user_id: string;
+  recommended_resume_id: string;
+  recommended_profile_type: ResumeProfileType;
+  match_score: number; // 0-100
+  matching_skills: string[];
+  missing_skills: string[];
+  score_reasons: string[];
+  project_overlap_score: number;
+  experience_compatibility: string;
+  location_compatibility: string;
+  selection_rationale: string;
+  created_at: string;
+}
+
+export interface RecruiterContact {
+  id: string;
+  job_id: string;
+  company: string;
+  name: string;
+  title: string;
+  email?: string;
+  email_verification_status: EmailVerificationStatus;
+  public_profile_url?: string;
+  source_provider: string;
+  is_company_verified: boolean;
+  verification_notes?: string;
+  retrieval_timestamp: string;
+  provenance: Provenance;
+  created_at: string;
+}
+
+export interface TailoredResumeRecord {
+  id: string;
+  user_id: string;
+  job_id: string;
+  source_resume_id: string;
+  tailored_title: string;
+  tailored_summary: string;
+  structured_data: ResumeStructuredData;
+  plain_text_preview: string;
+  changes_made: Array<{
+    section: string;
+    action: string;
+    details: string;
+  }>;
+  relevant_job_requirements_addressed: string[];
+  validation_warnings: string[];
+  factual_accuracy_guaranteed: boolean;
+  approved_by_user: boolean;
+  approved_at?: string;
+  created_at: string;
+}
+
+export type ApplicationStatus = 
+  | 'Discovered'
+  | 'Matched'
+  | 'Resume Tailored'
+  | 'Awaiting Review'
+  | 'Draft Created'
+  | 'Applied'
+  | 'Interview'
+  | 'Offer'
+  | 'Rejected'
+  | 'Withdrawn';
+
+export interface JobApplicationRecord {
+  id: string;
+  user_id: string;
+  job_id: string;
+  company: string;
+  role: string;
+  job_url: string;
+  contact_id?: string;
+  contact_name?: string;
+  contact_email?: string;
+  status: ApplicationStatus;
+  tailored_resume_id?: string;
+  email_draft_id?: string;
+  gmail_draft_id?: string;
+  match_score?: number;
+  date_discovered: string;
+  date_applied?: string;
+  follow_up_reminder_date?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PersonalizedEmailDraft {
+  id: string;
+  user_id: string;
+  job_id: string;
+  contact_id?: string;
+  email_type: 
+    | 'job_application'
+    | 'recruiter_outreach'
+    | 'hiring_manager'
+    | 'internship_inquiry'
+    | 'referral_request'
+    | 'application_followup'
+    | 'interview_thankyou';
+  recipient_name: string;
+  recipient_email: string;
+  delivery_target_email: string;
+  subject: string;
+  body: string;
+  body_html: string;
+  evidence_used: string[];
+  tailored_resume_id?: string;
+  status: 'GENERATED' | 'USER_EDITED' | 'APPROVED' | 'DRAFTED_IN_GMAIL' | 'SKIPPED';
+  gmail_draft_id?: string;
+  created_in_gmail: boolean;
+  creation_error?: string;
+  signature: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DailyAutomationConfig {
+  id: string;
+  user_id: string;
+  is_enabled: boolean;
+  frequency: 'daily' | 'manual';
+  max_jobs_per_run: number;
+  auto_tailor_resumes: boolean;
+  auto_generate_drafts: boolean;
+  last_run_timestamp?: string;
+  last_run_status?: string;
+  last_run_summary?: string;
+}
+

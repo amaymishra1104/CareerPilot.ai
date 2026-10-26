@@ -3,80 +3,105 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  Building2, 
   Users, 
   Sparkles, 
   CheckCircle2, 
   SendHorizontal, 
-  Terminal, 
   Settings, 
   Layers, 
   SlidersHorizontal,
   MailCheck,
-  Stethoscope,
-  FileText
+  FileText,
+  Briefcase,
+  Clock,
+  ShieldCheck
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  pendingApprovalCount: number;
-  approvedCount: number;
-  draftsCount: number;
+  resumesCount?: number;
+  jobsCount?: number;
+  matchesCount?: number;
+  tailoredCount?: number;
+  careerDraftsCount?: number;
+  applicationsCount?: number;
 }
 
 export function Sidebar({
   activeTab,
   setActiveTab,
-  pendingApprovalCount,
-  approvedCount,
-  draftsCount
+  resumesCount = 3,
+  jobsCount = 6,
+  matchesCount = 4,
+  tailoredCount = 2,
+  careerDraftsCount = 1,
+  applicationsCount = 4
 }: SidebarProps) {
+  // Navigation for CareerPilot AI
   const navItems = [
-    { id: 'dashboard', label: 'Overview Dashboard', icon: LayoutDashboard },
-    { id: 'icp', label: 'ICP Configuration', icon: SlidersHorizontal },
-    { type: 'header', label: '5-STAGE PIPELINE' },
-    { id: 'companies', label: '1. Company Search', icon: Building2 },
-    { id: 'leads', label: '2. Lead Search', icon: Users },
-    { id: 'enrichment', label: '3. Enrichment Engine', icon: Sparkles },
+    { id: 'career_dashboard', label: 'Career Dashboard', icon: LayoutDashboard },
+    { type: 'header', label: 'CANDIDATE CORE' },
     { 
-      id: 'approvals', 
-      label: '4. Human Approval', 
-      icon: CheckCircle2, 
-      badge: pendingApprovalCount > 0 ? `${pendingApprovalCount} pending` : undefined,
-      badgeColor: 'amber'
-    },
-    { 
-      id: 'sequences', 
-      label: '5. Email Sequences', 
-      icon: SendHorizontal,
-      badge: approvedCount > 0 ? `${approvedCount} ready` : undefined,
+      id: 'career_resumes', 
+      label: '1. Resume Library', 
+      icon: FileText,
+      badge: `${resumesCount} profiles`,
       badgeColor: 'indigo'
     },
-    { type: 'header', label: 'OUTPUT & EXECUTION' },
+    { id: 'career_preferences', label: '2. Job Preferences', icon: SlidersHorizontal },
     { 
-      id: 'drafts', 
-      label: 'Email Draft Queue', 
-      icon: MailCheck,
-      badge: draftsCount > 0 ? `${draftsCount}` : undefined,
+      id: 'career_jobs', 
+      label: '3. Real Job Discovery', 
+      icon: Briefcase,
+      badge: `${jobsCount} openings`,
+      badgeColor: 'sky'
+    },
+    { 
+      id: 'career_matching', 
+      label: '4. Matching & Selection', 
+      icon: Sparkles,
+      badge: `${matchesCount} scored`,
       badgeColor: 'emerald'
     },
-    { id: 'workflow', label: 'Workflow Logs', icon: Terminal },
-    { type: 'header', label: 'SPECIAL & SETTINGS' },
-    { id: 'docs', label: 'Documentation PDF', icon: FileText, badge: 'Official', badgeColor: 'indigo' },
-    { id: 'dental', label: 'Dental DSO Adaptation', icon: Stethoscope },
-    { id: 'settings', label: 'Integrations & API Keys', icon: Settings },
+    { 
+      id: 'career_tailor', 
+      label: '5. Factual Tailoring', 
+      icon: Layers,
+      badge: tailoredCount > 0 ? `${tailoredCount} ready` : undefined,
+      badgeColor: 'amber'
+    },
+    { type: 'header', label: 'OUTREACH & TRACKING' },
+    { id: 'career_recruiters', label: '6. Recruiter Discovery', icon: Users },
+    { id: 'career_outreach', label: '7. Personalized Outreach', icon: SendHorizontal },
+    { 
+      id: 'career_drafts', 
+      label: '8. Draft Queue (Test Gated)', 
+      icon: MailCheck,
+      badge: careerDraftsCount > 0 ? `${careerDraftsCount}` : undefined,
+      badgeColor: 'purple'
+    },
+    { 
+      id: 'career_tracker', 
+      label: '9. Application Tracker', 
+      icon: CheckCircle2,
+      badge: `${applicationsCount}`,
+      badgeColor: 'indigo'
+    },
+    { id: 'career_automation', label: '10. Daily Automation', icon: Clock },
+    { type: 'header', label: 'SYSTEM' },
+    { id: 'settings', label: 'Integrations & Settings', icon: Settings },
   ];
 
   return (
-    <aside className="w-64 shrink-0 border-r border-slate-800 bg-slate-950/60 p-4 flex flex-col justify-between min-h-[calc(100vh-65px)]">
+    <aside className="w-64 shrink-0 border-r border-slate-200/90 dark:border-slate-800 bg-white dark:bg-[#0d1322] p-4 flex flex-col justify-between min-h-[calc(100vh-65px)] shadow-xs transition-colors duration-200">
       <div className="space-y-1">
         {navItems.map((item, idx) => {
           if (item.type === 'header') {
             return (
               <div 
                 key={`header-${idx}`} 
-                className="pt-5 pb-1 px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase"
+                className="pt-4 pb-1.5 px-3 text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase"
               >
                 {item.label}
               </div>
@@ -90,23 +115,27 @@ export function Sidebar({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id!)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-indigo-600/15 text-indigo-300 border border-indigo-500/30 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent'
+                  ? 'bg-indigo-50/90 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 font-semibold shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-850 border border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
+                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`} />
+                <span className="truncate">{item.label}</span>
               </div>
               {item.badge && (
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
                   item.badgeColor === 'amber'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/40'
                     : item.badgeColor === 'emerald'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40'
+                    : item.badgeColor === 'sky'
+                    ? 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800/40'
+                    : item.badgeColor === 'purple'
+                    ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-800/40'
+                    : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/40'
                 }`}>
                   {item.badge}
                 </span>
@@ -116,14 +145,14 @@ export function Sidebar({
         })}
       </div>
 
-      {/* OSVI.ai Journey Value proposition pill */}
-      <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1.5 mt-6">
-        <div className="flex items-center gap-1.5 text-indigo-300 font-medium">
-          <Layers className="w-3.5 h-3.5" />
-          <span>Journey Architecture</span>
+      {/* Safety Gating Footer Box */}
+      <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 space-y-1.5 mt-6 shadow-xs">
+        <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Safety &amp; Privacy Gating</span>
         </div>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
-          Multi-agent orchestration layer above traditional bots, aligning QSR guest touchpoints directly with store operations.
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          Zero automated email sending. All outreach drafts are created strictly in the operator test inbox for human review.
         </p>
       </div>
     </aside>

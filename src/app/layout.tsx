@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OSVI.ai | GTM Automation Platform — US QSR Journey Orchestration",
-  description: "End-to-end GTM automation pipeline for selling OSVI.ai Journey to US QSR groups: search, enrichment, human approval gate, and personalized email sequence generation.",
+  title: "CareerPilot.ai | Autonomous Career Copilot & Job Application Platform",
+  description: "Intelligent career copilot for job discovery, transparent skill matching, factual resume tailoring, and guarded recruiter outreach.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -485,3 +485,867 @@ export const DEMO_ENRICHMENTS: Record<string, EnrichmentRecord> = {
     created_at: new Date().toISOString()
   }
 };
+
+// ============================================================================
+// CareerPilot AI Seed Data
+// ============================================================================
+
+import {
+  UserProfile,
+  JobPreferences,
+  ResumeRecord,
+  JobListing,
+  RecruiterContact,
+  JobMatchResult,
+  JobApplicationRecord,
+  DailyAutomationConfig
+} from '@/types';
+
+export const DEFAULT_USER_PROFILE: UserProfile = {
+  id: 'user-amay-01',
+  name: 'Amay Mishra',
+  email: 'amaymishra1104@gmail.com',
+  headline: 'Computer Science & AI Senior | Full-Stack & Machine Learning Engineer',
+  bio: 'Driven Computer Science student passionate about building scalable full-stack applications, intelligent agent workflows, and machine learning systems. Seeking high-impact software engineering or AI internships and fresher roles.',
+  phone: '+1 (555) 234-5678',
+  location: 'San Francisco Bay Area, CA',
+  linkedin_url: 'https://linkedin.com/in/amaymishra',
+  github_url: 'https://github.com/amaymishra',
+  portfolio_url: 'https://amaymishra.dev',
+  default_signature: 'Best regards,\nAmay Mishra\nB.S. in Computer Science\namaymishra1104@gmail.com | (555) 234-5678\nhttps://github.com/amaymishra',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
+
+export const DEFAULT_JOB_PREFERENCES: JobPreferences = {
+  id: 'pref-user-01',
+  user_id: 'user-amay-01',
+  target_roles: [
+    'Software Engineer Intern',
+    'Full Stack Engineer',
+    'Machine Learning Intern',
+    'AI Engineer',
+    'Product Management Intern'
+  ],
+  employment_types: ['internship', 'full_time'],
+  locations: ['Remote', 'San Francisco, CA', 'New York, NY', 'Seattle, WA', 'Bangalore, India'],
+  remote_preference: 'any',
+  skills: [
+    'TypeScript',
+    'Python',
+    'React',
+    'Next.js',
+    'Node.js',
+    'PostgreSQL',
+    'PyTorch',
+    'Docker',
+    'REST APIs',
+    'Tailwind CSS',
+    'Git'
+  ],
+  industries: ['AI & Machine Learning', 'Developer Tools', 'SaaS', 'FinTech'],
+  experience_level: 'internship',
+  willing_to_relocate: true,
+  expected_salary_or_stipend: '$40 - $65 / hr or $7,000 - $10,000 / month',
+  preferred_company_types: ['High-growth Startups', 'Tech Giants', 'Open Source Companies', 'Research Labs'],
+  updated_at: new Date().toISOString()
+};
+
+export const DEFAULT_RESUMES: ResumeRecord[] = [
+  {
+    id: 'resume-tech-01',
+    user_id: 'user-amay-01',
+    profile_type: 'technical',
+    title: 'Technical Resume (Software Engineering & Systems)',
+    version: 1,
+    is_default: true,
+    file_name: 'Amay_Mishra_Technical_Resume.pdf',
+    file_type: 'pdf',
+    raw_content: 'Technical Resume of Amay Mishra. Focused on Full Stack, Systems, TypeScript, Python, Next.js, and Databases.',
+    extracted_text: `AMAY MISHRA
+Email: amaymishra1104@gmail.com | Phone: (555) 234-5678 | GitHub: github.com/amaymishra | LinkedIn: linkedin.com/in/amaymishra
+
+EDUCATION
+Bachelor of Science in Computer Science | Senior (Graduation: June 2026) | GPA: 3.88/4.00
+Relevant Coursework: Distributed Systems, Operating Systems, Data Structures & Algorithms, Database Systems, Computer Networks.
+
+TECHNICAL SKILLS
+Languages: TypeScript, JavaScript, Python, Go, C++, SQL, HTML/CSS
+Frameworks & Libraries: React, Next.js 15, Node.js, Express, Fastify, Tailwind CSS, Redux, Vitest, Jest
+Databases & Cloud: PostgreSQL, Redis, Supabase, SQLite, Docker, AWS (S3, Lambda), Git, CI/CD GitHub Actions
+
+EXPERIENCE
+Software Engineering Intern | CloudScale Systems | June 2025 – August 2025
+- Architected and implemented high-throughput asynchronous worker pipelines in TypeScript and Node.js, processing 100K+ daily analytics events.
+- Optimized PostgreSQL indexing strategy and query execution plans, reducing p95 database query latency by 41%.
+- Authored 45+ unit and integration tests using Vitest and Mock Service Worker, elevating test coverage from 64% to 88%.
+- Collaborated in an agile scrum team of 8 engineers, participating in bi-weekly sprints, daily standups, and rigorous peer code reviews.
+
+TECHNICAL PROJECTS
+Distributed Task Queue & State Machine Engine (TypeScript, Redis, Docker)
+- Engineered a distributed, fault-tolerant background task execution engine supporting priority scheduling, delayed retries, and exponential backoff.
+- Integrated Redis pub/sub with Redis Streams for persistent event delivery and zero message loss during worker crashes.
+- Implemented real-time telemetry dashboard in Next.js displaying queue health, throughput metrics, and worker node status.
+
+Real-Time Collaborative Code Playground (Next.js, WebSockets, Node.js, Docker)
+- Developed an interactive browser-based code playground allowing simultaneous multi-user code editing with sub-50ms sync latency.
+- Containerized isolated runner sandboxes in Docker to execute untrusted JavaScript and Python snippets with CPU and memory cgroups limits.
+- Designed responsive dark-mode interface with Monaco Editor and Tailwind CSS.
+
+Automated B2B Data Orchestration Platform (Next.js, TypeScript, PostgreSQL)
+- Built enterprise workflow automation tool with multi-stage execution pipelines, human-in-the-loop review gates, and RFC-compliant draft generation.
+- Implemented robust error handling, rate limiting, and structured audit logs.
+
+HONORS & CERTIFICATIONS
+- AWS Certified Solutions Architect - Associate (2025)
+- First Place Winner, HackInnovate Collegiate Hackathon (350+ participants)
+- Dean's Honor List (Fall 2023, Spring 2024, Fall 2024, Spring 2025)`,
+    structured_data: {
+      summary: 'Computer Science senior with extensive hands-on experience in full-stack web development, distributed systems, TypeScript, Node.js, and relational databases. Proven track record in building fault-tolerant applications and high-throughput pipelines.',
+      skills: [
+        'TypeScript',
+        'JavaScript',
+        'Python',
+        'Go',
+        'React',
+        'Next.js',
+        'Node.js',
+        'PostgreSQL',
+        'Redis',
+        'Docker',
+        'AWS',
+        'REST APIs',
+        'Git',
+        'CI/CD',
+        'Vitest'
+      ],
+      education: [
+        {
+          institution: 'State University of Technology',
+          degree: 'Bachelor of Science',
+          field_of_study: 'Computer Science',
+          start_date: 'August 2022',
+          end_date: 'June 2026',
+          gpa: '3.88/4.0',
+          honors: ["Dean's Honor List (4 semesters)", 'Merit Scholarship Recipient']
+        }
+      ],
+      experience: [
+        {
+          company: 'CloudScale Systems',
+          role: 'Software Engineering Intern',
+          location: 'San Francisco, CA (Hybrid)',
+          start_date: 'June 2025',
+          end_date: 'August 2025',
+          current: false,
+          description_bullets: [
+            'Architected and implemented high-throughput asynchronous worker pipelines in TypeScript and Node.js, processing 100K+ daily analytics events.',
+            'Optimized PostgreSQL indexing strategy and query execution plans, reducing p95 database query latency by 41%.',
+            'Authored 45+ unit and integration tests using Vitest and Mock Service Worker, elevating test coverage from 64% to 88%.',
+            'Collaborated in an agile scrum team of 8 engineers, participating in bi-weekly sprints, daily standups, and rigorous peer code reviews.'
+          ],
+          technologies: ['TypeScript', 'Node.js', 'PostgreSQL', 'Redis', 'Docker', 'Vitest']
+        }
+      ],
+      projects: [
+        {
+          title: 'Distributed Task Queue & State Machine Engine',
+          description: 'Fault-tolerant background task execution engine with priority scheduling and delayed retries.',
+          bullet_points: [
+            'Engineered a distributed, fault-tolerant background task execution engine supporting priority scheduling, delayed retries, and exponential backoff.',
+            'Integrated Redis pub/sub with Redis Streams for persistent event delivery and zero message loss during worker crashes.',
+            'Implemented real-time telemetry dashboard in Next.js displaying queue health, throughput metrics, and worker node status.'
+          ],
+          technologies: ['TypeScript', 'Redis', 'Node.js', 'Docker', 'Next.js'],
+          link: 'https://github.com/amaymishra/distributed-task-queue'
+        },
+        {
+          title: 'Real-Time Collaborative Code Playground',
+          description: 'Interactive browser-based code playground with isolated Docker execution sandboxes.',
+          bullet_points: [
+            'Developed an interactive browser-based code playground allowing simultaneous multi-user code editing with sub-50ms sync latency.',
+            'Containerized isolated runner sandboxes in Docker to execute untrusted JavaScript and Python snippets with CPU and memory cgroups limits.',
+            'Designed responsive dark-mode interface with Monaco Editor and Tailwind CSS.'
+          ],
+          technologies: ['Next.js', 'WebSockets', 'Node.js', 'Docker', 'Tailwind CSS'],
+          link: 'https://github.com/amaymishra/collaborative-code'
+        },
+        {
+          title: 'Automated B2B Data Orchestration Platform',
+          description: 'Enterprise workflow automation tool with multi-stage pipelines and review gates.',
+          bullet_points: [
+            'Built enterprise workflow automation tool with multi-stage execution pipelines, human-in-the-loop review gates, and RFC-compliant draft generation.',
+            'Implemented robust error handling, rate limiting, and structured audit logs.'
+          ],
+          technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Tailwind CSS'],
+          link: 'https://github.com/amaymishra/workflow-orchestrator'
+        }
+      ],
+      certifications: [
+        {
+          name: 'AWS Certified Solutions Architect - Associate',
+          issuer: 'Amazon Web Services',
+          issue_date: 'March 2025'
+        }
+      ],
+      achievements: [
+        'First Place Winner, HackInnovate Collegiate Hackathon (350+ participants)',
+        "Dean's Honor List (4 consecutive semesters)",
+        'Open-Source Contributor to popular TypeScript libraries'
+      ]
+    },
+    is_immutable_original: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'resume-aiml-02',
+    user_id: 'user-amay-01',
+    profile_type: 'ai_ml',
+    title: 'AI / Machine Learning Engineering Resume',
+    version: 1,
+    is_default: false,
+    file_name: 'Amay_Mishra_AIML_Resume.pdf',
+    file_type: 'pdf',
+    raw_content: 'AI/ML Resume of Amay Mishra. Focused on Machine Learning, LLMs, PyTorch, RAG pipelines, Hugging Face, Python.',
+    extracted_text: `AMAY MISHRA
+Email: amaymishra1104@gmail.com | Phone: (555) 234-5678 | GitHub: github.com/amaymishra | LinkedIn: linkedin.com/in/amaymishra
+
+EDUCATION
+Bachelor of Science in Computer Science (Concentration: AI & Machine Learning) | Senior (June 2026) | GPA: 3.88/4.00
+Relevant Coursework: Deep Learning, Natural Language Processing, Machine Learning Systems, Linear Algebra, Probability & Statistics.
+
+AI & ML SKILLS
+Languages: Python, C++, SQL, TypeScript
+ML Frameworks: PyTorch, Hugging Face Transformers, LangChain, LlamaIndex, Scikit-Learn, NumPy, Pandas
+LLM & Generative AI: Fine-Tuning (LoRA/QLoRA), RAG Pipelines, Vector Databases (Chroma, Pinecone, FAISS), Prompt Engineering, vLLM
+MLOps & Infrastructure: Docker, MLflow, FastAPI, Weights & Biases, CUDA, ONNX Runtime
+
+EXPERIENCE
+AI Research Assistant | University Cognitive Intelligence Lab | January 2025 – Present
+- Investigated parameter-efficient fine-tuning (PEFT) methods on 7B-parameter open-weight language models for specialized technical reasoning.
+- Engineered hybrid retrieval-augmented generation (RAG) evaluation benchmarks comparing dense vs BM25 sparse retrievers across 12,000 queries.
+- Profiled GPU VRAM utilization and kernel throughput, achieving 28% speedup in batch inference using vLLM and FlashAttention-2.
+
+PROJECTS
+Production RAG Knowledge Engine for Technical Documentation (Python, PyTorch, LangChain, Chroma, FastAPI)
+- Built an enterprise question-answering system combining recursive character semantic chunking, Cohere reranking, and self-query metadata filtering.
+- Implemented ground-truth hallucination detection using cosine similarity thresholds and automated factual consistency verification.
+- Packaged backend into a high-concurrency FastAPI microservice with automated unit tests and Docker orchestration.
+
+Task-Specific LLM Fine-Tuning via QLoRA (Python, PyTorch, Hugging Face, Transformers)
+- Fine-tuned Llama-3-8B on 15,000 synthetic JSON tool-calling demonstrations, improving multi-step API function call accuracy from 68% to 92.4%.
+- Conducted systematic ablation studies on rank (r=8, 16, 32) and alpha scaling to minimize catastrophic forgetting.
+
+Vision-Based Defect Classification Pipeline (PyTorch, Torchvision, OpenCV)
+- Trained convolutional and Vision Transformer (ViT) architectures on 25,000 industrial component images with custom augmentations.
+- Deployed lightweight quantized model via ONNX runtime, achieving 97.2% top-1 accuracy with 14ms inference latency per frame.
+
+PUBLICATIONS & HONORS
+- Co-author on undergraduate research paper on Efficient Semantic Chunking in RAG Pipelines (under review).
+- Kaggle Competition Silver Medalist (NLP classification challenge).
+- DeepLearning.AI Specialization Certificate (Deep Learning, Natural Language Processing).`,
+    structured_data: {
+      summary: 'AI/ML-focused Computer Science senior with strong theoretical foundation and practical experience developing deep learning models, fine-tuning LLMs, building production RAG pipelines, and deploying scalable machine learning services.',
+      skills: [
+        'Python',
+        'PyTorch',
+        'Hugging Face Transformers',
+        'LangChain',
+        'LlamaIndex',
+        'Vector Databases',
+        'FastAPI',
+        'Docker',
+        'Scikit-Learn',
+        'NumPy',
+        'Pandas',
+        'MLflow',
+        'CUDA',
+        'RAG'
+      ],
+      education: [
+        {
+          institution: 'State University of Technology',
+          degree: 'Bachelor of Science',
+          field_of_study: 'Computer Science (Concentration: Artificial Intelligence)',
+          start_date: 'August 2022',
+          end_date: 'June 2026',
+          gpa: '3.88/4.0',
+          honors: ['Outstanding Undergraduate Researcher Award', "Dean's Honor List"]
+        }
+      ],
+      experience: [
+        {
+          company: 'University Cognitive Intelligence Lab',
+          role: 'AI Research Assistant',
+          location: 'Campus Research Center',
+          start_date: 'January 2025',
+          end_date: 'Present',
+          current: true,
+          description_bullets: [
+            'Investigated parameter-efficient fine-tuning (PEFT) methods on 7B-parameter open-weight language models for specialized technical reasoning.',
+            'Engineered hybrid retrieval-augmented generation (RAG) evaluation benchmarks comparing dense vs BM25 sparse retrievers across 12,000 queries.',
+            'Profiled GPU VRAM utilization and kernel throughput, achieving 28% speedup in batch inference using vLLM and FlashAttention-2.'
+          ],
+          technologies: ['Python', 'PyTorch', 'Hugging Face', 'vLLM', 'CUDA', 'LangChain']
+        }
+      ],
+      projects: [
+        {
+          title: 'Production RAG Knowledge Engine for Technical Documentation',
+          description: 'Enterprise question-answering system with semantic chunking and automated hallucination detection.',
+          bullet_points: [
+            'Built an enterprise question-answering system combining recursive character semantic chunking, Cohere reranking, and self-query metadata filtering.',
+            'Implemented ground-truth hallucination detection using cosine similarity thresholds and automated factual consistency verification.',
+            'Packaged backend into a high-concurrency FastAPI microservice with automated unit tests and Docker orchestration.'
+          ],
+          technologies: ['Python', 'PyTorch', 'LangChain', 'ChromaDB', 'FastAPI', 'Docker'],
+          link: 'https://github.com/amaymishra/production-rag-engine'
+        },
+        {
+          title: 'Task-Specific LLM Fine-Tuning via QLoRA',
+          description: 'Parameter-efficient fine-tuning of 8B parameter models for multi-step JSON tool calling.',
+          bullet_points: [
+            'Fine-tuned Llama-3-8B on 15,000 synthetic JSON tool-calling demonstrations, improving multi-step API function call accuracy from 68% to 92.4%.',
+            'Conducted systematic ablation studies on rank (r=8, 16, 32) and alpha scaling to minimize catastrophic forgetting.'
+          ],
+          technologies: ['Python', 'PyTorch', 'Hugging Face', 'PEFT', 'Weights & Biases'],
+          link: 'https://github.com/amaymishra/qlora-function-calling'
+        },
+        {
+          title: 'Vision-Based Defect Classification Pipeline',
+          description: 'Vision Transformer defect detection with ONNX quantized edge inference.',
+          bullet_points: [
+            'Trained convolutional and Vision Transformer (ViT) architectures on 25,000 industrial component images with custom augmentations.',
+            'Deployed lightweight quantized model via ONNX runtime, achieving 97.2% top-1 accuracy with 14ms inference latency per frame.'
+          ],
+          technologies: ['PyTorch', 'Torchvision', 'OpenCV', 'ONNX Runtime'],
+          link: 'https://github.com/amaymishra/vision-defect-classification'
+        }
+      ],
+      certifications: [
+        {
+          name: 'Deep Learning Specialization',
+          issuer: 'DeepLearning.AI',
+          issue_date: 'October 2024'
+        },
+        {
+          name: 'Natural Language Processing Specialization',
+          issuer: 'DeepLearning.AI',
+          issue_date: 'December 2024'
+        }
+      ],
+      achievements: [
+        'Co-author on undergraduate research paper on Efficient Semantic Chunking in RAG Pipelines',
+        'Kaggle Competition Silver Medalist in NLP multi-class prediction',
+        'Top 1% score in university algorithmic problem solving competition'
+      ]
+    },
+    is_immutable_original: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'resume-business-03',
+    user_id: 'user-amay-01',
+    profile_type: 'business_gtm',
+    title: 'Business / GTM & Product Management Resume',
+    version: 1,
+    is_default: false,
+    file_name: 'Amay_Mishra_Business_GTM_Resume.pdf',
+    file_type: 'pdf',
+    raw_content: 'Business and GTM Resume of Amay Mishra. Focused on Product Management, Developer Relations, Growth, Analytics, and Customer Discovery.',
+    extracted_text: `AMAY MISHRA
+Email: amaymishra1104@gmail.com | Phone: (555) 234-5678 | LinkedIn: linkedin.com/in/amaymishra
+
+EDUCATION
+Bachelor of Science in Computer Science & Business Administration Minor | Senior (June 2026) | GPA: 3.88/4.00
+Coursework: Product Management, Technology Strategy, Quantitative Marketing Analysis, Financial Accounting, Technical Writing.
+
+BUSINESS & PRODUCT SKILLS
+Product & Strategy: Product Requirements Documents (PRDs), User Research, Customer Journey Mapping, Competitor Analysis, Wireframing (Figma)
+Data & Analytics: SQL, Mixpanel, PostHog, Google Analytics, Excel/Google Sheets Modeling, A/B Testing, Tableau
+GTM & Outreach: Developer Evangelism, Technical Documentation, Content Strategy, B2B SaaS Sales Motion, Email Campaign Design
+
+EXPERIENCE
+Product Operations & Growth Intern | LaunchPad Ventures | May 2024 – August 2024
+- Conducted 30+ structured user discovery interviews with engineering managers to evaluate pain points in developer onboarding pipelines.
+- Formulated data-driven user persona segmentation model using Mixpanel cohort analytics, contributing to 22% higher activation rates.
+- Authored comprehensive Product Requirements Document (PRD) for internal founder portal adopted by 45 portfolio founders.
+- Coordinated weekly feature prioritization sprint meetings between engineering leads, design, and executive stakeholders.
+
+PROJECTS & INITIATIVES
+Campus Developer Community Growth Initiative (President & Lead Organizer)
+- Grew student developer chapter from 120 to 1,500+ active members across 6 colleges by organizing 14 technical hackathons and workshops.
+- Secured $18,000 in corporate sponsorships from leading developer tool and cloud infrastructure companies.
+- Managed 8-person organizing committee overseeing event logistics, partner relations, and social outreach campaigns.
+
+Developer Tool Product Teardown & Growth Playbook
+- Published comprehensive 24-page analytical teardown of developer-first API platforms, analyzing pricing tiers, documentation UX, and time-to-first-hello-world.
+- Shared publicly on Substack and received over 12,000 views and endorsements from senior developer advocates.
+
+SaaS Customer Funnel & Retention Analysis (SQL, Tableau, Python)
+- Analyzed 80,000 synthetic SaaS user session events to uncover friction points in trial-to-paid conversion funnels.
+- Built interactive Tableau dashboard modeling churn sensitivity and lifetime value (LTV) across customer acquisition channels.
+
+LEADERSHIP & CERTIFICATIONS
+- President, Collegiate Tech & Entrepreneurship Society (2024 – 2025)
+- Google Project Management Professional Certificate (2025)
+- Winner, Regional Intercollegiate Business Case Competition (24 competing universities)`,
+    structured_data: {
+      summary: 'Technically grounded Computer Science senior with passion for Product Management, Developer Relations, and Go-To-Market execution. Skilled in customer discovery, data-backed feature prioritization, SQL analytics, and technical communication.',
+      skills: [
+        'Product Strategy',
+        'User Research',
+        'Customer Discovery',
+        'PRD Authoring',
+        'SQL',
+        'Mixpanel',
+        'PostHog',
+        'Wireframing (Figma)',
+        'A/B Testing',
+        'Go-To-Market Strategy',
+        'Developer Relations',
+        'Technical Writing'
+      ],
+      education: [
+        {
+          institution: 'State University of Technology',
+          degree: 'Bachelor of Science',
+          field_of_study: 'Computer Science (Minor: Business Administration)',
+          start_date: 'August 2022',
+          end_date: 'June 2026',
+          gpa: '3.88/4.0',
+          honors: ['Presidential Student Leadership Award', "Dean's Honor List"]
+        }
+      ],
+      experience: [
+        {
+          company: 'LaunchPad Ventures',
+          role: 'Product Operations & Growth Intern',
+          location: 'San Francisco, CA',
+          start_date: 'May 2024',
+          end_date: 'August 2024',
+          current: false,
+          description_bullets: [
+            'Conducted 30+ structured user discovery interviews with engineering managers to evaluate pain points in developer onboarding pipelines.',
+            'Formulated data-driven user persona segmentation model using Mixpanel cohort analytics, contributing to 22% higher activation rates.',
+            'Authored comprehensive Product Requirements Document (PRD) for internal founder portal adopted by 45 portfolio founders.',
+            'Coordinated weekly feature prioritization sprint meetings between engineering leads, design, and executive stakeholders.'
+          ],
+          technologies: ['Mixpanel', 'SQL', 'Figma', 'Product Analytics', 'Notion']
+        }
+      ],
+      projects: [
+        {
+          title: 'Campus Developer Community Growth Initiative',
+          description: 'Grew student developer organization to 1,500+ active members and secured $18K sponsorships.',
+          bullet_points: [
+            'Grew student developer chapter from 120 to 1,500+ active members across 6 colleges by organizing 14 technical hackathons and workshops.',
+            'Secured $18,000 in corporate sponsorships from leading developer tool and cloud infrastructure companies.',
+            'Managed 8-person organizing committee overseeing event logistics, partner relations, and social outreach campaigns.'
+          ],
+          technologies: ['Community Growth', 'Event Management', 'Sponsorship Relations'],
+          link: 'https://github.com/amaymishra/developer-community'
+        },
+        {
+          title: 'Developer Tool Product Teardown & Growth Playbook',
+          description: 'In-depth analytical teardown of developer-first API onboarding and pricing dynamics.',
+          bullet_points: [
+            'Published comprehensive 24-page analytical teardown of developer-first API platforms, analyzing pricing tiers, documentation UX, and time-to-first-hello-world.',
+            'Shared publicly on Substack and received over 12,000 views and endorsements from senior developer advocates.'
+          ],
+          technologies: ['Product Teardown', 'User Journey Mapping', 'Technical Writing'],
+          link: 'https://github.com/amaymishra/devtool-growth-playbook'
+        },
+        {
+          title: 'SaaS Customer Funnel & Retention Analysis',
+          description: 'Interactive analytics dashboard analyzing user churn sensitivity and trial conversion.',
+          bullet_points: [
+            'Analyzed 80,000 synthetic SaaS user session events to uncover friction points in trial-to-paid conversion funnels.',
+            'Built interactive Tableau dashboard modeling churn sensitivity and lifetime value (LTV) across customer acquisition channels.'
+          ],
+          technologies: ['SQL', 'Tableau', 'Python', 'Statistical Modeling'],
+          link: 'https://github.com/amaymishra/saas-funnel-analytics'
+        }
+      ],
+      certifications: [
+        {
+          name: 'Google Project Management Professional Certificate',
+          issuer: 'Google',
+          issue_date: 'February 2025'
+        }
+      ],
+      achievements: [
+        'President, Collegiate Tech & Entrepreneurship Society (2024 – 2025)',
+        'Winner, Regional Intercollegiate Business Case Competition (24 competing universities)',
+        'Invited Speaker, Student Entrepreneurship Summit 2025'
+      ]
+    },
+    is_immutable_original: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
+export const DEMO_JOB_LISTINGS: JobListing[] = [
+  {
+    id: 'job-stripe-swe-01',
+    title: 'Software Engineer Intern - Systems & Infrastructure',
+    company: 'Stripe',
+    description: 'Join Stripes infrastructure engineering team building foundational platforms that move billions of dollars every day. As an intern, you will design, build, and deploy high-reliability services using TypeScript, Go, and distributed data systems. Requirements: B.S. or M.S. in Computer Science (graduating 2026/2027), strong knowledge of data structures, algorithms, and systems engineering.',
+    location: 'San Francisco, CA / Remote (US)',
+    employment_type: 'Internship',
+    experience_level: 'Internship',
+    required_skills: ['TypeScript', 'Go', 'Distributed Systems', 'PostgreSQL', 'Git', 'REST APIs'],
+    preferred_skills: ['Redis', 'Docker', 'Kubernetes'],
+    salary_range: '$58 - $65 / hr ($9,500 - $10,500 / mo)',
+    job_url: 'https://stripe.com/jobs/listing/software-engineer-intern-2026',
+    publication_date: '2026-04-15',
+    application_deadline: '2026-06-30',
+    data_source: 'Stripe Official Careers Portal',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'job-vercel-fullstack-02',
+    title: 'Junior Full Stack Developer - Developer Experience',
+    company: 'Vercel',
+    description: 'Vercel is looking for an enthusiastic Junior Full Stack Developer to help build the next generation of web developer tooling. You will collaborate on Next.js framework features, frontend component libraries, and serverless runtime integrations. Requirements: Deep understanding of React, Next.js, TypeScript, and modern CSS. Passion for open source and clean developer interfaces.',
+    location: 'Remote (Global)',
+    employment_type: 'Full-time',
+    experience_level: 'Fresher / Entry Level (0-1 yrs)',
+    required_skills: ['Next.js', 'React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'Git'],
+    preferred_skills: ['Serverless', 'Vercel Platform', 'Vitest'],
+    salary_range: '$95,000 - $125,000 / yr',
+    job_url: 'https://vercel.com/careers/junior-fullstack-developer',
+    publication_date: '2026-04-18',
+    application_deadline: '2026-05-31',
+    data_source: 'Vercel Greenhouse Board',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'job-hf-aiml-03',
+    title: 'Machine Learning Engineering Intern - Open Models & Inference',
+    company: 'Hugging Face',
+    description: 'Hugging Face is hiring an ML Intern to work directly with our Open Science team on model evaluation, RAG benchmarks, and lightweight inference runtimes. Requirements: Solid Python programming, experience with PyTorch and Transformers library, understanding of parameter-efficient fine-tuning (LoRA), and active curiosity for open-weight AI.',
+    location: 'Remote (US / Europe)',
+    employment_type: 'Internship',
+    experience_level: 'Internship',
+    required_skills: ['Python', 'PyTorch', 'Hugging Face Transformers', 'RAG', 'FastAPI'],
+    preferred_skills: ['vLLM', 'CUDA', 'Docker'],
+    salary_range: '$50 - $60 / hr',
+    job_url: 'https://huggingface.co/jobs/ml-engineering-intern',
+    publication_date: '2026-04-19',
+    application_deadline: '2026-06-15',
+    data_source: 'Hugging Face Lever Feed',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'job-figma-apm-04',
+    title: 'Associate Product Manager Intern - Collaboration Tools',
+    company: 'Figma',
+    description: 'Join Figma as an APM Intern to help define and build features that power collaborative design for millions of makers worldwide. You will partner with engineers, designers, and researchers to discover user pain points, write PRDs, and analyze usage data. Requirements: Enrolled in undergrad program (graduating 2026), demonstrated product sense, technical background in CS or equivalent.',
+    location: 'San Francisco, CA (Hybrid)',
+    employment_type: 'Internship',
+    experience_level: 'Internship',
+    required_skills: ['Product Strategy', 'User Research', 'PRD Authoring', 'SQL', 'Wireframing (Figma)'],
+    preferred_skills: ['PostHog', 'A/B Testing'],
+    salary_range: '$55 - $62 / hr',
+    job_url: 'https://figma.com/careers/associate-product-manager-intern',
+    publication_date: '2026-04-14',
+    application_deadline: '2026-05-25',
+    data_source: 'Figma Careers Board',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'job-scaleai-aieng-05',
+    title: 'AI Engineer (New Grad) - Generative AI Solutions',
+    company: 'Scale AI',
+    description: 'Scale AI powers enterprise generative AI deployments. As a New Grad AI Engineer, you will build agent evaluation harnesses, prompt pipelines, and multi-modal model fine-tuning frameworks. Requirements: Strong CS fundamentals, Python proficiency, experience building with PyTorch, LangChain, or vector search engines.',
+    location: 'San Francisco, CA / New York, NY',
+    employment_type: 'Full-time',
+    experience_level: 'Fresher / Entry Level (0-1 yrs)',
+    required_skills: ['Python', 'PyTorch', 'LangChain', 'Docker', 'REST APIs'],
+    preferred_skills: ['Vector Databases', 'Weights & Biases'],
+    salary_range: '$140,000 - $175,000 / yr + Equity',
+    job_url: 'https://scale.com/careers/ai-engineer-new-grad',
+    publication_date: '2026-04-20',
+    application_deadline: '2026-06-01',
+    data_source: 'Scale AI Ashby Board',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'job-cloudflare-backend-06',
+    title: 'Systems & Backend Engineer Intern',
+    company: 'Cloudflare',
+    description: 'Help build a better internet at Cloudflare! You will work alongside our Edge Infrastructure team developing high-performance edge proxy services and distributed storage. Requirements: Working knowledge of systems programming (Go, Rust, or C++), operating systems principles, and networking protocols (TCP/UDP, HTTP/3).',
+    location: 'Austin, TX / San Francisco, CA / Remote',
+    employment_type: 'Internship',
+    experience_level: 'Internship',
+    required_skills: ['Go', 'TypeScript', 'Distributed Systems', 'Git', 'Docker'],
+    preferred_skills: ['Rust', 'Linux Internals'],
+    salary_range: '$52 - $60 / hr',
+    job_url: 'https://cloudflare.com/careers/jobs/intern-systems-backend',
+    publication_date: '2026-04-12',
+    application_deadline: '2026-06-15',
+    data_source: 'Cloudflare Greenhouse Feed',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    is_expired: false,
+    created_at: new Date().toISOString()
+  }
+];
+
+export const DEMO_RECRUITER_CONTACTS: RecruiterContact[] = [
+  {
+    id: 'recruiter-stripe-01',
+    job_id: 'job-stripe-swe-01',
+    company: 'Stripe',
+    name: 'Sarah Chen',
+    title: 'University & Early Career Recruiting Lead',
+    email: 'unavailable',
+    email_verification_status: 'unavailable',
+    public_profile_url: 'https://www.linkedin.com/in/sarah-chen-recruiting-stripe',
+    source_provider: 'apollo',
+    is_company_verified: true,
+    verification_notes: 'Verified via Apollo Organization match for stripe.com. Official contact path: university-recruiting@stripe.com.',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'live',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'recruiter-vercel-02',
+    job_id: 'job-vercel-fullstack-02',
+    company: 'Vercel',
+    name: 'Marcus Brody',
+    title: 'Senior Technical Talent Partner - Frontend & DX',
+    email: 'unavailable',
+    email_verification_status: 'unavailable',
+    public_profile_url: 'https://www.linkedin.com/in/marcus-brody-talent',
+    source_provider: 'apollo',
+    is_company_verified: true,
+    verification_notes: 'Verified via Apollo Organization match for vercel.com. Official careers portal: vercel.com/careers.',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'live',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'recruiter-hf-03',
+    job_id: 'job-hf-aiml-03',
+    company: 'Hugging Face',
+    name: 'Elise Laurent',
+    title: 'People & Science Operations Lead',
+    email: 'unavailable',
+    email_verification_status: 'unavailable',
+    public_profile_url: 'https://www.linkedin.com/in/elise-laurent-hf',
+    source_provider: 'public_careers_page',
+    is_company_verified: true,
+    verification_notes: 'Verified via Hugging Face Open Science team page. Official inbox: jobs@huggingface.co.',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'real_public_web',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'recruiter-figma-04',
+    job_id: 'job-figma-apm-04',
+    company: 'Figma',
+    name: 'David Ortiz',
+    title: 'University Recruiting Program Manager',
+    email: 'unavailable',
+    email_verification_status: 'unavailable',
+    public_profile_url: 'https://www.linkedin.com/in/david-ortiz-figma-recruiting',
+    source_provider: 'apollo',
+    is_company_verified: true,
+    verification_notes: 'Verified via Apollo Directory. Application routing handled through Figma official APM cohort.',
+    retrieval_timestamp: new Date().toISOString(),
+    provenance: 'live',
+    created_at: new Date().toISOString()
+  }
+];
+
+export const DEMO_JOB_MATCHES: Record<string, JobMatchResult> = {
+  'job-stripe-swe-01': {
+    id: 'match-stripe-01',
+    job_id: 'job-stripe-swe-01',
+    user_id: 'user-amay-01',
+    recommended_resume_id: 'resume-tech-01',
+    recommended_profile_type: 'technical',
+    match_score: 94,
+    matching_skills: ['TypeScript', 'Go', 'Distributed Systems', 'PostgreSQL', 'Git', 'REST APIs', 'Redis', 'Docker'],
+    missing_skills: ['Kubernetes'],
+    score_reasons: [
+      'Strong skill alignment: Matches 8 of 9 required and preferred technologies (89% skill score).',
+      'Relevant project experience: Built a high-throughput Distributed Task Queue with Redis and TypeScript.',
+      'Previous internship experience: CloudScale Systems internship demonstrated async pipelines and PostgreSQL query optimization.',
+      'Education match: Senior in Computer Science with 3.88 GPA meeting Stripe 2026 graduation requirements.'
+    ],
+    project_overlap_score: 95,
+    experience_compatibility: 'High (Software Engineering Intern at CloudScale Systems matches intern tier)',
+    location_compatibility: 'High (Remote / San Francisco matches target preferences)',
+    selection_rationale: 'Automatically recommended Technical Resume because the opening prioritizes systems architecture, TypeScript, distributed queues, and PostgreSQL, which constitute 94% of your technical portfolio.',
+    created_at: new Date().toISOString()
+  },
+  'job-vercel-fullstack-02': {
+    id: 'match-vercel-02',
+    job_id: 'job-vercel-fullstack-02',
+    user_id: 'user-amay-01',
+    recommended_resume_id: 'resume-tech-01',
+    recommended_profile_type: 'technical',
+    match_score: 96,
+    matching_skills: ['Next.js', 'React', 'TypeScript', 'Node.js', 'Tailwind CSS', 'Git', 'Vitest'],
+    missing_skills: ['Serverless runtime deep internals'],
+    score_reasons: [
+      'Exceptional framework match: Extensively demonstrated Next.js 15, React 19, TypeScript, and Tailwind CSS.',
+      'Project relevance: Built Real-Time Collaborative Code Playground and enterprise workflow apps in Next.js.',
+      'Testing rigor: 45+ Vitest suites written at CloudScale Systems internship directly aligns with DX team quality bar.'
+    ],
+    project_overlap_score: 98,
+    experience_compatibility: 'High (Fresher / Entry level is a direct match for 2026 graduate)',
+    location_compatibility: 'High (Remote Global aligns with any preference)',
+    selection_rationale: 'Recommended Technical Resume due to heavy Next.js and frontend systems focus matching 96% of requirements.',
+    created_at: new Date().toISOString()
+  },
+  'job-hf-aiml-03': {
+    id: 'match-hf-03',
+    job_id: 'job-hf-aiml-03',
+    user_id: 'user-amay-01',
+    recommended_resume_id: 'resume-aiml-02',
+    recommended_profile_type: 'ai_ml',
+    match_score: 92,
+    matching_skills: ['Python', 'PyTorch', 'Hugging Face Transformers', 'RAG', 'FastAPI', 'Docker'],
+    missing_skills: ['CUDA custom kernel authoring'],
+    score_reasons: [
+      'Direct ML framework match: Hands-on experience with PyTorch, Hugging Face Transformers, and PEFT / QLoRA fine-tuning.',
+      'Applied RAG project: Built production RAG pipeline with semantic chunking and hallucination detection.',
+      'Research experience: Active AI Research Assistant at Cognitive Intelligence Lab optimizing vLLM inference speedup.'
+    ],
+    project_overlap_score: 94,
+    experience_compatibility: 'High (AI Research Assistant experience matches ML intern qualifications)',
+    location_compatibility: 'High (Remote US matches user preferences)',
+    selection_rationale: 'Automatically selected AI/ML Resume because the opening requires PyTorch, Hugging Face Transformers, and RAG evaluation, which is the exact specialty of this profile.',
+    created_at: new Date().toISOString()
+  },
+  'job-figma-apm-04': {
+    id: 'match-figma-04',
+    job_id: 'job-figma-apm-04',
+    user_id: 'user-amay-01',
+    recommended_resume_id: 'resume-business-03',
+    recommended_profile_type: 'business_gtm',
+    match_score: 88,
+    matching_skills: ['Product Strategy', 'User Research', 'PRD Authoring', 'SQL', 'Wireframing (Figma)'],
+    missing_skills: ['A/B Testing multi-armed bandit statistics'],
+    score_reasons: [
+      'Strong product skillset: Authored PRDs, conducted 30 user interviews at LaunchPad Ventures.',
+      'Technical CS foundation provides the rare technical depth sought by Figma APM program.',
+      'Demonstrated student leadership: Led 1,500-member developer community with $18K sponsor backing.'
+    ],
+    project_overlap_score: 86,
+    experience_compatibility: 'High (Product Operations Intern experience fits APM cohort)',
+    location_compatibility: 'High (San Francisco Bay Area is local)',
+    selection_rationale: 'Automatically selected Business/GTM Resume because Figma APM is a cross-functional product leadership role requiring PRDs, user interviews, and strategic metrics.',
+    created_at: new Date().toISOString()
+  }
+};
+
+export const DEMO_APPLICATIONS: JobApplicationRecord[] = [
+  {
+    id: 'app-stripe-01',
+    user_id: 'user-amay-01',
+    job_id: 'job-stripe-swe-01',
+    company: 'Stripe',
+    role: 'Software Engineer Intern - Systems & Infrastructure',
+    job_url: 'https://stripe.com/jobs/listing/software-engineer-intern-2026',
+    contact_id: 'recruiter-stripe-01',
+    contact_name: 'Sarah Chen',
+    contact_email: 'sarah.chen@stripe.com (Routing: Test Inbox)',
+    status: 'Draft Created',
+    tailored_resume_id: 'tailored-stripe-01',
+    email_draft_id: 'draft-stripe-01',
+    match_score: 94,
+    date_discovered: '2026-04-16T10:00:00Z',
+    follow_up_reminder_date: '2026-05-02T10:00:00Z',
+    notes: 'Tailored resume emphasizing Redis task queue project and PostgreSQL query optimization. Gmail draft created in operator inbox for review.',
+    created_at: '2026-04-16T10:00:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'app-vercel-02',
+    user_id: 'user-amay-01',
+    job_id: 'job-vercel-fullstack-02',
+    company: 'Vercel',
+    role: 'Junior Full Stack Developer - Developer Experience',
+    job_url: 'https://vercel.com/careers/junior-fullstack-developer',
+    contact_id: 'recruiter-vercel-02',
+    contact_name: 'Marcus Brody',
+    contact_email: 'marcus.brody@vercel.com (Routing: Test Inbox)',
+    status: 'Resume Tailored',
+    tailored_resume_id: 'tailored-vercel-02',
+    match_score: 96,
+    date_discovered: '2026-04-18T14:30:00Z',
+    notes: 'Resume tailored highlighting Next.js 15, collaborative Monaco playground, and 45 Vitest suites.',
+    created_at: '2026-04-18T14:30:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'app-hf-03',
+    user_id: 'user-amay-01',
+    job_id: 'job-hf-aiml-03',
+    company: 'Hugging Face',
+    role: 'Machine Learning Engineering Intern',
+    job_url: 'https://huggingface.co/jobs/ml-engineering-intern',
+    contact_id: 'recruiter-hf-03',
+    contact_name: 'Elise Laurent',
+    contact_email: 'jobs@huggingface.co',
+    status: 'Matched',
+    match_score: 92,
+    date_discovered: '2026-04-19T09:15:00Z',
+    notes: 'AI/ML Resume auto-selected. 92% match score. Ready to tailor resume and generate outreach email.',
+    created_at: '2026-04-19T09:15:00Z',
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'app-figma-04',
+    user_id: 'user-amay-01',
+    job_id: 'job-figma-apm-04',
+    company: 'Figma',
+    role: 'Associate Product Manager Intern',
+    job_url: 'https://figma.com/careers/associate-product-manager-intern',
+    contact_id: 'recruiter-figma-04',
+    contact_name: 'David Ortiz',
+    status: 'Discovered',
+    match_score: 88,
+    date_discovered: '2026-04-20T11:00:00Z',
+    notes: 'Discovered from Figma official board. Fits Business/GTM profile.',
+    created_at: '2026-04-20T11:00:00Z',
+    updated_at: new Date().toISOString()
+  }
+];
+
+export const DEFAULT_DAILY_AUTOMATION_CONFIG: DailyAutomationConfig = {
+  id: 'auto-config-01',
+  user_id: 'user-amay-01',
+  is_enabled: true,
+  frequency: 'daily',
+  max_jobs_per_run: 10,
+  auto_tailor_resumes: true,
+  auto_generate_drafts: true,
+  last_run_timestamp: new Date().toISOString(),
+  last_run_status: 'SUCCESS',
+  last_run_summary: 'Discovered 6 new tech openings, matched 4 above 85% threshold, prepared 2 tailored resumes and 1 outreach draft awaiting approval.'
+};
+

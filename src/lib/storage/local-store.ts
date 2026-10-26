@@ -12,14 +12,33 @@ import {
   WorkflowExecution, 
   WorkflowLog, 
   IntegrationSettings,
-  ApprovalStatus 
+  ApprovalStatus,
+  UserProfile,
+  JobPreferences,
+  ResumeRecord,
+  JobListing,
+  RecruiterContact,
+  JobMatchResult,
+  TailoredResumeRecord,
+  JobApplicationRecord,
+  PersonalizedEmailDraft,
+  DailyAutomationConfig,
+  ApplicationStatus
 } from '@/types';
 import { 
   INITIAL_ICP, 
   INITIAL_SETTINGS, 
   DEMO_COMPANIES, 
   DEMO_CONTACTS, 
-  DEMO_ENRICHMENTS 
+  DEMO_ENRICHMENTS,
+  DEFAULT_USER_PROFILE,
+  DEFAULT_JOB_PREFERENCES,
+  DEFAULT_RESUMES,
+  DEMO_JOB_LISTINGS,
+  DEMO_RECRUITER_CONTACTS,
+  DEMO_JOB_MATCHES,
+  DEMO_APPLICATIONS,
+  DEFAULT_DAILY_AUTOMATION_CONFIG
 } from '@/lib/seed';
 
 interface DatabaseSchema {
@@ -33,6 +52,18 @@ interface DatabaseSchema {
   emailDrafts: EmailDraftRecord[];
   workflowExecutions: WorkflowExecution[];
   workflowLogs: WorkflowLog[];
+
+  // CareerPilot AI Collections
+  userProfile?: UserProfile;
+  jobPreferences?: JobPreferences;
+  resumes?: ResumeRecord[];
+  jobListings?: JobListing[];
+  jobMatches?: Record<string, JobMatchResult>;
+  recruiterContacts?: RecruiterContact[];
+  tailoredResumes?: Record<string, TailoredResumeRecord>;
+  jobApplications?: JobApplicationRecord[];
+  personalizedDrafts?: PersonalizedEmailDraft[];
+  dailyAutomationConfig?: DailyAutomationConfig;
 }
 
 function getDbPath(): string {
@@ -53,42 +84,58 @@ function ensureDbFile(): DatabaseSchema {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
+  const defaultFullDb: DatabaseSchema = {
+    icp: INITIAL_ICP,
+    settings: INITIAL_SETTINGS,
+    companies: [...DEMO_COMPANIES],
+    contacts: [...DEMO_CONTACTS],
+    enrichments: { ...DEMO_ENRICHMENTS },
+    approvalHistory: [],
+    emailSequences: {},
+    emailDrafts: [],
+    workflowExecutions: [],
+    workflowLogs: [],
+    userProfile: { ...DEFAULT_USER_PROFILE },
+    jobPreferences: { ...DEFAULT_JOB_PREFERENCES },
+    resumes: [...DEFAULT_RESUMES],
+    jobListings: [...DEMO_JOB_LISTINGS],
+    jobMatches: { ...DEMO_JOB_MATCHES },
+    recruiterContacts: [...DEMO_RECRUITER_CONTACTS],
+    tailoredResumes: {},
+    jobApplications: [...DEMO_APPLICATIONS],
+    personalizedDrafts: [],
+    dailyAutomationConfig: { ...DEFAULT_DAILY_AUTOMATION_CONFIG }
+  };
+
   if (!fs.existsSync(dbPath)) {
-    const initialData: DatabaseSchema = {
-      icp: INITIAL_ICP,
-      settings: INITIAL_SETTINGS,
-      companies: [...DEMO_COMPANIES],
-      contacts: [...DEMO_CONTACTS],
-      enrichments: { ...DEMO_ENRICHMENTS },
-      approvalHistory: [],
-      emailSequences: {},
-      emailDrafts: [],
-      workflowExecutions: [],
-      workflowLogs: []
-    };
-    fs.writeFileSync(dbPath, JSON.stringify(initialData, null, 2), 'utf-8');
-    return initialData;
+    fs.writeFileSync(dbPath, JSON.stringify(defaultFullDb, null, 2), 'utf-8');
+    return defaultFullDb;
   }
 
   try {
     const raw = fs.readFileSync(dbPath, 'utf-8');
-    return JSON.parse(raw) as DatabaseSchema;
+    const parsed = JSON.parse(raw) as DatabaseSchema;
+    let modified = false;
+
+    if (!parsed.userProfile) { parsed.userProfile = { ...DEFAULT_USER_PROFILE }; modified = true; }
+    if (!parsed.jobPreferences) { parsed.jobPreferences = { ...DEFAULT_JOB_PREFERENCES }; modified = true; }
+    if (!parsed.resumes || parsed.resumes.length === 0) { parsed.resumes = [...DEFAULT_RESUMES]; modified = true; }
+    if (!parsed.jobListings || parsed.jobListings.length === 0) { parsed.jobListings = [...DEMO_JOB_LISTINGS]; modified = true; }
+    if (!parsed.jobMatches) { parsed.jobMatches = { ...DEMO_JOB_MATCHES }; modified = true; }
+    if (!parsed.recruiterContacts || parsed.recruiterContacts.length === 0) { parsed.recruiterContacts = [...DEMO_RECRUITER_CONTACTS]; modified = true; }
+    if (!parsed.tailoredResumes) { parsed.tailoredResumes = {}; modified = true; }
+    if (!parsed.jobApplications || parsed.jobApplications.length === 0) { parsed.jobApplications = [...DEMO_APPLICATIONS]; modified = true; }
+    if (!parsed.personalizedDrafts) { parsed.personalizedDrafts = []; modified = true; }
+    if (!parsed.dailyAutomationConfig) { parsed.dailyAutomationConfig = { ...DEFAULT_DAILY_AUTOMATION_CONFIG }; modified = true; }
+
+    if (modified) {
+      fs.writeFileSync(dbPath, JSON.stringify(parsed, null, 2), 'utf-8');
+    }
+    return parsed;
   } catch (err) {
     console.error('Error reading local db, resetting:', err);
-    const fallback: DatabaseSchema = {
-      icp: INITIAL_ICP,
-      settings: INITIAL_SETTINGS,
-      companies: [...DEMO_COMPANIES],
-      contacts: [...DEMO_CONTACTS],
-      enrichments: { ...DEMO_ENRICHMENTS },
-      approvalHistory: [],
-      emailSequences: {},
-      emailDrafts: [],
-      workflowExecutions: [],
-      workflowLogs: []
-    };
-    fs.writeFileSync(dbPath, JSON.stringify(fallback, null, 2), 'utf-8');
-    return fallback;
+    fs.writeFileSync(dbPath, JSON.stringify(defaultFullDb, null, 2), 'utf-8');
+    return defaultFullDb;
   }
 }
 
@@ -419,6 +466,328 @@ export class LocalStore {
     return db.workflowLogs || [];
   }
 
+  // ==========================================================================
+  // CareerPilot AI Methods
+  // ==========================================================================
+
+  // User Profile
+  static getUserProfile(): UserProfile {
+    const db = ensureDbFile();
+    return db.userProfile || DEFAULT_USER_PROFILE;
+  }
+
+  static updateUserProfile(profile: Partial<UserProfile>): UserProfile {
+    const db = ensureDbFile();
+    db.userProfile = {
+      ...(db.userProfile || DEFAULT_USER_PROFILE),
+      ...profile,
+      updated_at: new Date().toISOString()
+    };
+    saveDb(db);
+    return db.userProfile;
+  }
+
+  // Job Preferences
+  static getJobPreferences(): JobPreferences {
+    const db = ensureDbFile();
+    return db.jobPreferences || DEFAULT_JOB_PREFERENCES;
+  }
+
+  static updateJobPreferences(prefs: Partial<JobPreferences>): JobPreferences {
+    const db = ensureDbFile();
+    db.jobPreferences = {
+      ...(db.jobPreferences || DEFAULT_JOB_PREFERENCES),
+      ...prefs,
+      updated_at: new Date().toISOString()
+    };
+    saveDb(db);
+    return db.jobPreferences;
+  }
+
+  // Resumes
+  static getResumes(userId?: string): ResumeRecord[] {
+    const db = ensureDbFile();
+    const resumes = db.resumes || DEFAULT_RESUMES;
+    if (userId) {
+      return resumes.filter(r => r.user_id === userId);
+    }
+    return resumes;
+  }
+
+  static getResumeById(id: string): ResumeRecord | undefined {
+    const db = ensureDbFile();
+    return (db.resumes || []).find(r => r.id === id);
+  }
+
+  static saveResume(resume: ResumeRecord): ResumeRecord {
+    const db = ensureDbFile();
+    db.resumes = db.resumes || [];
+    const index = db.resumes.findIndex(r => r.id === resume.id);
+    if (index >= 0) {
+      db.resumes[index] = resume;
+    } else {
+      db.resumes.push(resume);
+    }
+    saveDb(db);
+    return resume;
+  }
+
+  static deleteResume(id: string): boolean {
+    const db = ensureDbFile();
+    const initialLen = (db.resumes || []).length;
+    db.resumes = (db.resumes || []).filter(r => r.id !== id);
+    if (db.resumes.length !== initialLen) {
+      saveDb(db);
+      return true;
+    }
+    return false;
+  }
+
+  // Job Listings
+  static getJobListings(filter?: { company?: string; location?: string; keyword?: string }): JobListing[] {
+    const db = ensureDbFile();
+    let jobs: JobListing[] = db.jobListings || DEMO_JOB_LISTINGS;
+    if (filter) {
+      if (filter.company) {
+        jobs = jobs.filter((j: JobListing) => j.company.toLowerCase().includes(filter.company!.toLowerCase()));
+      }
+      if (filter.location) {
+        jobs = jobs.filter((j: JobListing) => j.location.toLowerCase().includes(filter.location!.toLowerCase()));
+      }
+      if (filter.keyword) {
+        const kw = filter.keyword.toLowerCase();
+        jobs = jobs.filter((j: JobListing) => 
+          j.title.toLowerCase().includes(kw) || 
+          j.description.toLowerCase().includes(kw) ||
+          j.required_skills.some((s: string) => s.toLowerCase().includes(kw))
+        );
+      }
+    }
+    return jobs;
+  }
+
+  static getJobById(id: string): JobListing | undefined {
+    const db = ensureDbFile();
+    return (db.jobListings || []).find(j => j.id === id);
+  }
+
+  static addJobListing(job: JobListing): JobListing {
+    const db = ensureDbFile();
+    db.jobListings = db.jobListings || [];
+    const existing = db.jobListings.find(j => 
+      j.id === job.id || 
+      (j.title.toLowerCase().trim() === job.title.toLowerCase().trim() && 
+       j.company.toLowerCase().trim() === job.company.toLowerCase().trim())
+    );
+    if (existing) {
+      return existing;
+    }
+    db.jobListings.unshift(job);
+    saveDb(db);
+    return job;
+  }
+
+  static addJobListings(jobs: JobListing[]): JobListing[] {
+    const db = ensureDbFile();
+    db.jobListings = db.jobListings || [];
+    const added: JobListing[] = [];
+    for (const job of jobs) {
+      const exists = db.jobListings.some(j => 
+        j.id === job.id || 
+        (j.title.toLowerCase().trim() === job.title.toLowerCase().trim() && 
+         j.company.toLowerCase().trim() === job.company.toLowerCase().trim())
+      );
+      if (!exists) {
+        db.jobListings.unshift(job);
+        added.push(job);
+      }
+    }
+    if (added.length > 0) {
+      saveDb(db);
+    }
+    return added;
+  }
+
+  static updateJobListing(id: string, updates: Partial<JobListing>): JobListing | undefined {
+    const db = ensureDbFile();
+    db.jobListings = db.jobListings || [];
+    const idx = db.jobListings.findIndex(j => j.id === id);
+    if (idx >= 0) {
+      db.jobListings[idx] = { ...db.jobListings[idx], ...updates };
+      saveDb(db);
+      return db.jobListings[idx];
+    }
+    return undefined;
+  }
+
+  // Matches
+  static getJobMatches(userId?: string): Record<string, JobMatchResult> {
+    const db = ensureDbFile();
+    return db.jobMatches || DEMO_JOB_MATCHES;
+  }
+
+  static getJobMatchByJobId(jobId: string): JobMatchResult | undefined {
+    const db = ensureDbFile();
+    return (db.jobMatches || {})[jobId];
+  }
+
+  static saveJobMatch(match: JobMatchResult): JobMatchResult {
+    const db = ensureDbFile();
+    db.jobMatches = db.jobMatches || {};
+    db.jobMatches[match.job_id] = match;
+    saveDb(db);
+    return match;
+  }
+
+  // Recruiter Contacts
+  static getRecruiterContacts(jobId?: string): RecruiterContact[] {
+    const db = ensureDbFile();
+    const contacts: RecruiterContact[] = db.recruiterContacts || DEMO_RECRUITER_CONTACTS;
+    if (jobId) {
+      return contacts.filter((c: RecruiterContact) => c.job_id === jobId);
+    }
+    return contacts;
+  }
+
+  static getRecruiterContactById(id: string): RecruiterContact | undefined {
+    const db = ensureDbFile();
+    return (db.recruiterContacts || []).find(c => c.id === id);
+  }
+
+  static saveRecruiterContact(contact: RecruiterContact): RecruiterContact {
+    const db = ensureDbFile();
+    db.recruiterContacts = db.recruiterContacts || [];
+    const index = db.recruiterContacts.findIndex(c => c.id === contact.id);
+    if (index >= 0) {
+      db.recruiterContacts[index] = contact;
+    } else {
+      db.recruiterContacts.push(contact);
+    }
+    saveDb(db);
+    return contact;
+  }
+
+  // Tailored Resumes
+  static getTailoredResumes(jobId?: string): TailoredResumeRecord[] {
+    const db = ensureDbFile();
+    const tailoredMap = db.tailoredResumes || {};
+    const list = Object.values(tailoredMap);
+    if (jobId) {
+      return list.filter(t => t.job_id === jobId);
+    }
+    return list;
+  }
+
+  static getTailoredResumeById(id: string): TailoredResumeRecord | undefined {
+    const db = ensureDbFile();
+    const tailoredMap = db.tailoredResumes || {};
+    for (const key of Object.keys(tailoredMap)) {
+      if (tailoredMap[key].id === id || key === id) {
+        return tailoredMap[key];
+      }
+    }
+    return undefined;
+  }
+
+  static saveTailoredResume(tailored: TailoredResumeRecord): TailoredResumeRecord {
+    const db = ensureDbFile();
+    db.tailoredResumes = db.tailoredResumes || {};
+    db.tailoredResumes[tailored.job_id] = tailored;
+    saveDb(db);
+    return tailored;
+  }
+
+  // Job Applications
+  static getJobApplications(userId?: string): JobApplicationRecord[] {
+    const db = ensureDbFile();
+    const apps: JobApplicationRecord[] = db.jobApplications || DEMO_APPLICATIONS;
+    if (userId) {
+      return apps.filter((a: JobApplicationRecord) => a.user_id === userId);
+    }
+    return apps;
+  }
+
+  static getJobApplicationById(id: string): JobApplicationRecord | undefined {
+    const db = ensureDbFile();
+    return (db.jobApplications || []).find(a => a.id === id);
+  }
+
+  static saveJobApplication(app: JobApplicationRecord): JobApplicationRecord {
+    const db = ensureDbFile();
+    db.jobApplications = db.jobApplications || [];
+    const idx = db.jobApplications.findIndex(a => a.id === app.id || a.job_id === app.job_id);
+    if (idx >= 0) {
+      db.jobApplications[idx] = { ...db.jobApplications[idx], ...app, updated_at: new Date().toISOString() };
+      saveDb(db);
+      return db.jobApplications[idx];
+    } else {
+      db.jobApplications.unshift(app);
+      saveDb(db);
+      return app;
+    }
+  }
+
+  static updateApplicationStatus(id: string, status: ApplicationStatus, notes?: string): JobApplicationRecord | undefined {
+    const db = ensureDbFile();
+    db.jobApplications = db.jobApplications || [];
+    const app = db.jobApplications.find(a => a.id === id || a.job_id === id);
+    if (app) {
+      app.status = status;
+      if (notes) app.notes = notes;
+      if (status === 'Applied' && !app.date_applied) {
+        app.date_applied = new Date().toISOString();
+      }
+      app.updated_at = new Date().toISOString();
+      saveDb(db);
+      return app;
+    }
+    return undefined;
+  }
+
+  // Personalized Email Drafts
+  static getPersonalizedDrafts(jobId?: string): PersonalizedEmailDraft[] {
+    const db = ensureDbFile();
+    const drafts = db.personalizedDrafts || [];
+    if (jobId) {
+      return drafts.filter(d => d.job_id === jobId);
+    }
+    return drafts;
+  }
+
+  static getPersonalizedDraftById(id: string): PersonalizedEmailDraft | undefined {
+    const db = ensureDbFile();
+    return (db.personalizedDrafts || []).find(d => d.id === id);
+  }
+
+  static savePersonalizedDraft(draft: PersonalizedEmailDraft): PersonalizedEmailDraft {
+    const db = ensureDbFile();
+    db.personalizedDrafts = db.personalizedDrafts || [];
+    const idx = db.personalizedDrafts.findIndex(d => d.id === draft.id);
+    if (idx >= 0) {
+      db.personalizedDrafts[idx] = draft;
+    } else {
+      db.personalizedDrafts.unshift(draft);
+    }
+    saveDb(db);
+    return draft;
+  }
+
+  // Daily Automation Config
+  static getDailyAutomationConfig(): DailyAutomationConfig {
+    const db = ensureDbFile();
+    return db.dailyAutomationConfig || DEFAULT_DAILY_AUTOMATION_CONFIG;
+  }
+
+  static updateDailyAutomationConfig(config: Partial<DailyAutomationConfig>): DailyAutomationConfig {
+    const db = ensureDbFile();
+    db.dailyAutomationConfig = {
+      ...(db.dailyAutomationConfig || DEFAULT_DAILY_AUTOMATION_CONFIG),
+      ...config
+    };
+    saveDb(db);
+    return db.dailyAutomationConfig;
+  }
+
   // Reset to Demo Data
   static resetToDemo(): void {
     const freshDb: DatabaseSchema = {
@@ -431,7 +800,17 @@ export class LocalStore {
       emailSequences: {},
       emailDrafts: [],
       workflowExecutions: [],
-      workflowLogs: []
+      workflowLogs: [],
+      userProfile: { ...DEFAULT_USER_PROFILE },
+      jobPreferences: { ...DEFAULT_JOB_PREFERENCES },
+      resumes: [...DEFAULT_RESUMES],
+      jobListings: [...DEMO_JOB_LISTINGS],
+      jobMatches: { ...DEMO_JOB_MATCHES },
+      recruiterContacts: [...DEMO_RECRUITER_CONTACTS],
+      tailoredResumes: {},
+      jobApplications: [...DEMO_APPLICATIONS],
+      personalizedDrafts: [],
+      dailyAutomationConfig: { ...DEFAULT_DAILY_AUTOMATION_CONFIG }
     };
     saveDb(freshDb);
   }

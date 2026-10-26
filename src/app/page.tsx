@@ -3,119 +3,123 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
-import { OverviewDashboard } from '@/components/dashboard/OverviewDashboard';
-import { IcpTab } from '@/components/icp/IcpTab';
-import { CompanySearchTab } from '@/components/companies/CompanySearchTab';
-import { LeadSearchTab } from '@/components/leads/LeadSearchTab';
-import { EnrichmentWorkspaceTab } from '@/components/enrichment/EnrichmentWorkspaceTab';
-import { ApprovalQueueTab } from '@/components/approvals/ApprovalQueueTab';
-import { EmailSequenceBuilderTab } from '@/components/sequences/EmailSequenceBuilderTab';
-import { DraftQueueTab } from '@/components/drafts/DraftQueueTab';
-import { WorkflowLogsTab } from '@/components/workflow/WorkflowLogsTab';
-import { DentalAdaptationTab } from '@/components/dental/DentalAdaptationTab';
-import { DocumentationTab } from '@/components/docs/DocumentationTab';
+
+// CareerPilot AI Components
+import { CareerDashboardTab } from '@/components/career/CareerDashboardTab';
+import { ResumeLibraryTab } from '@/components/career/ResumeLibraryTab';
+import { JobPreferencesTab } from '@/components/career/JobPreferencesTab';
+import { JobDiscoveryTab } from '@/components/career/JobDiscoveryTab';
+import { JobMatchingTab } from '@/components/career/JobMatchingTab';
+import { ResumeTailoringTab } from '@/components/career/ResumeTailoringTab';
+import { RecruiterDiscoveryTab } from '@/components/career/RecruiterDiscoveryTab';
+import { PersonalizedOutreachTab } from '@/components/career/PersonalizedOutreachTab';
+import { CareerDraftQueueTab } from '@/components/career/CareerDraftQueueTab';
+import { ApplicationTrackerTab } from '@/components/career/ApplicationTrackerTab';
+import { DailyAutomationTab } from '@/components/career/DailyAutomationTab';
 import { SettingsTab } from '@/components/settings/SettingsTab';
 import { GuidedDemoModal } from '@/components/demo/GuidedDemoModal';
 import { KnownLimitationsModal } from '@/components/common/KnownLimitationsModal';
 
 import { 
-  ICPConfig, 
-  Company, 
-  Contact, 
-  EnrichmentRecord, 
-  ApprovalHistoryItem, 
-  EmailSequence, 
-  EmailDraftRecord, 
-  WorkflowExecution, 
-  WorkflowLog, 
-  IntegrationSettings 
+  IntegrationSettings,
+  UserProfile,
+  JobPreferences,
+  ResumeRecord,
+  JobListing,
+  JobMatchResult,
+  RecruiterContact,
+  TailoredResumeRecord,
+  PersonalizedEmailDraft,
+  JobApplicationRecord,
+  DailyAutomationConfig,
+  ApplicationStatus,
+  ResumeProfileType
 } from '@/types';
-import { INITIAL_ICP, INITIAL_SETTINGS } from '@/lib/seed';
+
+import { 
+  INITIAL_SETTINGS,
+  DEFAULT_USER_PROFILE,
+  DEFAULT_JOB_PREFERENCES,
+  DEFAULT_RESUMES,
+  DEFAULT_DAILY_AUTOMATION_CONFIG
+} from '@/lib/seed';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
-  const [icp, setIcp] = useState<ICPConfig>(INITIAL_ICP);
+  const [activeTab, setActiveTab] = useState<string>('career_dashboard');
+
+  // Integration Settings
   const [settings, setSettings] = useState<IntegrationSettings>(INITIAL_SETTINGS);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [enrichments, setEnrichments] = useState<Record<string, EnrichmentRecord>>({});
-  const [sequences, setSequences] = useState<Record<string, EmailSequence>>({});
-  const [drafts, setDrafts] = useState<EmailDraftRecord[]>([]);
-  const [approvalHistory, setApprovalHistory] = useState<ApprovalHistoryItem[]>([]);
-  const [executions, setExecutions] = useState<WorkflowExecution[]>([]);
-  const [latestExecution, setLatestExecution] = useState<WorkflowExecution | undefined>();
-  const [logs, setLogs] = useState<WorkflowLog[]>([]);
+
+  // CareerPilot AI State
+  const [_userProfile, setUserProfile] = useState<UserProfile>(DEFAULT_USER_PROFILE);
+  const [jobPreferences, setJobPreferences] = useState<JobPreferences>(DEFAULT_JOB_PREFERENCES);
+  const [resumes, setResumes] = useState<ResumeRecord[]>(DEFAULT_RESUMES);
+  const [careerJobs, setCareerJobs] = useState<JobListing[]>([]);
+  const [careerMatches, setCareerMatches] = useState<Record<string, JobMatchResult>>({});
+  const [careerContacts, setCareerContacts] = useState<RecruiterContact[]>([]);
+  const [tailoredResumes, setTailoredResumes] = useState<TailoredResumeRecord[]>([]);
+  const [careerDrafts, setCareerDrafts] = useState<PersonalizedEmailDraft[]>([]);
+  const [careerApplications, setCareerApplications] = useState<JobApplicationRecord[]>([]);
+  const [careerAutomationConfig, setCareerAutomationConfig] = useState<DailyAutomationConfig>(DEFAULT_DAILY_AUTOMATION_CONFIG);
 
   // Loading States
   const [isLoading, setIsLoading] = useState(true);
-  const [isSearchingCompanies, setIsSearchingCompanies] = useState(false);
-  const [isEnriching, setIsEnriching] = useState(false);
-  const [isGeneratingSequence, setIsGeneratingSequence] = useState(false);
-  const [isDrafting, setIsDrafting] = useState(false);
-  const [isRunningWorkflow, setIsRunningWorkflow] = useState(false);
   const [isGuidedDemoOpen, setIsGuidedDemoOpen] = useState(false);
   const [isLimitationsOpen, setIsLimitationsOpen] = useState(false);
 
-  // Load all initial data
+  // CareerPilot Action States
+  const [isSearchingCareerJobs, setIsSearchingCareerJobs] = useState(false);
+  const [isDiscoveringRecruiters, setIsDiscoveringRecruiters] = useState(false);
+  const [isAutomatingCareer, setIsAutomatingCareer] = useState(false);
+
+  // Load all platform data
   const loadPlatformData = useCallback(async () => {
     try {
       const [
-        icpRes,
         settingsRes,
-        companiesRes,
-        contactsRes,
-        draftsRes,
-        historyRes,
-        workflowRes,
-        seqsRes
+        profileRes,
+        prefRes,
+        resumesRes,
+        jobsRes,
+        matchesRes,
+        recruitersRes,
+        tailoredRes,
+        outreachRes,
+        appsRes,
+        autoRes
       ] = await Promise.all([
-        fetch('/api/icp').then(r => r.json()),
-        fetch('/api/settings').then(r => r.json()),
-        fetch('/api/companies').then(r => r.json()),
-        fetch('/api/leads').then(r => r.json()),
-        fetch('/api/drafts').then(r => r.json()),
-        fetch('/api/approvals').then(r => r.json()),
-        fetch('/api/workflows').then(r => r.json()),
-        fetch('/api/sequences').then(r => r.json())
+        fetch('/api/settings').then(r => r.json()).catch(() => null),
+        fetch('/api/career/profile').then(r => r.json()).catch(() => null),
+        fetch('/api/career/preferences').then(r => r.json()).catch(() => null),
+        fetch('/api/career/resumes').then(r => r.json()).catch(() => []),
+        fetch('/api/career/jobs').then(r => r.json()).catch(() => []),
+        fetch('/api/career/matches').then(r => r.json()).catch(() => []),
+        fetch('/api/career/recruiters').then(r => r.json()).catch(() => []),
+        fetch('/api/career/tailor').then(r => r.json()).catch(() => []),
+        fetch('/api/career/outreach').then(r => r.json()).catch(() => []),
+        fetch('/api/career/applications').then(r => r.json()).catch(() => []),
+        fetch('/api/career/automation').then(r => r.json()).catch(() => null)
       ]);
 
-      if (icpRes && !icpRes.error) setIcp(icpRes);
       if (settingsRes && !settingsRes.error) setSettings(settingsRes);
-      if (Array.isArray(companiesRes)) setCompanies(companiesRes);
-      if (Array.isArray(contactsRes)) setContacts(contactsRes);
-      if (Array.isArray(draftsRes)) setDrafts(draftsRes);
-      if (Array.isArray(historyRes)) setApprovalHistory(historyRes);
-      if (workflowRes && !workflowRes.error) {
-        setExecutions(workflowRes.executions || []);
-        setLatestExecution(workflowRes.latest);
-        setLogs(workflowRes.logs || []);
-      }
-      if (Array.isArray(seqsRes)) {
-        const seqMap: Record<string, EmailSequence> = {};
-        for (const s of seqsRes) {
-          seqMap[s.lead_id] = s;
+      if (profileRes && !profileRes.error) setUserProfile(profileRes);
+      if (prefRes && !prefRes.error) setJobPreferences(prefRes);
+      if (Array.isArray(resumesRes) && resumesRes.length > 0) setResumes(resumesRes);
+      if (Array.isArray(jobsRes) && jobsRes.length > 0) setCareerJobs(jobsRes);
+      if (Array.isArray(matchesRes)) {
+        const matchMap: Record<string, JobMatchResult> = {};
+        for (const m of matchesRes) {
+          matchMap[m.job_id] = m;
         }
-        setSequences(seqMap);
+        setCareerMatches(matchMap);
       }
-
-      // Fetch enrichments for contacts
-      if (Array.isArray(contactsRes) && contactsRes.length > 0) {
-        const enrichMap: Record<string, EnrichmentRecord> = {};
-        for (const c of contactsRes) {
-          try {
-            const enrichRes = await fetch(`/api/enrichment?leadId=${c.id}`);
-            if (enrichRes.ok) {
-              const enrichData = await enrichRes.json();
-              enrichMap[c.id] = enrichData;
-            }
-          } catch {
-            // Ignore missing enrichments
-          }
-        }
-        setEnrichments(enrichMap);
-      }
+      if (Array.isArray(recruitersRes)) setCareerContacts(recruitersRes);
+      if (Array.isArray(tailoredRes)) setTailoredResumes(tailoredRes);
+      if (Array.isArray(outreachRes)) setCareerDrafts(outreachRes);
+      if (Array.isArray(appsRes)) setCareerApplications(appsRes);
+      if (autoRes && !autoRes.error) setCareerAutomationConfig(autoRes);
     } catch (err) {
-      console.error('Error loading platform state:', err);
+      console.error('Error loading CareerPilot AI state:', err);
     } finally {
       setIsLoading(false);
     }
@@ -136,21 +140,261 @@ export default function App() {
     }
   }, []);
 
-  // Handlers
-  const handleResetDemo = async () => {
-    await fetch('/api/demo/seed', { method: 'POST' });
-    await loadPlatformData();
+  // ==========================================
+  // CAREERPILOT AI HANDLERS
+  // ==========================================
+
+  const handleUploadResume = async (data: {
+    fileName: string;
+    fileType: 'pdf' | 'docx' | 'txt' | 'json';
+    content: string;
+    profileType: ResumeProfileType;
+    title?: string;
+  }) => {
+    const res = await fetch('/api/career/resumes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      const record = await res.json();
+      setResumes(prev => [record, ...prev]);
+      return record;
+    } else {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to upload resume');
+    }
   };
 
-  const handleSaveIcp = async (updated: Partial<ICPConfig>) => {
-    const res = await fetch('/api/icp', {
+  const handleDeleteResume = async (id: string) => {
+    const res = await fetch(`/api/career/resumes?id=${id}`, {
+      method: 'DELETE'
+    });
+    if (res.ok) {
+      setResumes(prev => prev.filter(r => r.id !== id));
+    }
+  };
+
+  const handleSaveJobPreferences = async (updated: Partial<JobPreferences>) => {
+    const res = await fetch('/api/career/preferences', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated)
     });
     if (res.ok) {
       const saved = await res.json();
-      setIcp(saved);
+      setJobPreferences(saved);
+    }
+  };
+
+  const handleSearchLiveJobs = async (provider: string, query: string) => {
+    setIsSearchingCareerJobs(true);
+    try {
+      const res = await fetch('/api/career/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'search', provider, query })
+      });
+      const data = await res.json();
+      if (res.ok && data.jobs) {
+        setCareerJobs(data.jobs);
+        return data;
+      } else {
+        alert(data.error || 'Job search error');
+        return data;
+      }
+    } finally {
+      setIsSearchingCareerJobs(false);
+    }
+  };
+
+  const handleImportJobsCsv = async (csvText: string) => {
+    const res = await fetch('/api/career/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'import_csv', csvText })
+    });
+    const data = await res.json();
+    if (data.jobs) {
+      setCareerJobs(data.jobs);
+    }
+    return data;
+  };
+
+  const handleAddManualJob = async (job: any) => {
+    const res = await fetch('/api/career/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'manual', job })
+    });
+    const data = await res.json();
+    if (res.ok && data.job) {
+      setCareerJobs(prev => [data.job, ...prev]);
+    }
+    return data;
+  };
+
+  const handleCalculateMatch = async (jobId: string, resumeId?: string): Promise<JobMatchResult> => {
+    const res = await fetch('/api/career/matches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId, resumeId })
+    });
+    const match = await res.json();
+    if (res.ok) {
+      setCareerMatches(prev => ({
+        ...prev,
+        [jobId]: match
+      }));
+      return match;
+    }
+    throw new Error(match.error || 'Failed to calculate match');
+  };
+
+  const handleDiscoverRecruiters = async (jobId: string) => {
+    setIsDiscoveringRecruiters(true);
+    try {
+      const res = await fetch('/api/career/recruiters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId })
+      });
+      const data = await res.json();
+      if (res.ok && data.contacts) {
+        setCareerContacts(prev => {
+          const others = prev.filter(c => c.job_id !== jobId);
+          return [...data.contacts, ...others];
+        });
+        return data;
+      } else {
+        alert(data.error || 'Discovery failed');
+        return data;
+      }
+    } finally {
+      setIsDiscoveringRecruiters(false);
+    }
+  };
+
+  const handleGenerateTailoredResume = async (jobId: string, resumeId: string): Promise<TailoredResumeRecord> => {
+    const res = await fetch('/api/career/tailor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId, resumeId })
+    });
+    const tailored = await res.json();
+    if (res.ok) {
+      setTailoredResumes(prev => {
+        const others = prev.filter(t => t.id !== tailored.id && t.job_id !== jobId);
+        return [tailored, ...others];
+      });
+      return tailored;
+    }
+    throw new Error(tailored.error || 'Failed to tailor resume');
+  };
+
+  const handleApproveTailoredResume = async (id: string) => {
+    const res = await fetch('/api/career/tailor', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setTailoredResumes(prev => prev.map(t => t.id === id ? updated : t));
+    }
+  };
+
+  const handleGenerateOutreachDraft = async (params: {
+    jobId: string;
+    contactId?: string;
+    resumeId?: string;
+    emailType: any;
+    tone: any;
+  }): Promise<PersonalizedEmailDraft> => {
+    const res = await fetch('/api/career/outreach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    const draft = await res.json();
+    if (res.ok) {
+      setCareerDrafts(prev => {
+        const others = prev.filter(d => d.id !== draft.id);
+        return [draft, ...others];
+      });
+      return draft;
+    }
+    throw new Error(draft.error || 'Failed to generate outreach email');
+  };
+
+  const handleSaveOutreachDraftEdit = async (id: string, subject: string, body: string, signature: string) => {
+    const res = await fetch('/api/career/outreach', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, subject, body, signature })
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setCareerDrafts(prev => prev.map(d => d.id === id ? updated : d));
+    }
+  };
+
+  const handlePushOutreachToGmail = async (draftId: string): Promise<{ success: boolean; gmailDraftId?: string; error?: string }> => {
+    const res = await fetch('/api/career/drafts/gmail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ draftId })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setCareerDrafts(prev => prev.map(d => d.id === draftId ? {
+        ...d,
+        gmail_draft_id: data.gmailDraftId,
+        gmail_draft_created: true
+      } : d));
+      return { success: true, gmailDraftId: data.gmailDraftId };
+    }
+    return { success: false, error: data.error };
+  };
+
+  const handleUpdateApplicationStatus = async (id: string, status: ApplicationStatus, notes?: string) => {
+    const res = await fetch('/api/career/applications', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, notes })
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setCareerApplications(prev => prev.map(a => a.id === id ? updated : a));
+      return updated;
+    }
+  };
+
+  const handleUpdateAutomationConfig = async (config: Partial<DailyAutomationConfig>) => {
+    const res = await fetch('/api/career/automation', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setCareerAutomationConfig(updated);
+    }
+  };
+
+  const handleRunDailyAutomation = async () => {
+    setIsAutomatingCareer(true);
+    try {
+      const res = await fetch('/api/career/automation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'run' })
+      });
+      const report = await res.json();
+      await loadPlatformData();
+      return report;
+    } finally {
+      setIsAutomatingCareer(false);
     }
   };
 
@@ -166,274 +410,19 @@ export default function App() {
     }
   };
 
-  const handleSearchCompanies = async (filters: any) => {
-    setIsSearchingCompanies(true);
-    try {
-      const res = await fetch('/api/companies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(`Search Notice: ${data.error || 'Provider encountered an error'}`);
-        return;
-      }
-      if (data.companies) {
-        setCompanies(data.companies);
-      }
-    } catch (err: any) {
-      alert(`Network error searching companies: ${err.message}`);
-    } finally {
-      setIsSearchingCompanies(false);
-    }
+  const handleResetDemo = async () => {
+    await fetch('/api/demo/seed', { method: 'POST' });
+    await loadPlatformData();
   };
 
-  const handleImportCsv = async (csvText: string) => {
-    const res = await fetch('/api/companies/import', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csvText })
-    });
-    const data = await res.json();
-    if (data.success) {
-      await loadPlatformData();
-    }
-    return data;
-  };
-
-  const handleSearchLeadsForCompany = async (companyId: string) => {
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyId })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        if (data.contacts) {
-          setContacts(prev => {
-            const others = prev.filter(c => c.company_id !== companyId);
-            return [...data.contacts, ...others];
-          });
-        }
-        await loadPlatformData();
-      } else {
-        alert(`Decision-Maker Discovery Notice: ${data.error || 'Provider returned an error'}`);
-      }
-    } catch (err: any) {
-      alert(`Network error searching decision-makers: ${err.message}`);
-    }
-  };
-
-  const handleEnrichLead = async (leadId: string) => {
-    setIsEnriching(true);
-    try {
-      const res = await fetch('/api/enrichment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.enrichment) {
-        setEnrichments(prev => ({
-          ...prev,
-          [leadId]: data.enrichment
-        }));
-      } else {
-        alert(`Enrichment Notice: ${data.error || 'Enrichment failed'}`);
-      }
-    } catch (err: any) {
-      alert(`Network error enriching lead: ${err.message}`);
-    } finally {
-      setIsEnriching(false);
-    }
-  };
-
-  const handleApproveLead = async (leadId: string, reviewerNotes?: string) => {
-    const res = await fetch('/api/approvals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, action: 'APPROVE', reviewerNotes })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setContacts(prev => prev.map(c => c.id === leadId ? data.contact : c));
-      const histRes = await fetch('/api/approvals');
-      if (histRes.ok) setApprovalHistory(await histRes.json());
-    }
-  };
-
-  const handleRejectLead = async (leadId: string, reviewerNotes?: string, rejectionReason?: string) => {
-    const res = await fetch('/api/approvals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, action: 'REJECT', reviewerNotes, rejectionReason })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setContacts(prev => prev.map(c => c.id === leadId ? data.contact : c));
-      const histRes = await fetch('/api/approvals');
-      if (histRes.ok) setApprovalHistory(await histRes.json());
-    }
-  };
-
-  const handleGenerateSequence = async (leadId: string) => {
-    setIsGeneratingSequence(true);
-    try {
-      const res = await fetch('/api/sequences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSequences(prev => ({
-          ...prev,
-          [leadId]: data.sequence
-        }));
-      } else {
-        const err = await res.json();
-        alert(`Approval Gate Blocked: ${err.error}`);
-      }
-    } finally {
-      setIsGeneratingSequence(false);
-    }
-  };
-
-  const handleRegenerateEmail = async (leadId: string, stepNumber: number) => {
-    setIsGeneratingSequence(true);
-    try {
-      const res = await fetch('/api/sequences/regenerate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId, stepNumber })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSequences(prev => ({
-          ...prev,
-          [leadId]: data.sequence
-        }));
-      }
-    } finally {
-      setIsGeneratingSequence(false);
-    }
-  };
-
-  const handleUpdateEmail = async (leadId: string, stepNumber: number, subject: string, body: string) => {
-    const res = await fetch('/api/sequences', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId, stepNumber, subject, body })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setSequences(prev => ({
-        ...prev,
-        [leadId]: data.sequence
-      }));
-    }
-  };
-
-  const handleCreateDrafts = async (sequenceId: string) => {
-    setIsDrafting(true);
-    try {
-      const res = await fetch('/api/drafts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sequenceId })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const draftsRes = await fetch('/api/drafts');
-        if (draftsRes.ok) setDrafts(await draftsRes.json());
-      } else {
-        const err = await res.json();
-        alert(`Draft Creation Error: ${err.error}`);
-      }
-    } finally {
-      setIsDrafting(false);
-    }
-  };
-
-  const handleExportCsv = () => {
-    window.location.href = '/api/drafts/export?format=csv';
-  };
-
-  const handleExportJson = () => {
-    window.location.href = '/api/drafts/export?format=json';
-  };
-
-  const handleRunWorkflow = async () => {
-    setIsRunningWorkflow(true);
-    try {
-      const res = await fetch('/api/workflows', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'run' })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.execution) {
-        setLatestExecution(data.execution);
-        setLogs(data.logs || []);
-        await loadPlatformData();
-      } else {
-        alert(`Pipeline Execution Warning: ${data.error || 'Failed to complete workflow run'}`);
-        await loadPlatformData();
-      }
-    } catch (err: any) {
-      alert(`Network error running pipeline: ${err.message}`);
-    } finally {
-      setIsRunningWorkflow(false);
-    }
-  };
-
-  const handleResumeWorkflow = async () => {
-    setIsRunningWorkflow(true);
-    try {
-      const res = await fetch('/api/workflows', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'resume' })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.execution) {
-        setLatestExecution(data.execution);
-        setLogs(data.logs || []);
-        await loadPlatformData();
-      } else {
-        alert(`Pipeline Resume Warning: ${data.error || 'Failed to resume workflow'}`);
-        await loadPlatformData();
-      }
-    } catch (err: any) {
-      alert(`Network error resuming pipeline: ${err.message}`);
-    } finally {
-      setIsRunningWorkflow(false);
-    }
-  };
-
-  const handleTestRejectedLeadGate = async (leadId: string): Promise<{ blocked: boolean; error: string }> => {
-    // Explicitly call the sequences API on the rejected lead to demonstrate backend enforcement
-    const res = await fetch('/api/sequences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadId })
-    });
-
-    if (res.status === 403) {
-      const err = await res.json();
-      return { blocked: true, error: err.error || 'Server Gate: HTTP 403 Forbidden' };
-    }
-
-    return { blocked: false, error: 'Lead was not blocked by server' };
-  };
-
-  const pendingApprovalsCount = contacts.filter(c => c.approval_status === 'PENDING').length;
-  const approvedCount = contacts.filter(c => c.approval_status === 'APPROVED').length;
+  // Badge counts
+  const matchesCount = Object.keys(careerMatches).length;
+  const tailoredCount = tailoredResumes.length;
+  const careerDraftsCount = careerDrafts.length;
+  const applicationsCount = careerApplications.length;
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Header
         demoMode={settings.demo_mode_active}
         apolloConnected={Boolean((settings as any).apollo_configured)}
@@ -444,148 +433,144 @@ export default function App() {
         gmailConnected={settings.gmail_connected}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onRunWorkflow={handleRunWorkflow}
-        isRunningWorkflow={isRunningWorkflow}
+        onRunWorkflow={handleRunDailyAutomation}
+        isRunningWorkflow={isAutomatingCareer}
       />
 
       <div className="flex-1 flex flex-col md:flex-row">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          pendingApprovalCount={pendingApprovalsCount}
-          approvedCount={approvedCount}
-          draftsCount={drafts.length}
+          resumesCount={resumes.length}
+          jobsCount={careerJobs.length}
+          matchesCount={matchesCount}
+          tailoredCount={tailoredCount}
+          careerDraftsCount={careerDraftsCount}
+          applicationsCount={applicationsCount}
         />
 
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[50vh] text-xs text-slate-400">
-              Loading OSVI.ai Journey platform state...
+              Loading CareerPilot AI candidate platform...
             </div>
           ) : (
             <>
-              {activeTab === 'dashboard' && (
-                <OverviewDashboard
-                  companies={companies}
-                  contacts={contacts}
-                  enrichedCount={Object.keys(enrichments).length}
-                  draftsCount={drafts.length}
-                  latestExecution={latestExecution}
-                  logs={logs}
-                  onNavigateTab={setActiveTab}
-                  onRunPipeline={handleRunWorkflow}
-                  onResumePipeline={handleResumeWorkflow}
-                  isRunningWorkflow={isRunningWorkflow}
+              {activeTab === 'career_dashboard' && (
+                <CareerDashboardTab
+                  resumes={resumes}
+                  jobs={careerJobs}
+                  applications={careerApplications}
+                  drafts={careerDrafts}
+                  matches={careerMatches}
+                  onNavigate={setActiveTab}
+                  onRunAutomation={handleRunDailyAutomation}
+                  isAutomating={isAutomatingCareer}
                 />
               )}
 
-              {activeTab === 'icp' && (
-                <IcpTab
-                  icp={icp}
-                  onSaveIcp={handleSaveIcp}
+              {activeTab === 'career_resumes' && (
+                <ResumeLibraryTab
+                  resumes={resumes}
+                  onUploadResume={handleUploadResume}
+                  onDeleteResume={handleDeleteResume}
                 />
               )}
 
-              {activeTab === 'companies' && (
-                <CompanySearchTab
-                  companies={companies}
-                  icp={icp}
-                  onSearchCompanies={handleSearchCompanies}
-                  onImportCsv={handleImportCsv}
-                  onFindLeadsForCompany={(companyId) => {
-                    handleSearchLeadsForCompany(companyId);
-                    setActiveTab('leads');
+              {activeTab === 'career_preferences' && (
+                <JobPreferencesTab
+                  preferences={jobPreferences}
+                  onSavePreferences={handleSaveJobPreferences}
+                />
+              )}
+
+              {activeTab === 'career_jobs' && (
+                <JobDiscoveryTab
+                  jobs={careerJobs}
+                  onSearchLive={handleSearchLiveJobs}
+                  onImportCsv={handleImportJobsCsv}
+                  onAddManualJob={handleAddManualJob}
+                  onSelectJobForMatching={(job) => {
+                    handleCalculateMatch(job.id);
+                    setActiveTab('career_matching');
                   }}
-                  isSearching={isSearchingCompanies}
+                  isSearching={isSearchingCareerJobs}
                 />
               )}
 
-              {activeTab === 'leads' && (
-                <LeadSearchTab
-                  contacts={contacts}
-                  companies={companies}
-                  onEnrichLead={async (leadId) => {
-                    await handleEnrichLead(leadId);
-                    setActiveTab('enrichment');
-                  }}
-                  onNavigateToApprovals={(leadId) => {
-                    setActiveTab('approvals');
-                  }}
-                  onSearchLeadsForCompany={handleSearchLeadsForCompany}
-                  isEnriching={isEnriching}
-                />
-              )}
-
-              {activeTab === 'enrichment' && (
-                <EnrichmentWorkspaceTab
-                  contacts={contacts}
-                  companies={companies}
-                  enrichments={enrichments}
-                  onEnrichLead={handleEnrichLead}
-                  onNavigateToApprovals={(leadId) => {
-                    setActiveTab('approvals');
-                  }}
-                  isEnriching={isEnriching}
-                />
-              )}
-
-              {activeTab === 'approvals' && (
-                <ApprovalQueueTab
-                  contacts={contacts}
-                  companies={companies}
-                  enrichments={enrichments}
-                  approvalHistory={approvalHistory}
-                  onApproveLead={handleApproveLead}
-                  onRejectLead={handleRejectLead}
-                  onNavigateToSequences={(leadId) => {
-                    setActiveTab('sequences');
+              {activeTab === 'career_matching' && (
+                <JobMatchingTab
+                  jobs={careerJobs}
+                  resumes={resumes}
+                  matches={careerMatches}
+                  onCalculateMatch={handleCalculateMatch}
+                  onProceedToTailor={(job, resume) => {
+                    handleGenerateTailoredResume(job.id, resume.id);
+                    setActiveTab('career_tailor');
                   }}
                 />
               )}
 
-              {activeTab === 'sequences' && (
-                <EmailSequenceBuilderTab
-                  contacts={contacts}
-                  companies={companies}
-                  sequences={sequences}
+              {activeTab === 'career_tailor' && (
+                <ResumeTailoringTab
+                  jobs={careerJobs}
+                  resumes={resumes}
+                  tailoredResumes={tailoredResumes}
+                  onGenerateTailored={handleGenerateTailoredResume}
+                  onApproveTailored={handleApproveTailoredResume}
+                  onProceedToOutreach={(_job, _tailored) => {
+                    setActiveTab('career_outreach');
+                  }}
+                />
+              )}
+
+              {activeTab === 'career_recruiters' && (
+                <RecruiterDiscoveryTab
+                  jobs={careerJobs}
+                  contacts={careerContacts}
+                  onDiscoverContacts={handleDiscoverRecruiters}
+                  onSelectContactForEmail={(_contact, _job) => {
+                    setActiveTab('career_outreach');
+                  }}
+                  isDiscovering={isDiscoveringRecruiters}
+                />
+              )}
+
+              {activeTab === 'career_outreach' && (
+                <PersonalizedOutreachTab
+                  jobs={careerJobs}
+                  resumes={resumes}
+                  contacts={careerContacts}
+                  drafts={careerDrafts}
+                  onGenerateDraft={handleGenerateOutreachDraft}
+                  onSaveDraftEdit={handleSaveOutreachDraftEdit}
+                  onPushToGmail={handlePushOutreachToGmail}
+                />
+              )}
+
+              {activeTab === 'career_drafts' && (
+                <CareerDraftQueueTab
+                  drafts={careerDrafts}
                   settings={settings}
-                  onGenerateSequence={handleGenerateSequence}
-                  onRegenerateEmail={handleRegenerateEmail}
-                  onUpdateEmail={handleUpdateEmail}
-                  onCreateDrafts={handleCreateDrafts}
-                  isGenerating={isGeneratingSequence}
-                  isDrafting={isDrafting}
+                  onPushToGmail={handlePushOutreachToGmail}
+                  onRefresh={loadPlatformData}
                 />
               )}
 
-              {activeTab === 'drafts' && (
-                <DraftQueueTab
-                  drafts={drafts}
-                  settings={settings}
-                  onRefreshDrafts={loadPlatformData}
-                  onExportCsv={handleExportCsv}
-                  onExportJson={handleExportJson}
+              {activeTab === 'career_tracker' && (
+                <ApplicationTrackerTab
+                  applications={careerApplications}
+                  onUpdateStatus={handleUpdateApplicationStatus}
                 />
               )}
 
-              {activeTab === 'workflow' && (
-                <WorkflowLogsTab
-                  executions={executions}
-                  latestExecution={latestExecution}
-                  logs={logs}
-                  settings={settings}
-                  onRunPipeline={handleRunWorkflow}
-                  onResumePipeline={handleResumeWorkflow}
-                  isRunning={isRunningWorkflow}
+              {activeTab === 'career_automation' && (
+                <DailyAutomationTab
+                  config={careerAutomationConfig}
+                  onUpdateConfig={handleUpdateAutomationConfig}
+                  onRunNow={handleRunDailyAutomation}
+                  isRunning={isAutomatingCareer}
                 />
-              )}
-
-              {activeTab === 'docs' && (
-                <DocumentationTab />
-              )}
-
-              {activeTab === 'dental' && (
-                <DentalAdaptationTab />
               )}
 
               {activeTab === 'settings' && (
@@ -607,10 +592,6 @@ export default function App() {
           setActiveTab(tab);
           setIsGuidedDemoOpen(false);
         }}
-        onApproveLead={handleApproveLead}
-        onRejectLead={handleRejectLead}
-        onGenerateSequence={handleGenerateSequence}
-        onTestRejectedLeadGate={handleTestRejectedLeadGate}
       />
 
       <KnownLimitationsModal
