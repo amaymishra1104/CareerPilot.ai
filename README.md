@@ -1,7 +1,7 @@
 # CareerPilot.ai — Autonomous Career Copilot & Job Application Platform
 
 > **Candidate:** Amay Mishra (`amaymishra1104@gmail.com`)  
-> **Repository:** [https://github.com/amaymishra1104/osvi.ai.git](https://github.com/amaymishra1104/osvi.ai.git)  
+> **Repository:** [https://github.com/amaymishra1104/CareerPilot.ai.git](https://github.com/amaymishra1104/CareerPilot.ai.git)  
 > **Platform:** CareerPilot.ai (Autonomous Job Search & Application Engine) with integrated GTM Outbound Engine
 
 ---
